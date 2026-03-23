@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "8ef689e2-00c6-45a1-939d-a76e6a378549",
+      "name": "Developer Check-in",
+      "enabled": false,
+      "createdAtMs": 1773999576226,
+      "updatedAtMs": 1774052540266,
+      "schedule": {
+        "kind": "every",
+        "everyMs": 14400000,
+        "anchorMs": 1773999576226
+      },
+      "sessionTarget": "main",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "systemEvent",
+        "text": "Run developer check-in: poll developers on Slack for their status and blockers, record in memory"
+      },
+      "state": {
+        "lastRunAtMs": 1774042776247,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 58961,
+        "lastDeliveryStatus": "not-requested",
+        "consecutiveErrors": 0
+      }
+    },
+    {
+      "id": "1e14ae94-94b2-4ab3-81d0-d36814d90eaf",
+      "agentId": "dev1",
+      "name": "dev1 Check-in",
+      "enabled": true,
+      "createdAtMs": 1774250651333,
+      "updatedAtMs": 1774251030562,
+      "schedule": {
+        "kind": "cron",
+        "expr": "*/10 * * * *"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Check if polling is due by running scripts/poll-check.sh. If due (data.due == 1), send a brief 1-2 sentence check-in via Slack DM to <slack-id>, then update memory/poll-state.json with last_interaction set to current timestamp.",
+        "timeoutSeconds": 120
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "slack",
+        "to": "<slack-id>"
+      },
+      "state": {
+        "nextRunAtMs": 1774251600000,
+        "lastRunAtMs": 1774251023819,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 6743,
+        "lastError": "TypeError: (0 , _providerWebSearch.mergeScopedSearchConfig) is not a function",
+        "lastDeliveryStatus": "unknown",
+        "consecutiveErrors": 1
+      }
+    }
+  ]
+}

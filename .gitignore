@@ -1,0 +1,4 @@
+# Runtime artifacts - do not commit
+.openclaw/agents/*/sessions/
+.openclaw/agents/*/memory/daily/
+.openclaw/agents/*/memory/archives/
