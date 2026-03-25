@@ -1,0 +1,143 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "1e14ae94-94b2-4ab3-81d0-d36814d90eaf",
+      "agentId": "dev1",
+      "name": "dev1 Check-in",
+      "enabled": true,
+      "schedule": {
+        "kind": "every",
+        "everyMs": 7200000
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/poll-check.sh. Parse the JSON output.\n\nIf data.due == 0, output ONLY 'NO_ACTION' and nothing else.\n\nIf data.due == 1:\n1. Review your conversation history and memory to understand what the developer has been working on recently.\n2. Compose a warm, friendly check-in message. Be specific — reference something they were working on or mentioned recently. Your goal is to be supportive and helpful, not generic. Avoid canned phrases like 'just checking in' — instead ask a thoughtful question or offer help with something concrete.\n3. Send the message using this exact command: openclaw message send --channel slack --target user:<slack-id> --message \"<your message>\"\n4. After sending, update memory/poll-state.json: set awaiting_response to true.",
+        "timeoutSeconds": 120,
+        "thinking": "on",
+        "model": "fw-mm25"
+      },
+      "sessionKey": "agent:dev1:main",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "b2c7a3d1-5e8f-4b9a-9c2d-e1f0a3b4c5d6",
+      "agentId": "<your-org>",
+      "name": "<your-org> Check-in",
+      "enabled": true,
+      "schedule": {
+        "kind": "every",
+        "everyMs": 7200000
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/poll-check.sh. Parse the JSON output.\n\nIf data.due == 0, output ONLY 'NO_ACTION' and nothing else.\n\nIf data.due == 1:\n1. Review your conversation history and memory to understand what the developer has been working on recently.\n2. Compose a warm, friendly check-in message. Be specific — reference something they were working on or mentioned recently. Your goal is to be supportive and helpful, not generic. Avoid canned phrases like 'just checking in' — instead ask a thoughtful question or offer help with something concrete.\n3. Send the message using this exact command: openclaw message send --channel slack --target user:<slack-id> --message \"<your message>\"\n4. After sending, update memory/poll-state.json: set awaiting_response to true.",
+        "timeoutSeconds": 120,
+        "thinking": "on",
+        "model": "fw-mm25"
+      },
+      "sessionKey": "agent:<your-org>:main",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "bfba28e9-b95d-42e8-87c2-1932e3a212c8",
+      "agentId": "dev10",
+      "name": "dev10 Check-in",
+      "enabled": true,
+      "schedule": {
+        "kind": "every",
+        "everyMs": 7200000
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/poll-check.sh. Parse the JSON output.\n\nIf data.due == 0, output ONLY 'NO_ACTION' and nothing else.\n\nIf data.due == 1:\n1. Review your conversation history and memory to understand what the developer has been working on recently.\n2. Compose a warm, friendly check-in message. Be specific — reference something they were working on or mentioned recently. Your goal is to be supportive and helpful, not generic. Avoid canned phrases like 'just checking in' — instead ask a thoughtful question or offer help with something concrete.\n3. Send the message using this exact command: openclaw message send --channel slack --target user:<slack-id> --message \"<your message>\"\n4. After sending, update memory/poll-state.json: set awaiting_response to true.",
+        "timeoutSeconds": 120,
+        "thinking": "on",
+        "model": "fw-mm25"
+      },
+      "sessionKey": "agent:dev10:main",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "282695e2-9346-489f-a6eb-0078562aa0da",
+      "agentId": "dev10",
+      "name": "dev10 Check-in",
+      "enabled": true,
+      "schedule": {
+        "kind": "every",
+        "everyMs": 7200000
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/poll-check.sh. Parse the JSON output.\n\nIf data.due == 0, output ONLY 'NO_ACTION' and nothing else.\n\nIf data.due == 1:\n1. Review your conversation history and memory to understand what the developer has been working on recently.\n2. Compose a warm, friendly check-in message. Be specific — reference something they were working on or mentioned recently. Your goal is to be supportive and helpful, not generic. Avoid canned phrases like 'just checking in' — instead ask a thoughtful question or offer help with something concrete.\n3. Send the message using this exact command: openclaw message send --channel slack --target user:<slack-id> --message \"<your message>\"\n4. After sending, update memory/poll-state.json: set awaiting_response to true.",
+        "timeoutSeconds": 120,
+        "thinking": "on",
+        "model": "fw-mm25"
+      },
+      "sessionKey": "agent:dev10:main",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "4b088f23-bb17-46db-b6bc-805ac3f8a9ed",
+      "agentId": "dev10",
+      "name": "dev10 Check-in",
+      "enabled": true,
+      "schedule": {
+        "kind": "every",
+        "everyMs": 7200000
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/poll-check.sh. Parse the JSON output.\n\nIf data.due == 0, output ONLY 'NO_ACTION' and nothing else.\n\nIf data.due == 1:\n1. Review your conversation history and memory to understand what the developer has been working on recently.\n2. Compose a warm, friendly check-in message. Be specific — reference something they were working on or mentioned recently. Your goal is to be supportive and helpful, not generic. Avoid canned phrases like 'just checking in' — instead ask a thoughtful question or offer help with something concrete.\n3. Send the message using this exact command: openclaw message send --channel slack --target user:<slack-id> --message \"<your message>\"\n4. After sending, update memory/poll-state.json: set awaiting_response to true.",
+        "timeoutSeconds": 120,
+        "thinking": "on",
+        "model": "fw-mm25"
+      },
+      "sessionKey": "agent:dev10:main",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "052701dd-ad8f-48fe-8e3d-51018945055b",
+      "agentId": "dev10-jean",
+      "name": "dev10 Jean Check-in",
+      "enabled": true,
+      "schedule": {
+        "kind": "every",
+        "everyMs": 7200000
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/poll-check.sh. Parse the JSON output.\n\nIf data.due == 0, output ONLY 'NO_ACTION' and nothing else.\n\nIf data.due == 1:\n1. Review your conversation history and memory to understand what the developer has been working on recently.\n2. Compose a warm, friendly check-in message. Be specific — reference something they were working on or mentioned recently. Your goal is to be supportive and helpful, not generic. Avoid canned phrases like 'just checking in' — instead ask a thoughtful question or offer help with something concrete.\n3. Send the message using this exact command: openclaw message send --channel slack --target user:<slack-id> --message \"<your message>\"\n4. After sending, update memory/poll-state.json: set awaiting_response to true.",
+        "timeoutSeconds": 120,
+        "thinking": "on",
+        "model": "fw-mm25"
+      },
+      "sessionKey": "agent:dev10-jean:main",
+      "delivery": {
+        "mode": "none"
+      }
+    }
+  ]
+}
