@@ -6,7 +6,7 @@
       "name": "Developer Check-in",
       "enabled": false,
       "createdAtMs": 1773999576226,
-      "updatedAtMs": 1774052540266,
+      "updatedAtMs": 1774258490202,
       "schedule": {
         "kind": "every",
         "everyMs": 14400000,
@@ -19,10 +19,10 @@
         "text": "Run developer check-in: poll developers on Slack for their status and blockers, record in memory"
       },
       "state": {
-        "lastRunAtMs": 1774042776247,
+        "lastRunAtMs": 1774258488101,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 58961,
+        "lastDurationMs": 2101,
         "lastDeliveryStatus": "not-requested",
         "consecutiveErrors": 0
       }
@@ -33,32 +33,70 @@
       "name": "dev1 Check-in",
       "enabled": true,
       "createdAtMs": 1774250651333,
-      "updatedAtMs": 1774251030562,
+      "updatedAtMs": 1774398672891,
       "schedule": {
-        "kind": "cron",
-        "expr": "*/10 * * * *"
+        "kind": "every",
+        "everyMs": 28800000,
+        "anchorMs": 1774341480360
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Check if polling is due by running scripts/poll-check.sh. If due (data.due == 1), send a brief 1-2 sentence check-in via Slack DM to <slack-id>, then update memory/poll-state.json with last_interaction set to current timestamp.",
-        "timeoutSeconds": 120
-      },
-      "delivery": {
-        "mode": "announce",
-        "channel": "slack",
-        "to": "<slack-id>"
+        "message": "Run scripts/poll-check.sh. If data.due == 1, send 'Hey! Just checking in. How's it going?' to <slack-id> on Slack, then update memory/poll-state.json with timestamp. If data.due == 0, output ONLY 'NO_ACTION' and nothing else.",
+        "timeoutSeconds": 120,
+        "thinking": "off",
+        "model": "fw-mm25"
       },
       "state": {
-        "nextRunAtMs": 1774251600000,
-        "lastRunAtMs": 1774251023819,
-        "lastRunStatus": "error",
-        "lastStatus": "error",
-        "lastDurationMs": 6743,
-        "lastError": "TypeError: (0 , _providerWebSearch.mergeScopedSearchConfig) is not a function",
-        "lastDeliveryStatus": "unknown",
-        "consecutiveErrors": 1
+        "nextRunAtMs": 1774427400024,
+        "lastRunAtMs": 1774398600024,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 72867,
+        "lastDeliveryStatus": "not-delivered",
+        "consecutiveErrors": 0,
+        "lastDelivered": false
+      },
+      "sessionKey": "agent:dev1:main",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "b2c7a3d1-5e8f-4b9a-9c2d-e1f0a3b4c5d6",
+      "agentId": "<your-org>",
+      "name": "<your-org> Check-in",
+      "enabled": true,
+      "createdAtMs": 1774332000000,
+      "updatedAtMs": 1774398700129,
+      "schedule": {
+        "kind": "every",
+        "everyMs": 28800000,
+        "anchorMs": 1774341481969
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "1. Run './scripts/poll-check.sh' using the exec tool. 2. Parse the JSON output - if data.due == 1, then: a) Use exec to call 'openclaw message send --channel slack --target user:<slack-id> --message \"Hey! Just checking in. How's it going?\"' to send the message. b) Use the 'write' tool to update memory/poll-state.json with current timestamp. 3. If data.due == 0, output ONLY 'NO_ACTION' and nothing else.",
+        "timeoutSeconds": 120,
+        "thinking": "off",
+        "model": "fw-mm25"
+      },
+      "state": {
+        "nextRunAtMs": 1774427474899,
+        "lastRunAtMs": 1774398674899,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 25230,
+        "lastDeliveryStatus": "not-delivered",
+        "consecutiveErrors": 0,
+        "lastDelivered": false
+      },
+      "sessionKey": "agent:<your-org>:main",
+      "delivery": {
+        "mode": "none"
       }
     }
   ]
