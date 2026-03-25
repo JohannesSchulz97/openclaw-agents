@@ -4,6 +4,12 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib/json-response.sh"
 
+# ── Dependency check ─────────────────────────
+if ! command -v jq &>/dev/null; then
+    echo '{"success":false,"operation":"poll-check","error":{"code":"MISSING_DEP","message":"jq is required but not found"}}' >&2
+    exit 1
+fi
+
 # ── Args ──────────────────────────────────────
 REMAINING_ARGS=()
 QUIET=false
@@ -21,41 +27,80 @@ done
 
 # ── Config ────────────────────────────────────
 AGENT_DIR="$(dirname "$SCRIPT_DIR")"
+AGENT_NAME="$(basename "$AGENT_DIR")"
+POLL_CONFIG_FILE="$AGENT_DIR/poll-config.json"
 POLL_STATE_FILE="$AGENT_DIR/memory/poll-state.json"
+SESSIONS_FILE="$HOME/.openclaw/agents/$AGENT_NAME/sessions/sessions.json"
 
-# ── Main Logic ───────────────────────────────
-log "Checking poll state..."
+# ── Ensure poll-config.json exists ────────────
+if [[ ! -f "$POLL_CONFIG_FILE" ]]; then
+    log "Creating default poll config..."
+    jq -n '{interval_minutes: 240}' > "$POLL_CONFIG_FILE"
+fi
 
-# Create default poll state if not exists
+# ── Ensure poll-state.json exists ─────────────
 if [[ ! -f "$POLL_STATE_FILE" ]]; then
     log "Creating default poll state..."
     mkdir -p "$(dirname "$POLL_STATE_FILE")"
-    jq -n \
-        --arg ts "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" \
-        '{interval_minutes: 240, last_interaction: $ts}' > "$POLL_STATE_FILE"
+    jq -n '{awaiting_response: false}' > "$POLL_STATE_FILE"
 fi
 
-# Read poll state
-INTERVAL_MINUTES=$(jq -r '.interval_minutes // 240' "$POLL_STATE_FILE")
-LAST_INTERACTION=$(jq -r '.last_interaction // empty' "$POLL_STATE_FILE")
+# Read config and state from separate files
+INTERVAL_MINUTES=$(jq -r '.interval_minutes // 240' "$POLL_CONFIG_FILE")
+AWAITING_RESPONSE=$(jq -r '.awaiting_response // false' "$POLL_STATE_FILE")
 
-if [[ -z "$LAST_INTERACTION" ]]; then
-    json_error "poll-check" "NO_LAST_INTERACTION" "No last_interaction in poll-state.json"
-    exit 1
+# ── Query last human interaction ──────────────
+LAST_HUMAN_EPOCH_S=""
+LAST_HUMAN_ISO=""
+
+if [[ ! -f "$SESSIONS_FILE" ]]; then
+    log "WARNING: sessions.json not found at $SESSIONS_FILE"
+else
+    # Filter out cron sessions, get max updatedAt (epoch ms), convert to seconds
+    LAST_HUMAN_EPOCH_MS=$(jq -r '
+        to_entries
+        | map(select(.key | test("cron") | not))
+        | map(.value.updatedAt // 0)
+        | max // 0
+    ' "$SESSIONS_FILE" 2>/dev/null || echo "0")
+
+    if [[ "$LAST_HUMAN_EPOCH_MS" != "0" && "$LAST_HUMAN_EPOCH_MS" != "null" ]]; then
+        LAST_HUMAN_EPOCH_S=$(( LAST_HUMAN_EPOCH_MS / 1000 ))
+        LAST_HUMAN_ISO=$(date -u -r "$LAST_HUMAN_EPOCH_S" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || echo "")
+    fi
 fi
 
-# Calculate if poll is due
-LAST_EPOCH=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$LAST_INTERACTION" +%s 2>/dev/null || echo "0")
+# ── Decision logic ────────────────────────────
 NOW_EPOCH=$(date -u +%s)
-ELAPSED_MINUTES=$(( (NOW_EPOCH - LAST_EPOCH) / 60 ))
-DUE=$((ELAPSED_MINUTES >= INTERVAL_MINUTES))
 
-log "Last interaction: $LAST_INTERACTION (${ELAPSED_MINUTES}m ago), interval: ${INTERVAL_MINUTES}m, due: $DUE"
+if [[ "$AWAITING_RESPONSE" == "true" ]]; then
+    DUE=0
+    if [[ -n "$LAST_HUMAN_EPOCH_S" ]]; then
+        ELAPSED_MINUTES=$(( (NOW_EPOCH - LAST_HUMAN_EPOCH_S) / 60 ))
+    else
+        ELAPSED_MINUTES=0
+    fi
+elif [[ -z "$LAST_HUMAN_EPOCH_S" ]]; then
+    # No human sessions found - should check in
+    DUE=1
+    ELAPSED_MINUTES=0
+else
+    ELAPSED_MINUTES=$(( (NOW_EPOCH - LAST_HUMAN_EPOCH_S) / 60 ))
+    if (( ELAPSED_MINUTES >= INTERVAL_MINUTES )); then
+        DUE=1
+    else
+        DUE=0
+    fi
+fi
+
+log "Agent: $AGENT_NAME, last human interaction: ${LAST_HUMAN_ISO:-none} (${ELAPSED_MINUTES}m ago), interval: ${INTERVAL_MINUTES}m, awaiting: $AWAITING_RESPONSE, due: $DUE"
 
 # ── Output ────────────────────────────────────
 json_success "poll-check" "$(jq -n \
     --argjson due "$DUE" \
     --argjson interval "$INTERVAL_MINUTES" \
-    --arg last "$LAST_INTERACTION" \
     --argjson elapsed "$ELAPSED_MINUTES" \
-    '{due: $due, interval_minutes: $interval, last_interaction: $last, elapsed_minutes: $elapsed}')"
+    --argjson awaiting "$AWAITING_RESPONSE" \
+    --arg last "${LAST_HUMAN_ISO:-}" \
+    --arg agent "$AGENT_NAME" \
+    '{due: $due, interval_minutes: $interval, elapsed_minutes: $elapsed, awaiting_response: $awaiting, last_human_interaction: $last, agent_name: $agent}')"
