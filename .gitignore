@@ -1,4 +1,22 @@
 # Runtime artifacts - do not commit
 .openclaw/agents/*/sessions/
+.openclaw/agents/*/.openclaw/
 .openclaw/agents/*/memory/daily/
 .openclaw/agents/*/memory/archives/
+.openclaw/agents/*/memory/poll-state.json
+
+# Runtime cron state - managed by openclaw, not stow
+.openclaw/cron/jobs.json
+
+# Shared files copied by sync-agents.sh (source of truth is types/)
+.openclaw/agents/*/SOUL.md
+.openclaw/agents/*/AGENTS.md
+.openclaw/agents/*/TOOLS.md
+.openclaw/agents/*/HEARTBEAT.md
+.openclaw/agents/*/BOOTSTRAP.md
+.openclaw/agents/*/scripts/
+.openclaw/agents/*/poll-config.json
+
+# Per-agent files (runtime/personal)
+.openclaw/agents/*/IDENTITY.md
+.openclaw/agents/*/USER.md

@@ -1,1 +1,0 @@
-../../../types/dev-pa/AGENTS.md
