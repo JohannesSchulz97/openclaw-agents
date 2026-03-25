@@ -20,7 +20,7 @@ done
 [[ ${#REMAINING_ARGS[@]} -gt 0 ]] && set -- "${REMAINING_ARGS[@]}" || true
 
 # ── Config ────────────────────────────────────
-AGENT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
+AGENT_DIR="$(dirname "$SCRIPT_DIR")"
 POLL_STATE_FILE="$AGENT_DIR/memory/poll-state.json"
 
 # ── Main Logic ───────────────────────────────
