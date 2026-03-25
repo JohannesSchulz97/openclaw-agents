@@ -168,6 +168,26 @@ bash scripts/apply-cron.sh
 - Polling: every 10 minutes, check-in due after 240 min of no interaction
 - Model: fw-mm25
 
+
+## Agent: dev10
+
+- Slack ID: <slack-id>
+- Polling: every 10 minutes, check-in due after 240 min of no interaction
+- Model: fw-mm25
+
+
+## Agent: dev10 Jean
+
+- Slack ID: <slack-id>
+- Polling: every 10 minutes, check-in due after 240 min of no interaction
+- Model: fw-mm25
+
+## Agent: dev10
+
+- Slack ID: <slack-id>
+- Polling: every 10 minutes, check-in due after 240 min of no interaction
+- Model: fw-mm25
+
 ## Useful Commands
 
 ```bash
