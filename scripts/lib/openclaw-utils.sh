@@ -7,6 +7,7 @@
 #   remove_agent_entry — remove an agent from .agents.list[]
 #   add_binding        — add a Slack DM route to .bindings[]
 #   remove_binding     — remove a Slack DM route from .bindings[]
+#   add_to_allowlist   — add a Slack user ID to .channels.slack.allowFrom[]
 #
 # SECURITY: openclaw.json contains credentials — never echo its contents.
 
@@ -226,4 +227,40 @@ remove_binding() {
         --arg agentId "$agent_name"
 
     log "Removed binding for agent '$agent_name'."
+}
+
+# --------------------------------------------------------------------------- #
+# add_to_allowlist — add a Slack user ID to .channels.slack.allowFrom[]
+#
+# Usage: add_to_allowlist <openclaw_file> <slack_id>
+#
+# Idempotent: skips if the ID is already present.
+# --------------------------------------------------------------------------- #
+add_to_allowlist() {
+    local openclaw_file="${1:?Usage: add_to_allowlist <openclaw_file> <slack_id>}"
+    local slack_id="${2:?Missing slack_id}"
+
+    check_jq
+
+    if [[ ! -f "$openclaw_file" ]]; then
+        log "Error: File not found: $openclaw_file"
+        return 1
+    fi
+
+    # Idempotent: skip if already in the allowlist
+    local already_present
+    already_present=$(jq --arg id "$slack_id" \
+        'if (.channels.slack.allowFrom | index($id)) then "yes" else "no" end' \
+        "$openclaw_file" | tr -d '"')
+
+    if [[ "$already_present" == "yes" ]]; then
+        log "Slack ID '$slack_id' already in allowFrom — skipping."
+        return 0
+    fi
+
+    _atomic_write "$openclaw_file" \
+        '.channels.slack.allowFrom += [$id]' \
+        --arg id "$slack_id"
+
+    log "Added Slack ID '$slack_id' to channels.slack.allowFrom."
 }
