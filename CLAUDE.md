@@ -13,6 +13,7 @@ openclaw-agents/
 │       ├── TOOLS.md                 # Shared tools config
 │       ├── HEARTBEAT.md             # Shared periodic tasks
 │       ├── BOOTSTRAP.md             # Shared first-run onboarding
+│       ├── poll-config.json         # Shared polling configuration
 │       ├── IDENTITY.md.template     # Template: copied for new agents
 │       ├── USER.md.template         # Template: copied for new agents
 │       └── scripts/                 # Shared scripts
@@ -22,7 +23,10 @@ openclaw-agents/
 │   ├── create-agent.sh
 │   ├── remove-agent.sh
 │   ├── sync-agents.sh              # Propagates type changes to agents
-│   └── apply-cron.sh               # Applies cron config to runtime
+│   ├── apply-cron.sh               # Applies cron config to runtime
+│   └── lib/
+│       ├── cron-utils.sh
+│       └── openclaw-utils.sh
 ├── .openclaw/                       # Stowed into ~/.openclaw/
 │   ├── agents/
 │   │   └── <agent-name>/
@@ -34,6 +38,7 @@ openclaw-agents/
 │   │       ├── scripts/             # Real copy of directory
 │   │       ├── IDENTITY.md          # Per-agent (from template)
 │   │       ├── USER.md              # Per-agent (from template)
+│   │       ├── .agent-type          # Per-agent type identifier
 │   │       └── memory/              # Per-agent runtime state
 │   └── cron/
 │       └── jobs-config.json         # Cron config source of truth
@@ -159,33 +164,39 @@ bash scripts/apply-cron.sh
 ## Agent: dev1
 
 - Slack ID: <slack-id>
-- Polling: every 10 minutes, check-in due after 240 min of no interaction
-- Model: google/gemini-3.1-pro
+- Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
+- Model: fw-mm25
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
-- Polling: every 10 minutes, check-in due after 240 min of no interaction
+- Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: fw-mm25
 
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
-- Polling: every 10 minutes, check-in due after 240 min of no interaction
+- Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: fw-mm25
 
 
 ## Agent: dev10 Jean
 
 - Slack ID: <slack-id>
-- Polling: every 10 minutes, check-in due after 240 min of no interaction
+- Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: fw-mm25
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
-- Polling: every 10 minutes, check-in due after 240 min of no interaction
+- Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
+- Model: fw-mm25
+
+## Agent: <your-org>
+
+- Slack ID: <slack-id>
+- Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: fw-mm25
 
 ## Useful Commands
