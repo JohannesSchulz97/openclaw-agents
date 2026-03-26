@@ -208,12 +208,6 @@ bash scripts/apply-cron.sh
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: openai-codex/gpt-5.4
 
-## Agent: Svea
-
-- Slack ID: <slack-id>
-- Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
-- Model: openai-codex/gpt-5.4
-
 ## Agent: dev3
 
 - Slack ID: <slack-id>
@@ -280,7 +274,7 @@ bash scripts/apply-cron.sh
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: openai-codex/gpt-5.4
 
-## Agent: dev10 G
+## Agent: dev10
 
 - Slack ID: <slack-id>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction

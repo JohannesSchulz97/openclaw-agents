@@ -8,12 +8,6 @@ _Learn about the person you're helping. Update this as you go._
 - **Timezone:**
 - **Notes:**
 
-## GitHub
-
-- **GitHub Usernames:** <github-username(s)>
-- **Organization:** <your-org>
-- **Note:** Comma-separated if developer uses multiple accounts
-
 ## Context
 
 _(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)_
