@@ -40,6 +40,7 @@ sync_dir() {
 }
 
 for agent_dir in "$AGENTS_DIR"/*/; do
+  agent_dir="${agent_dir%/}"
   agent_name="$(basename "$agent_dir")"
   # Read type from .agent-type file, fall back to dev-pa for backward compatibility
   if [[ -f "$agent_dir/.agent-type" ]]; then
@@ -88,7 +89,9 @@ for agent_dir in "$AGENTS_DIR"/*/; do
         log "removed symlink $dst_scripts"
       fi
     fi
-    mkdir -p "$dst_scripts"
+    if ! $DRY_RUN; then
+      mkdir -p "$dst_scripts"
+    fi
     sync_dir "$type_dir/scripts" "$dst_scripts"
   fi
 

@@ -177,10 +177,21 @@ fi
 echo ""
 echo "--- Summary ---"
 echo "Agent:          $NAME"
-echo "Repo directory: $AGENT_DIR (removed)"
-echo "Live directory: $HOME/.openclaw/agents/$NAME (removed)"
+if [ "$DRY_RUN" = true ]; then
+  echo "Repo directory: $AGENT_DIR (would be removed)"
+  echo "Live directory: $HOME/.openclaw/agents/$NAME (would be removed)"
+else
+  echo "Repo directory: $AGENT_DIR (removed)"
+  echo "Live directory: $HOME/.openclaw/agents/$NAME (removed)"
+fi
 echo "Cron jobs:      $CRON_REMOVED removed"
-echo "openclaw.json:  agent entry and binding removed"
+if [ "$HAS_OPENCLAW_UTILS" = false ]; then
+  echo "openclaw.json:  skipped (openclaw-utils.sh not available)"
+elif [ "$DRY_RUN" = true ]; then
+  echo "openclaw.json:  agent entry and binding would be removed"
+else
+  echo "openclaw.json:  agent entry and binding removed"
+fi
 echo "Stow:           re-stowed remaining agents"
 if [ "$DRY_RUN" = true ]; then
   echo ""
