@@ -1,0 +1,46 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "inputPatterns": [".*openclaw\\s+.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/blockers/openclaw.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "inputPatterns": [".*launchctl.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/blockers/launchctl.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "inputPatterns": [".*security\\s+(add|delete)-generic-password.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/blockers/keychain.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "inputPatterns": [".*(~|/)\\.*openclaw.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/blockers/workspace.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

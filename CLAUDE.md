@@ -164,12 +164,14 @@ bash scripts/apply-cron.sh
 ## Agent: dev1
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>, <manager-agent>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: fw-mm25
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: fw-mm25
 
@@ -177,6 +179,7 @@ bash scripts/apply-cron.sh
 ## Agent: dev10
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: fw-mm25
 
@@ -184,12 +187,14 @@ bash scripts/apply-cron.sh
 ## Agent: dev10 Jean
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: fw-mm25
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: fw-mm25
 
