@@ -11,7 +11,15 @@ CRON_CONFIG="$REPO_ROOT/.openclaw/cron/jobs-config.json"
 CLAUDE_MD="$REPO_ROOT/CLAUDE.md"
 OPENCLAW_CONFIG="$HOME/.openclaw/openclaw.json"
 
-source "$REPO_ROOT/scripts/lib/openclaw-utils.sh"
+OPENCLAW_UTILS="$REPO_ROOT/scripts/lib/openclaw-utils.sh"
+if [ ! -f "$OPENCLAW_UTILS" ]; then
+  echo "WARNING: $OPENCLAW_UTILS not found. openclaw.json cleanup will be skipped." >&2
+  HAS_OPENCLAW_UTILS=false
+else
+  source "$OPENCLAW_UTILS"
+  HAS_OPENCLAW_UTILS=true
+fi
+source "$REPO_ROOT/scripts/lib/cron-utils.sh"
 
 NAME=""
 FORCE=false
@@ -88,15 +96,11 @@ if [ -f "$CRON_CONFIG" ]; then
   if [ "$CRON_REMOVED" -gt 0 ]; then
     if [ "$DRY_RUN" = true ]; then
       echo "[DRY RUN] Remove $CRON_REMOVED cron job(s) for agent '$NAME' from $CRON_CONFIG"
-      echo "[DRY RUN] Apply cron changes to live"
+      echo "[DRY RUN] Apply cron changes to live (remove phase will clean up gateway)"
     else
       echo "Remove $CRON_REMOVED cron job(s) for agent '$NAME' from $CRON_CONFIG"
-      TMP="$(mktemp)"
-      trap 'rm -f "$TMP"' EXIT
-      jq --arg agent "$NAME" '.jobs = [.jobs[] | select(.agentId != $agent)]' "$CRON_CONFIG" > "$TMP"
-      mv "$TMP" "$CRON_CONFIG"
-      trap - EXIT
-      echo "Apply cron changes to live"
+      remove_cron_job "$CRON_CONFIG" "$NAME"
+      echo "Apply cron changes to live (remove phase will clean up gateway)"
       if ! "$REPO_ROOT/scripts/apply-cron.sh" 2>&1; then
         echo "Warning: Failed to apply cron config to live system."
         echo "  Run 'scripts/apply-cron.sh' manually after fixing the issue."
@@ -127,7 +131,9 @@ run_cmd "Re-stow: restoring symlinks for remaining agents" \
 # --- Step 4: Remove agent from openclaw.json ---
 
 if [ -f "$OPENCLAW_CONFIG" ]; then
-  if [ "$DRY_RUN" = true ]; then
+  if [ "$HAS_OPENCLAW_UTILS" = false ]; then
+    echo "WARNING: Skipping openclaw.json cleanup (openclaw-utils.sh not available)"
+  elif [ "$DRY_RUN" = true ]; then
     echo "[DRY RUN] Remove agent entry and binding for '$NAME' from $OPENCLAW_CONFIG"
   else
     echo "Remove agent entry and binding for '$NAME' from $OPENCLAW_CONFIG"
@@ -153,8 +159,9 @@ if [ -f "$CLAUDE_MD" ]; then
         echo "Remove agent section from $CLAUDE_MD"
         # Delete from "## Agent: Name" to the line before the next "## " heading (or EOF)
         awk -v display="## Agent: $DISPLAY_NAME" -v raw="## Agent: $NAME" '
-          BEGIN { skip=0; IGNORECASE=1 }
-          $0 == display || $0 == raw { skip=1; next }
+          BEGIN { skip=0 }
+          { low=tolower($0) }
+          low == tolower(display) || low == tolower(raw) { skip=1; next }
           /^## / { skip=0 }
           !skip
         ' "$CLAUDE_MD" > "$CLAUDE_MD.tmp" && mv "$CLAUDE_MD.tmp" "$CLAUDE_MD"
