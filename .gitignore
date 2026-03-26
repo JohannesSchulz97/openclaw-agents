@@ -20,4 +20,7 @@
 .openclaw/agents/*/scripts/
 .openclaw/agents/*/poll-config.json
 
+# Bootstrap completion markers - runtime only
+.openclaw/agents/*/.BOOTSTRAP.md.done
+
 # IDENTITY.md and USER.md are tracked (contain Slack IDs, GitHub usernames, developer context)

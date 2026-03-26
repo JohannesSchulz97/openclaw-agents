@@ -41,9 +41,13 @@ Keep it brief. Something like:
 
 > "Manager agent online. Monitoring [N] agents. Reports will follow the schedule in my configuration. Reach me here if you need a status check."
 
-## Step 5: Clean Up
+## Step 5: Mark Bootstrap Complete
 
-Delete this file. You are initialized.
+When bootstrap is complete, create a marker file `.BOOTSTRAP.md.done` in your workspace root:
+```bash
+cp BOOTSTRAP.md .BOOTSTRAP.md.done
+```
+This signals that bootstrap has been completed. Do NOT delete BOOTSTRAP.md (it is managed by stow and would be recreated).
 
 ---
 
