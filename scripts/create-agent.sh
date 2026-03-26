@@ -16,7 +16,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 NAME=""
 SLACK_ID=""
 TYPE="dev-pa"
-MODEL="fw-mm25"
+MODEL="openai-codex/gpt-5.4"
 DISPLAY_NAME=""
 DRY_RUN=false
 
@@ -33,7 +33,7 @@ Required:
 
 Optional:
   --type TYPE          Agent type under types/ (default: dev-pa)
-  --model MODEL        Model for cron job (default: fw-mm25)
+  --model MODEL        Model for cron job (default: openai-codex/gpt-5.4)
   --display-name NAME  Human-readable name (default: title-cased agent name)
   --dry-run            Print what would be done without making changes
   --help               Show this help message

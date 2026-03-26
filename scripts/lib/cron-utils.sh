@@ -73,7 +73,7 @@ generate_uuid() {
 #   agent_name   — agent identifier (e.g. "dev1")
 #   display_name — human-readable name (e.g. "dev1")
 #   slack_id     — Slack user ID (e.g. "<slack-id>")
-#   model        — model identifier (e.g. "fw-mm25")
+#   model        — model identifier (e.g. "openai-codex/gpt-5.4")
 # --------------------------------------------------------------------------- #
 add_cron_job() {
     local cron_file="${1:?Usage: add_cron_job <cron_file> <agent_name> <display_name> <slack_id> <model>}"
@@ -92,15 +92,7 @@ add_cron_job() {
 
     # Build the payload message with substituted values
     local message
-    message="Run scripts/poll-check.sh. Parse the JSON output.
-
-If data.due == 0, output ONLY 'NO_ACTION' and nothing else.
-
-If data.due == 1:
-1. Review your conversation history and memory to understand what the developer has been working on recently.
-2. Compose a warm, friendly check-in message. Be specific — reference something they were working on or mentioned recently. Your goal is to be supportive and helpful, not generic. Avoid canned phrases like 'just checking in' — instead ask a thoughtful question or offer help with something concrete.
-3. Send the message using this exact command: openclaw message send --channel slack --target user:${slack_id} --message \"<your message>\"
-4. After sending, update memory/poll-state.json: set awaiting_response to true."
+    message="Run scripts/poll-check.sh. Parse the JSON output.\n\nIf data.due == 0, output ONLY 'NO_ACTION' and nothing else.\n\nIf data.due == 1:\n1. Read USER.md to find the developer's name, context, and GitHub username(s) from the ## GitHub section. Also read IDENTITY.md to find your target Slack user ID.\n2. If one or more GitHub usernames are configured in USER.md, run scripts/github-activity.sh --user <github-usernames> --since 24 (comma-separated if multiple). Parse the output for recent PRs, commits, reviews, and issues. If no GitHub username is configured, or the script fails or returns no data, skip this step and proceed without it -- GitHub activity is enrichment, not a blocker.\nIMPORTANT: Only use GitHub activity data from the script output above. Do NOT independently query GitHub APIs, the Events API, or any other GitHub endpoints. Do NOT reference any repositories outside <your-org> organization. Personal repos are strictly off-limits.\n3. Review your conversation history and memory for recent context about what the developer has been working on.\n4. Compose a check-in message that:\n   a. References specific GitHub activity or recent conversation context\n   b. Asks what they have been working on since the last check-in\n   c. Explicitly asks them to share any work NOT visible in GitHub -- meetings, design discussions, code reviews, research, architecture planning, pairing sessions, mentoring, documentation, or any other contributions\n   d. Asks about current blockers or anything they need help with\n   e. Is warm and specific, not generic. Avoid canned phrases like 'just checking in'.\n5. Send the message using this exact command: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\" -- where <SLACK_ID> is the target user's Slack ID from your identity/config files.\n6. After sending, update memory/poll-state.json: set awaiting_response to true."
 
     # Build the job object and append it to the jobs array
     local tmp_file
