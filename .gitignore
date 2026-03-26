@@ -1,3 +1,6 @@
+# Backups - do not commit
+.backups/
+
 # Runtime artifacts - do not commit
 .openclaw/agents/*/sessions/
 .openclaw/agents/*/.openclaw/
@@ -17,6 +20,4 @@
 .openclaw/agents/*/scripts/
 .openclaw/agents/*/poll-config.json
 
-# Per-agent files (runtime/personal)
-.openclaw/agents/*/IDENTITY.md
-.openclaw/agents/*/USER.md
+# IDENTITY.md and USER.md are tracked (contain Slack IDs, GitHub usernames, developer context)
