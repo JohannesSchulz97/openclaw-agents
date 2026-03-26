@@ -127,7 +127,7 @@ If data.due == 1:
             payload: {
                 kind: "agentTurn",
                 message: $message,
-                timeoutSeconds: 120,
+                timeoutSeconds: 180,
                 thinking: "on",
                 model: $model
             },

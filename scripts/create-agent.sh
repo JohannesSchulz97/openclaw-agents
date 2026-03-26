@@ -145,6 +145,14 @@ echo ""
 log_action "Creating directory: .openclaw/agents/$NAME/memory/"
 run_cmd mkdir -p "$AGENT_DIR/memory"
 
+# Write agent type marker
+log_action "Writing .agent-type file ($TYPE)"
+if [ "$DRY_RUN" = false ]; then
+  printf '%s\n' "$TYPE" > "$AGENT_DIR/.agent-type"
+else
+  echo "[DRY RUN] Write '$TYPE' to .openclaw/agents/$NAME/.agent-type"
+fi
+
 # Copy per-agent files from templates
 log_action "Copying IDENTITY.md from template"
 run_cmd cp "$TYPE_DIR/IDENTITY.md.template" "$AGENT_DIR/IDENTITY.md"
@@ -180,66 +188,12 @@ fi
 # ------------------------------------------------------------------------------
 log_action "Adding cron job to .openclaw/cron/jobs-config.json"
 
-CRON_UTILS="$REPO_ROOT/scripts/lib/cron-utils.sh"
-if [ -f "$CRON_UTILS" ]; then
-  # shellcheck source=lib/cron-utils.sh
-  source "$CRON_UTILS"
-  if [ "$DRY_RUN" = false ]; then
-    add_cron_job "$CRON_CONFIG" "$NAME" "$DISPLAY_NAME" "$SLACK_ID" "$MODEL"
-  fi
+# shellcheck source=lib/cron-utils.sh
+source "$REPO_ROOT/scripts/lib/cron-utils.sh"
+if [ "$DRY_RUN" = false ]; then
+  add_cron_job "$CRON_CONFIG" "$NAME" "$DISPLAY_NAME" "$SLACK_ID" "$MODEL"
 else
-  # Inline fallback: add cron job directly via jq
-  JOB_ID="$(uuidgen | tr '[:upper:]' '[:lower:]')"
-  CRON_MESSAGE="Run scripts/poll-check.sh. Parse the JSON output.
-
-If data.due == 0, output ONLY 'NO_ACTION' and nothing else.
-
-If data.due == 1:
-1. Review your conversation history and memory to understand what the developer has been working on recently.
-2. Compose a warm, friendly check-in message. Be specific — reference something they were working on or mentioned recently. Your goal is to be supportive and helpful, not generic. Avoid canned phrases like 'just checking in' — instead ask a thoughtful question or offer help with something concrete.
-3. Send the message using this exact command: openclaw message send --channel slack --target user:${SLACK_ID} --message \"<your message>\"
-4. After sending, update memory/poll-state.json: set awaiting_response to true."
-
-  if [ "$DRY_RUN" = false ]; then
-    NEW_JOB=$(jq -n \
-      --arg id "$JOB_ID" \
-      --arg agentId "$NAME" \
-      --arg name "$DISPLAY_NAME Check-in" \
-      --arg message "$CRON_MESSAGE" \
-      --arg model "$MODEL" \
-      --arg sessionKey "agent:$NAME:main" \
-      '{
-        id: $id,
-        agentId: $agentId,
-        name: $name,
-        enabled: true,
-        schedule: { kind: "every", everyMs: 7200000 },
-        sessionTarget: "isolated",
-        wakeMode: "now",
-        payload: {
-          kind: "agentTurn",
-          message: $message,
-          timeoutSeconds: 120,
-          thinking: "on",
-          model: $model
-        },
-        sessionKey: $sessionKey,
-        delivery: { mode: "none" }
-      }')
-
-    _cron_tmp="${CRON_CONFIG}.tmp"
-    trap 'rm -f "$_cron_tmp"' EXIT
-    if [ -f "$CRON_CONFIG" ]; then
-      jq --argjson newJob "$NEW_JOB" '.jobs += [$newJob]' "$CRON_CONFIG" > "$_cron_tmp" \
-        && mv "$_cron_tmp" "$CRON_CONFIG"
-    else
-      echo "{\"version\": 1, \"jobs\": [$NEW_JOB]}" | jq '.' > "$_cron_tmp" \
-        && mv "$_cron_tmp" "$CRON_CONFIG"
-    fi
-    trap - EXIT
-  else
-    echo "[DRY RUN] Would add cron job: $DISPLAY_NAME Check-in (model: $MODEL, slack: $SLACK_ID)"
-  fi
+  echo "[DRY RUN] Would add cron job: $DISPLAY_NAME Check-in (model: $MODEL, slack: $SLACK_ID)"
 fi
 
 # Apply cron config to live system
