@@ -157,6 +157,13 @@ fi
 log_action "Copying IDENTITY.md from template"
 run_cmd cp "$TYPE_DIR/IDENTITY.md.template" "$AGENT_DIR/IDENTITY.md"
 
+# Substitute placeholders in IDENTITY.md
+log_action "Substituting placeholders in IDENTITY.md"
+if [ "$DRY_RUN" = false ]; then
+  sed -i '' "s/<slack-user-id>/$SLACK_ID/g" "$AGENT_DIR/IDENTITY.md"
+  sed -i '' "s/^\(- \*\*Name:\*\*\) *$/\1 $DISPLAY_NAME/" "$AGENT_DIR/IDENTITY.md"
+fi
+
 log_action "Copying USER.md from template"
 run_cmd cp "$TYPE_DIR/USER.md.template" "$AGENT_DIR/USER.md"
 
@@ -229,11 +236,14 @@ else
   if [ "$DRY_RUN" = true ]; then
     echo "[DRY RUN] Would add agent entry for '$NAME' in $OPENCLAW_CONFIG"
     echo "[DRY RUN] Would add Slack binding for '$NAME' (slack-id: $SLACK_ID) in $OPENCLAW_CONFIG"
+    echo "[DRY RUN] Would add Slack ID '$SLACK_ID' to allowFrom in $OPENCLAW_CONFIG"
   else
     log_action "Registering agent '$NAME' in openclaw.json"
     add_agent_entry "$OPENCLAW_CONFIG" "$NAME" "$REPO_ROOT"
     log_action "Adding Slack binding for '$NAME' in openclaw.json"
     add_binding "$OPENCLAW_CONFIG" "$NAME" "$SLACK_ID"
+    log_action "Adding Slack ID '$SLACK_ID' to DM allowlist in openclaw.json"
+    add_to_allowlist "$OPENCLAW_CONFIG" "$SLACK_ID"
   fi
 fi
 
@@ -293,7 +303,7 @@ echo "  Config: .openclaw/cron/jobs-config.json"
 echo "  Applied to live system via apply-cron.sh"
 echo ""
 echo "openclaw.json:"
-echo "  Agent entry and Slack binding registered (if openclaw.json exists)."
+echo "  Agent entry, Slack binding, and DM allowlist updated (if openclaw.json exists)."
 echo ""
 echo "CLAUDE.md updated with agent info."
 echo ""
@@ -302,4 +312,5 @@ echo ""
 echo "Next steps:"
 echo "  1. Edit .openclaw/agents/$NAME/IDENTITY.md with agent personality"
 echo "  2. Edit .openclaw/agents/$NAME/USER.md with user context"
-echo "  3. Run: openclaw cron run <job-id>  (to trigger first bootstrap session)"
+echo "  3. Restart the gateway: openclaw gateway restart"
+echo "  4. Run: openclaw cron run <job-id>  (to trigger first bootstrap session)"
