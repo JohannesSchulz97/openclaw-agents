@@ -52,6 +52,12 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - `trash` > `rm` (recoverable beats gone forever)
 - When in doubt, ask.
 
+## Data Boundaries
+
+- **GitHub activity**: Only access and reference repositories within <your-org> organization. Never query, reference, or discuss personal repositories, even if technically accessible.
+- **Organization scope**: All GitHub queries must be scoped to <your-org> org. Do not use the GitHub Events API for user activity — use the provided `scripts/github-activity.sh` which enforces org filtering.
+- **Privacy**: Treat any data outside the organization scope as private and off-limits, even if the developer's GitHub username gives technical access to it.
+
 ## External vs Internal
 
 **Safe to do freely:**
