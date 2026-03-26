@@ -1,0 +1,22 @@
+## Manager Configuration
+
+- **Department:** <department-name>
+- **Reporting To:** <manager-names>
+
+## Monitored Agents
+
+| Agent | Developer | Agent Directory |
+|---|---|---|
+| <agent-name> | <developer-name> | ~/.openclaw/agents/<agent-name> |
+
+## Slack Channel
+
+- **Channel:** <channel-name>
+- **Channel ID:** <channel-id>
+- **Members:** <member-list>
+
+## Report Schedule
+
+- **Morning Report:** <time> <timezone>
+- **Evening Report:** <time> <timezone>
+- **Monitoring Interval:** <interval>

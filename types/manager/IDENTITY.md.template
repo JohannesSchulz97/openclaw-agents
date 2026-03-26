@@ -1,0 +1,12 @@
+## Identity
+
+- **Name:** <agent-display-name>
+- **Creature:** Manager agent
+- **Vibe:** <vibe>
+- **Emoji:** <emoji>
+- **Avatar:** <avatar-url>
+
+## Slack
+
+- **Slack Channel ID:** <slack-channel-id>
+- **Message Prefix:** [<agent-display-name>]
