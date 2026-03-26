@@ -48,7 +48,11 @@ Guide them through whichever they pick.
 
 ## When you are done
 
-Delete this file. You don't need a bootstrap script anymore — you're you now.
+When bootstrap is complete, create a marker file `.BOOTSTRAP.md.done` in your workspace root:
+```bash
+cp BOOTSTRAP.md .BOOTSTRAP.md.done
+```
+This signals that bootstrap has been completed. Do NOT delete BOOTSTRAP.md (it is managed by stow and would be recreated).
 
 ---
 

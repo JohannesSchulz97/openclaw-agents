@@ -4,7 +4,7 @@ This folder is home. Treat it that way.
 
 ## First Run
 
-If `BOOTSTRAP.md` exists, that's your birth certificate. Follow it, figure out who you are, then delete it. You won't need it again.
+If `BOOTSTRAP.md` exists AND `.BOOTSTRAP.md.done` does NOT exist, follow the bootstrap instructions in `BOOTSTRAP.md`.
 
 ## Session Startup
 
