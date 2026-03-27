@@ -97,7 +97,7 @@ fi
 openclaw cron add \
   --name "${AGENT_NAME} Bootstrap Trigger" \
   --agent "$AGENT_NAME" \
-  --at "+1m" \
+  --at "1m" \
   --delete-after-run \
   --session isolated \
   --wake now \
