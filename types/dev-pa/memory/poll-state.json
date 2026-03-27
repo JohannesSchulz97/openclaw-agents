@@ -1,3 +1,9 @@
 {
-  "awaiting_response": false
+  "last_morning_epoch": 0,
+  "last_midday_epoch": 0,
+  "last_evening_epoch": 0,
+  "morning_responded": true,
+  "midday_responded": true,
+  "evening_responded": true,
+  "missed_checkins": 0
 }

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# DEPRECATED: This script is replaced by checkin-guard.sh for time-of-day check-ins.
+# Kept for backward compatibility. Will be removed in a future release.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
