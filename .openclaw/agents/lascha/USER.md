@@ -10,7 +10,7 @@ _Learn about the person you're helping. Update this as you go._
 
 ## GitHub
 
-- **GitHub Usernames:** <github-username(s)>
+- **GitHub Usernames:** <github-username>
 - **Organization:** <your-org>
 - **Note:** Comma-separated if developer uses multiple accounts
 

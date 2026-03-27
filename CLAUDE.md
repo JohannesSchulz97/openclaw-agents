@@ -139,8 +139,6 @@ QMD is an alternative memory backend by Tobi Lutke. To enable:
    }
    ```
 
-**Note:** There are known issues with QMD (GitHub issue #11308) - timeouts, fallback bugs, collection mismatches. Consider using `memory.backend: "local"` as fallback until resolved.
-
 ## Sync and Stow Workflow
 
 After editing shared files in `types/`:
@@ -217,66 +215,70 @@ bash scripts/apply-cron.sh
 ## Agent: dev4
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: openai-codex/gpt-5.4
 
 ## Agent: dev5
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: openai-codex/gpt-5.4
 
 ## Agent: dev6
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: openai-codex/gpt-5.4
 
 ## Agent: dev7
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: openai-codex/gpt-5.4
 
 ## Agent: dev8
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: openai-codex/gpt-5.4
 
 ## Agent: dev9
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: openai-codex/gpt-5.4
 
 ## Agent: dev10 B
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: openai-codex/gpt-5.4
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: openai-codex/gpt-5.4
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
-- Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
-- Model: openai-codex/gpt-5.4
-
-## Agent: Malarvizhi
-
-- Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: openai-codex/gpt-5.4
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-in cron: every 2 hours, due after 240 min of no interaction
 - Model: openai-codex/gpt-5.4
 
