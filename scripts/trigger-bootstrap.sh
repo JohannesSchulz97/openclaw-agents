@@ -5,7 +5,7 @@
 # Use case: Proactively initiate bootstrap from the admin side when a new agent
 # has been created but hasn't had its first interactive session yet.
 #
-# Usage: scripts/trigger-bootstrap.sh --agent <name> [--dry-run]
+# Usage: scripts/trigger-bootstrap.sh --agent <name> [--continue] [--dry-run]
 # Example: scripts/trigger-bootstrap.sh --agent dev10
 
 set -euo pipefail
@@ -18,6 +18,7 @@ REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 # ------------------------------------------------------------------------------
 AGENT_NAME=""
 DRY_RUN=false
+CONTINUE_MODE=false
 
 # ------------------------------------------------------------------------------
 # Usage
@@ -30,6 +31,7 @@ Required:
   --agent NAME         Agent name, kebab-case (e.g., "dev10", "<your-org>")
 
 Optional:
+  --continue   Use continuation mode for agents with existing conversation history
   --dry-run            Print what would be done without making changes
   --help               Show this help message
 EOF
@@ -41,9 +43,10 @@ EOF
 # ------------------------------------------------------------------------------
 while [ $# -gt 0 ]; do
   case "$1" in
-    --agent)   AGENT_NAME="$2"; shift 2 ;;
-    --dry-run) DRY_RUN=true; shift ;;
-    --help)    usage 0 ;;
+    --agent)    AGENT_NAME="$2"; shift 2 ;;
+    --continue) CONTINUE_MODE=true; shift ;;
+    --dry-run)  DRY_RUN=true; shift ;;
+    --help)     usage 0 ;;
     *)         echo "Error: Unknown option: $1" >&2; usage 1 ;;
   esac
 done
