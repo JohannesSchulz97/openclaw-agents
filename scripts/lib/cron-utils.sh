@@ -19,6 +19,9 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     exit 1
 fi
 
+# Source schedule-utils for compute_checkin_times, build_cron_expr, validate_timezone
+source "${BASH_SOURCE[0]%/*}/schedule-utils.sh"
+
 # --------------------------------------------------------------------------- #
 # check_dependencies — verify required tools are available
 # --------------------------------------------------------------------------- #
@@ -64,6 +67,9 @@ generate_uuid() {
 }
 
 # --------------------------------------------------------------------------- #
+# DEPRECATED: Use add_cron_jobs (plural) instead. This function creates a single
+# every-2h check-in job. Retained for backward compatibility during migration.
+#
 # add_cron_job — add a new job to the cron config file
 #
 # Usage: add_cron_job <cron_file> <agent_name> <display_name> <slack_id> <model>
@@ -131,6 +137,102 @@ add_cron_job() {
 
     mv "$tmp_file" "$cron_file"
     echo "Added cron job '${display_name} Check-in' for agent '${agent_name}' (id: ${job_id})"
+}
+
+# --------------------------------------------------------------------------- #
+# add_cron_jobs — add 3 time-of-day check-in jobs (morning, midday, evening)
+#
+# Usage: add_cron_jobs <cron_file> <agent_name> <display_name> <model> <start_hour> <end_hour> <timezone> <works_weekends>
+# --------------------------------------------------------------------------- #
+add_cron_jobs() {
+    local cron_file="$1" agent_name="$2" display_name="$3" model="$4"
+    local start_hour="${5:-9}" end_hour="${6:-18}" timezone="${7:-UTC}" works_weekends="${8:-false}"
+
+    if [[ ! -f "$cron_file" ]]; then
+        echo "Error: Cron file not found: $cron_file" >&2
+        return 1
+    fi
+
+    # Validate timezone
+    if ! validate_timezone "$timezone"; then
+        echo "Error: Invalid timezone: $timezone" >&2
+        return 1
+    fi
+
+    # Compute check-in times
+    compute_checkin_times "$start_hour" "$end_hour"
+
+    # Build cron expressions
+    local morning_cron midday_cron evening_cron
+    morning_cron=$(build_cron_expr "$MORNING_HOUR" "$MORNING_MIN" "$works_weekends")
+    midday_cron=$(build_cron_expr "$MIDDAY_HOUR" "$MIDDAY_MIN" "$works_weekends")
+    evening_cron=$(build_cron_expr "$EVENING_HOUR" "$EVENING_MIN" "$works_weekends")
+
+    # Create 3 jobs with type-specific payloads
+    for type in morning midday evening; do
+        local job_id
+        job_id=$(generate_uuid)
+        local cron_expr name_suffix message
+
+        case $type in
+            morning)
+                cron_expr="$morning_cron"
+                name_suffix="Morning Check-in"
+                message="Run scripts/checkin-guard.sh morning. Parse the JSON output.\n\nIf data.skip == true, output ONLY 'NO_ACTION' and nothing else.\n\nIf data.skip == false:\n1. Read USER.md to find the developer's name, context, and GitHub username(s). Read IDENTITY.md for your target Slack user ID.\n2. If GitHub usernames configured, run scripts/github-activity.sh --user <github-usernames> --since 16 (overnight activity). Parse for recent PRs, commits, reviews. Skip if no username or script fails.\nIMPORTANT: Only use GitHub data from script output. Do NOT query GitHub APIs independently. Only <your-org> org repos.\n3. Review conversation history and memory for recent context.\n4. Compose a SHORT morning check-in (2-3 sentences max) that:\n   a. Greets them for the start of their day\n   b. If relevant, mention carry-over from yesterday or overnight activity -- do NOT list commits/PRs\n   c. Asks what they're planning to focus on today\n   d. Tone: energetic, forward-looking, planning-oriented\n5. If data.prev_unanswered == true, add a brief gentle note (e.g., \"Didn't hear back yesterday -- no worries, just making sure nothing's stuck.\")\n6. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\" -- where <SLACK_ID> is from IDENTITY.md."
+                ;;
+            midday)
+                cron_expr="$midday_cron"
+                name_suffix="Midday Check-in"
+                message="Run scripts/checkin-guard.sh midday. Parse the JSON output.\n\nIf data.skip == true, output ONLY 'NO_ACTION' and nothing else.\n\nIf data.skip == false:\n1. Read USER.md to find the developer's name, context, and GitHub username(s). Read IDENTITY.md for your target Slack user ID.\n2. If GitHub usernames configured, run scripts/github-activity.sh --user <github-usernames> --since 6 (today's work so far). Parse for recent activity. Skip if no username or script fails.\nIMPORTANT: Only use GitHub data from script output. Do NOT query GitHub APIs independently. Only <your-org> org repos.\n3. Review conversation history and memory for what they said this morning.\n4. Compose a SHORT midday check-in (2-3 sentences max) that:\n   a. Acknowledges the day is underway\n   b. Asks what's keeping them busy, including beyond what's visible in GitHub\n   c. Asks if they need help with anything\n   d. Tone: collaborative, curious, supportive\n5. If data.prev_unanswered == true, mention briefly and move on.\n6. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\" -- where <SLACK_ID> is from IDENTITY.md."
+                ;;
+            evening)
+                cron_expr="$evening_cron"
+                name_suffix="Evening Check-in"
+                message="Run scripts/checkin-guard.sh evening. Parse the JSON output.\n\nIf data.skip == true, output ONLY 'NO_ACTION' and nothing else.\n\nIf data.skip == false:\n1. Read USER.md to find the developer's name, context, and GitHub username(s). Read IDENTITY.md for your target Slack user ID.\n2. If GitHub usernames configured, run scripts/github-activity.sh --user <github-usernames> --since 10 (today's full activity). Parse for recent activity. Skip if no username or script fails.\nIMPORTANT: Only use GitHub data from script output. Do NOT query GitHub APIs independently. Only <your-org> org repos.\n3. Review conversation history and memory for what happened today.\n4. Compose a SHORT evening check-in (2-3 sentences max) that:\n   a. Acknowledges the day is winding down\n   b. Asks how the day went -- what went well, what didn't, anything to carry over tomorrow\n   c. Tone: reflective, appreciative, wrap-up oriented\n5. If data.prev_unanswered == true and data.missed_checkins >= 2, note gently (\"Haven't heard from you today -- hope everything's OK. No pressure, just here if you need anything.\")\n6. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\" -- where <SLACK_ID> is from IDENTITY.md."
+                ;;
+        esac
+
+        # Append to jobs-config.json using jq
+        local tmp_file
+        tmp_file=$(mktemp)
+        trap "rm -f '$tmp_file'" RETURN
+
+        jq --arg id "$job_id" \
+           --arg agentId "$agent_name" \
+           --arg name "${display_name} ${name_suffix}" \
+           --arg message "$message" \
+           --arg model "$model" \
+           --arg sessionKey "agent:${agent_name}:cron:${type}" \
+           --arg cronExpr "$cron_expr" \
+           --arg tz "$timezone" \
+           '.jobs += [{
+                id: $id,
+                agentId: $agentId,
+                name: $name,
+                enabled: true,
+                schedule: {
+                    kind: "cron",
+                    cronExpr: $cronExpr,
+                    tz: $tz
+                },
+                sessionTarget: "isolated",
+                wakeMode: "now",
+                payload: {
+                    kind: "agentTurn",
+                    message: $message,
+                    timeoutSeconds: 180,
+                    thinking: "on",
+                    model: $model
+                },
+                sessionKey: $sessionKey,
+                delivery: {
+                    mode: "none"
+                }
+            }]' "$cron_file" > "$tmp_file"
+
+        mv "$tmp_file" "$cron_file"
+        echo "Added cron job '${display_name} ${name_suffix}' for agent '${agent_name}' (id: ${job_id})"
+    done
 }
 
 # --------------------------------------------------------------------------- #
