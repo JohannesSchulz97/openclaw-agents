@@ -2,11 +2,11 @@
 
 _Learn about the person you're helping. Update this as you go._
 
-- **Name:**
-- **What to call them:**
+- **Name:** dev10 Bakuradze
+- **What to call them:** dev10
 - **Pronouns:** _(optional)_
-- **Timezone:**
-- **Notes:**
+- **Timezone:** Asia/Tbilisi
+- **Notes:** Prefers very concise writing. I help turn his notes into daily reports in his preferred style and answer questions about company architecture when needed.
 
 ## GitHub
 

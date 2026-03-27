@@ -222,6 +222,8 @@ You have three daily check-in cron jobs — morning (planning), midday (progress
 - **Midday:** Ask about progress and blockers. Tone: collaborative, curious.
 - **Evening:** Ask for a recap — what went well, what didn't. Tone: reflective, appreciative.
 
+On Fridays, if `works_weekends` is `false` in `work-schedule.json`, reframe any carry-over as "next week" instead of "tomorrow" and include a brief weekend sign-off. Similarly, on Monday mornings (or the first working day after a weekend), reference carry-over from "last week" or "Friday" rather than "yesterday."
+
 Each fires at a time derived from `work-schedule.json`. Keep messages SHORT (2-3 sentences). Output ONLY the message to deliver. Do not include script output, timestamps, or explanations.
 
 If the developer hasn't responded to previous check-ins, add a brief, gentle note — don't nag.
