@@ -72,17 +72,44 @@ for agent in "${AGENT_LIST[@]}"; do
         log "  WARNING: poll-config.json not found for $agent, using default ${INTERVAL_MINUTES}m"
     fi
 
-    # ── Read poll state ─────────────────────
+    # ── Skip agents not yet bootstrapped ────
+    WORK_SCHEDULE_FILE="$AGENT_DIR/work-schedule.json"
     POLL_STATE_FILE="$AGENT_DIR/memory/poll-state.json"
+
+    if [[ ! -f "$POLL_STATE_FILE" ]] || [[ ! -f "$WORK_SCHEDULE_FILE" ]]; then
+        log "  SKIP: $agent not yet bootstrapped"
+        continue
+    fi
+
+    # ── Read poll state (new + old schema) ──
     AWAITING_RESPONSE="false"
     LAST_CHECK_IN=""
+    MISSED_FROM_STATE=0
 
-    if [[ -f "$POLL_STATE_FILE" ]]; then
+    # Detect schema: new schema has last_morning_epoch
+    HAS_NEW_SCHEMA=$(jq 'has("last_morning_epoch")' "$POLL_STATE_FILE" 2>/dev/null || echo "false")
+
+    if [[ "$HAS_NEW_SCHEMA" == "true" ]]; then
+        # New schema: check if any check-in is unresponded
+        ANY_<slack-id>=$(jq '
+            (if .morning_responded == false then 1 else 0 end) +
+            (if .midday_responded == false then 1 else 0 end) +
+            (if .evening_responded == false then 1 else 0 end)
+        ' "$POLL_STATE_FILE" 2>/dev/null || echo "0")
+        if [[ "$ANY_<slack-id>" -gt 0 ]]; then
+            AWAITING_RESPONSE="true"
+        fi
+        MISSED_FROM_STATE=$(jq -r '.missed_checkins // 0' "$POLL_STATE_FILE" 2>/dev/null || echo "0")
+        # last_check_in equivalent: max of the three epoch fields
+        LAST_CHECKIN_EPOCH=$(jq '[.last_morning_epoch, .last_midday_epoch, .last_evening_epoch] | map(select(. > 0)) | max // 0' "$POLL_STATE_FILE" 2>/dev/null || echo "0")
+        if [[ "$LAST_CHECKIN_EPOCH" != "0" ]]; then
+            LAST_CHECK_IN=$(epoch_to_iso "$LAST_CHECKIN_EPOCH")
+        fi
+    else
+        # Old schema: use original field names
         AWAITING_RESPONSE=$(jq -r '.awaiting_response // false' "$POLL_STATE_FILE" 2>/dev/null || echo "false")
         LAST_CHECK_IN=$(jq -r '.last_check_in // ""' "$POLL_STATE_FILE" 2>/dev/null || echo "")
-    else
-        log "  WARNING: poll-state.json not found for $agent, skipping"
-        continue
+        MISSED_FROM_STATE=$(jq -r '.missed_checkins // 0' "$POLL_STATE_FILE" 2>/dev/null || echo "0")
     fi
 
     # ── Get last human interaction ──────────
@@ -110,46 +137,56 @@ for agent in "${AGENT_LIST[@]}"; do
 
     if [[ -n "$LAST_HUMAN_EPOCH_S" ]]; then
         ELAPSED_S=$(( NOW_EPOCH - LAST_HUMAN_EPOCH_S ))
-        ELAPSED_MINUTES=$(( ELAPSED_S / 60 ))
         HOURS_SINCE=$(( ELAPSED_S / 3600 ))
         LAST_HUMAN_ISO=$(epoch_to_iso "$LAST_HUMAN_EPOCH_S")
-
-        # Calculate how many check-in intervals have passed without human interaction
-        if [[ "$INTERVAL_MINUTES" -gt 0 ]]; then
-            MISSED_COUNT=$(( ELAPSED_MINUTES / INTERVAL_MINUTES ))
-        fi
-    else
-        # No session data at all -- treat as potentially missed
-        log "  No session data found for $agent"
-        if [[ "$AWAITING_RESPONSE" == "true" ]]; then
-            MISSED_COUNT=$((THRESHOLD))
-        fi
     fi
 
-    # ── Check if alert threshold is met ─────
-    # Case 1: awaiting_response is true and time since check-in exceeds interval
-    if [[ "$AWAITING_RESPONSE" == "true" && -n "$LAST_CHECK_IN" ]]; then
-        # Parse last_check_in timestamp to epoch
-        CHECK_IN_EPOCH=$(date -j -u -f '%Y-%m-%dT%H:%M:%SZ' "$LAST_CHECK_IN" '+%s' 2>/dev/null \
-            || date -u -d "$LAST_CHECK_IN" '+%s' 2>/dev/null \
-            || echo "0")
+    if [[ "$HAS_NEW_SCHEMA" == "true" ]]; then
+        # New schema: checkin-guard.sh already tracks missed_checkins accurately
+        MISSED_COUNT=$MISSED_FROM_STATE
+    else
+        # Old schema: fall back to elapsed-time calculation
+        if [[ -n "$LAST_HUMAN_EPOCH_S" ]]; then
+            ELAPSED_S=$(( NOW_EPOCH - LAST_HUMAN_EPOCH_S ))
+            ELAPSED_MINUTES=$(( ELAPSED_S / 60 ))
 
-        if [[ "$CHECK_IN_EPOCH" != "0" ]]; then
-            SINCE_CHECKIN_MIN=$(( (NOW_EPOCH - CHECK_IN_EPOCH) / 60 ))
-            if [[ "$SINCE_CHECKIN_MIN" -ge "$INTERVAL_MINUTES" ]]; then
-                MISSED_COUNT=$(( SINCE_CHECKIN_MIN / INTERVAL_MINUTES ))
+            # Calculate how many check-in intervals have passed without human interaction
+            if [[ "$INTERVAL_MINUTES" -gt 0 ]]; then
+                MISSED_COUNT=$(( ELAPSED_MINUTES / INTERVAL_MINUTES ))
+            fi
+        else
+            # No session data at all -- treat as potentially missed
+            log "  No session data found for $agent"
+            if [[ "$AWAITING_RESPONSE" == "true" ]]; then
+                MISSED_COUNT=$((THRESHOLD))
             fi
         fi
-    fi
 
-    # Case 2: no activity for longer than (poll_interval * threshold)
-    MAX_SILENCE=$(( INTERVAL_MINUTES * THRESHOLD ))
-    if [[ -n "$LAST_HUMAN_EPOCH_S" ]]; then
-        ELAPSED_MINUTES=$(( (NOW_EPOCH - LAST_HUMAN_EPOCH_S) / 60 ))
-        if [[ "$ELAPSED_MINUTES" -ge "$MAX_SILENCE" ]]; then
-            POTENTIAL_MISSED=$(( ELAPSED_MINUTES / INTERVAL_MINUTES ))
-            if [[ "$POTENTIAL_MISSED" -gt "$MISSED_COUNT" ]]; then
-                MISSED_COUNT=$POTENTIAL_MISSED
+        # Check if alert threshold is met
+        # Case 1: awaiting_response is true and time since check-in exceeds interval
+        if [[ "$AWAITING_RESPONSE" == "true" && -n "$LAST_CHECK_IN" ]]; then
+            # Parse last_check_in timestamp to epoch
+            CHECK_IN_EPOCH=$(date -j -u -f '%Y-%m-%dT%H:%M:%SZ' "$LAST_CHECK_IN" '+%s' 2>/dev/null \
+                || date -u -d "$LAST_CHECK_IN" '+%s' 2>/dev/null \
+                || echo "0")
+
+            if [[ "$CHECK_IN_EPOCH" != "0" ]]; then
+                SINCE_CHECKIN_MIN=$(( (NOW_EPOCH - CHECK_IN_EPOCH) / 60 ))
+                if [[ "$SINCE_CHECKIN_MIN" -ge "$INTERVAL_MINUTES" ]]; then
+                    MISSED_COUNT=$(( SINCE_CHECKIN_MIN / INTERVAL_MINUTES ))
+                fi
+            fi
+        fi
+
+        # Case 2: no activity for longer than (poll_interval * threshold)
+        MAX_SILENCE=$(( INTERVAL_MINUTES * THRESHOLD ))
+        if [[ -n "$LAST_HUMAN_EPOCH_S" ]]; then
+            ELAPSED_MINUTES=$(( (NOW_EPOCH - LAST_HUMAN_EPOCH_S) / 60 ))
+            if [[ "$ELAPSED_MINUTES" -ge "$MAX_SILENCE" ]]; then
+                POTENTIAL_MISSED=$(( ELAPSED_MINUTES / INTERVAL_MINUTES ))
+                if [[ "$POTENTIAL_MISSED" -gt "$MISSED_COUNT" ]]; then
+                    MISSED_COUNT=$POTENTIAL_MISSED
+                fi
             fi
         fi
     fi

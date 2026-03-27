@@ -120,16 +120,45 @@ for agent in "${AGENT_LIST[@]}"; do
         ACTIVE_TODAY=$((ACTIVE_TODAY + 1))
     fi
 
-    # ── Poll state ──────────────────────────
+    # ── Poll state (new + old schema) ──────
     POLL_STATE_FILE="$AGENT_DIR/memory/poll-state.json"
     AWAITING_RESPONSE="false"
     LAST_CHECK_IN=""
     POLL_STATE="{}"
+    MISSED_CHECKINS=0
 
     if [[ -f "$POLL_STATE_FILE" ]]; then
         POLL_STATE=$(jq '.' "$POLL_STATE_FILE" 2>/dev/null || echo "{}")
-        AWAITING_RESPONSE=$(echo "$POLL_STATE" | jq -r '.awaiting_response // false')
-        LAST_CHECK_IN=$(echo "$POLL_STATE" | jq -r '.last_check_in // ""')
+        MISSED_CHECKINS=$(echo "$POLL_STATE" | jq -r '.missed_checkins // 0')
+
+        # Detect schema: new schema has last_morning_epoch
+        ST_HAS_NEW_SCHEMA=$(echo "$POLL_STATE" | jq 'has("last_morning_epoch")')
+
+        if [[ "$ST_HAS_NEW_SCHEMA" == "true" ]]; then
+            # New schema: awaiting if any *_responded is false
+            ANY_<slack-id>=$(echo "$POLL_STATE" | jq '
+                (if .morning_responded == false then 1 else 0 end) +
+                (if .midday_responded == false then 1 else 0 end) +
+                (if .evening_responded == false then 1 else 0 end)
+            ')
+            if [[ "$ANY_<slack-id>" -gt 0 ]]; then
+                AWAITING_RESPONSE="true"
+            fi
+            # Enrich poll_state with computed fields for output
+            POLL_STATE=$(echo "$POLL_STATE" | jq '{
+                missed_checkins: .missed_checkins,
+                morning_responded: .morning_responded,
+                midday_responded: .midday_responded,
+                evening_responded: .evening_responded,
+                last_morning_epoch: .last_morning_epoch,
+                last_midday_epoch: .last_midday_epoch,
+                last_evening_epoch: .last_evening_epoch
+            }')
+        else
+            # Old schema
+            AWAITING_RESPONSE=$(echo "$POLL_STATE" | jq -r '.awaiting_response // false')
+            LAST_CHECK_IN=$(echo "$POLL_STATE" | jq -r '.last_check_in // ""')
+        fi
     else
         log "  WARNING: poll-state.json not found for $agent, skipping poll state"
     fi
