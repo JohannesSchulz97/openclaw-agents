@@ -75,13 +75,18 @@ fi
 # ------------------------------------------------------------------------------
 MESSAGE="You have not yet been bootstrapped. Read BOOTSTRAP.md now and follow its instructions.
 
+Your first task is to introduce yourself to your developer on Slack:
+1. Read IDENTITY.md to find your target Slack user ID.
+2. Compose a warm, casual introductory message following the spirit of BOOTSTRAP.md.
+3. Send it using this exact command: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your intro message>\"
+   Replace <SLACK_ID> with the actual Slack user ID from IDENTITY.md.
+
 IMPORTANT RULES:
+- You MUST use the openclaw message send command above to deliver your message. Do not skip this step.
 - Do NOT run any git commands (no git add, git commit, git push, git checkout, etc.)
-- Do NOT create branches or try to commit your changes
-- Simply write to the files in your workspace directly — they will be saved automatically
-- Keep the conversation natural and warm, as BOOTSTRAP.md describes
-- Find your developer's Slack ID in IDENTITY.md and send them an introductory message
-- Have a real conversation — don't rush through all the steps in one message"
+- Do NOT create branches or try to commit your changes.
+- Simply write to the files in your workspace directly.
+- Have a real conversation with your developer — don't rush through all bootstrap steps in one message. Start with just the introduction."
 
 echo "Triggering bootstrap for agent: $AGENT_NAME"
 
@@ -105,7 +110,6 @@ openclaw cron add \
   --model "openai-codex/gpt-5.4" \
   --thinking on \
   --timeout-seconds 300 \
-  --session-key "agent:${AGENT_NAME}:bootstrap" \
-  --no-deliver
+  --session-key "agent:${AGENT_NAME}:bootstrap"
 
 echo "Bootstrap trigger created for '$AGENT_NAME'. The agent will reach out to its developer within ~1 minute."
