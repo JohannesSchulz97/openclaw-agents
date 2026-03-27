@@ -128,6 +128,9 @@ build_cmd_args() {
   AGENT_ID=$(echo "$JOB" | jq -r '.agentId // empty')
   ENABLED=$(echo "$JOB" | jq -r '.enabled')
   EVERY_MS=$(echo "$JOB" | jq -r '.schedule.everyMs // empty')
+  SCHEDULE_KIND=$(echo "$JOB" | jq -r '.schedule.kind // "every"')
+  CRON_EXPR=$(echo "$JOB" | jq -r '.schedule.cronExpr // empty')
+  SCHEDULE_TZ=$(echo "$JOB" | jq -r '.schedule.tz // empty')
   SESSION_TARGET=$(echo "$JOB" | jq -r '.sessionTarget // empty')
   WAKE_MODE=$(echo "$JOB" | jq -r '.wakeMode // empty')
   MESSAGE=$(echo "$JOB" | jq -r '.payload.message // empty')
@@ -147,7 +150,10 @@ build_cmd_args() {
     [ "$ENABLED" != "true" ] && CMD+=(--disabled)
   fi
 
-  if [ -n "$EVERY_MS" ]; then
+  if [ "$SCHEDULE_KIND" = "cron" ] && [ -n "$CRON_EXPR" ]; then
+    CMD+=(--cron "$CRON_EXPR")
+    [ -n "$SCHEDULE_TZ" ] && CMD+=(--tz "$SCHEDULE_TZ")
+  elif [ -n "$EVERY_MS" ]; then
     local EVERY_MIN=$((EVERY_MS / 60000))
     CMD+=(--every "${EVERY_MIN}m")
   fi
@@ -182,8 +188,9 @@ GATEWAY_COUNT=$(echo "$GATEWAY_JOBS" | jq '.jobs | length')
 echo "Gateway has $GATEWAY_COUNT existing job(s)"
 echo ""
 
-# Collect config agentIds for the removal phase
+# Collect config agentIds and sessionKeys for the removal phase
 CONFIG_AGENT_IDS=$(jq -r '.jobs[].agentId' "$CONFIG_FILE" | sort -u)
+CONFIG_SESSION_KEYS=$(jq -r '.jobs[].sessionKey' "$CONFIG_FILE" | sort -u)
 
 # --------------------------------------------------------------------------- #
 # Phase 1: ADD — config entries with no gateway match
@@ -198,8 +205,14 @@ for i in $(seq 0 $((JOB_COUNT - 1))); do
 
   [ -z "$AGENT_ID" ] && continue
 
-  GATEWAY_ID=$(echo "$GATEWAY_JOBS" | jq -r --arg aid "$AGENT_ID" \
-    '.jobs[] | select(.agentId == $aid) | .id' 2>/dev/null | head -1)
+  SESSION_KEY=$(echo "$JOB" | jq -r '.sessionKey // empty')
+  if [ -n "$SESSION_KEY" ]; then
+    GATEWAY_ID=$(echo "$GATEWAY_JOBS" | jq -r --arg sk "$SESSION_KEY" \
+      '.jobs[] | select(.sessionKey == $sk) | .id' 2>/dev/null | head -1)
+  else
+    GATEWAY_ID=$(echo "$GATEWAY_JOBS" | jq -r --arg aid "$AGENT_ID" \
+      '.jobs[] | select(.agentId == $aid) | .id' 2>/dev/null | head -1)
+  fi
 
   if [ -z "$GATEWAY_ID" ]; then
     ADD_COUNT=$((ADD_COUNT + 1))
@@ -235,8 +248,14 @@ for i in $(seq 0 $((JOB_COUNT - 1))); do
 
   [ -z "$AGENT_ID" ] && continue
 
-  GATEWAY_ID=$(echo "$GATEWAY_JOBS" | jq -r --arg aid "$AGENT_ID" \
-    '.jobs[] | select(.agentId == $aid) | .id' 2>/dev/null | head -1)
+  SESSION_KEY=$(echo "$JOB" | jq -r '.sessionKey // empty')
+  if [ -n "$SESSION_KEY" ]; then
+    GATEWAY_ID=$(echo "$GATEWAY_JOBS" | jq -r --arg sk "$SESSION_KEY" \
+      '.jobs[] | select(.sessionKey == $sk) | .id' 2>/dev/null | head -1)
+  else
+    GATEWAY_ID=$(echo "$GATEWAY_JOBS" | jq -r --arg aid "$AGENT_ID" \
+      '.jobs[] | select(.agentId == $aid) | .id' 2>/dev/null | head -1)
+  fi
 
   if [ -n "$GATEWAY_ID" ]; then
     EDIT_COUNT=$((EDIT_COUNT + 1))
@@ -276,7 +295,20 @@ else
 
     [ -z "$GW_AGENT_ID" ] && continue
 
-    if ! echo "$CONFIG_AGENT_IDS" | grep -qx "$GW_AGENT_ID"; then
+    GW_SESSION_KEY=$(echo "$GW_JOB" | jq -r '.sessionKey // empty')
+    is_orphan=false
+    if [ -n "$GW_SESSION_KEY" ]; then
+      if ! echo "$CONFIG_SESSION_KEYS" | grep -qxF "$GW_SESSION_KEY"; then
+        is_orphan=true
+      fi
+    else
+      # Fallback for jobs without sessionKey: check by agentId
+      if ! echo "$CONFIG_AGENT_IDS" | grep -qx "$GW_AGENT_ID"; then
+        is_orphan=true
+      fi
+    fi
+
+    if [ "$is_orphan" = true ]; then
       REMOVE_COUNT=$((REMOVE_COUNT + 1))
       echo "  REMOVE: $GW_NAME (agentId=$GW_AGENT_ID, gateway=$GW_ID)"
       if [ "$DRY_RUN" = true ]; then

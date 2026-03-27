@@ -146,40 +146,60 @@ for agent in "${AGENT_LIST[@]}"; do
         log "  WARNING: sessions.json not found for $agent"
     fi
 
-    # ── Check awaiting_response for >8 hours ──
+    # ── Check developer unresponsive for >8 hours ──
     POLL_STATE_FILE="$AGENT_DIR/memory/poll-state.json"
 
     if [[ -f "$POLL_STATE_FILE" ]]; then
-        AWAITING=$(jq -r '.awaiting_response // false' "$POLL_STATE_FILE" 2>/dev/null || echo "false")
-        LAST_CHECK_IN=$(jq -r '.last_check_in // ""' "$POLL_STATE_FILE" 2>/dev/null || echo "")
+        # Detect schema: new schema has last_morning_epoch
+        BN_HAS_NEW_SCHEMA=$(jq 'has("last_morning_epoch")' "$POLL_STATE_FILE" 2>/dev/null || echo "false")
 
-        if [[ "$AWAITING" == "true" && -n "$LAST_CHECK_IN" ]]; then
-            CHECK_IN_EPOCH=$(date -j -u -f '%Y-%m-%dT%H:%M:%SZ' "$LAST_CHECK_IN" '+%s' 2>/dev/null \
-                || date -u -d "$LAST_CHECK_IN" '+%s' 2>/dev/null \
-                || echo "0")
+        AWAITING="false"
+        CHECK_IN_EPOCH="0"
 
-            if [[ "$CHECK_IN_EPOCH" != "0" ]]; then
-                SINCE_CHECKIN_S=$(( NOW_EPOCH - CHECK_IN_EPOCH ))
+        if [[ "$BN_HAS_NEW_SCHEMA" == "true" ]]; then
+            # New schema: awaiting if any *_responded is false
+            ANY_<slack-id>=$(jq '
+                (if .morning_responded == false then 1 else 0 end) +
+                (if .midday_responded == false then 1 else 0 end) +
+                (if .evening_responded == false then 1 else 0 end)
+            ' "$POLL_STATE_FILE" 2>/dev/null || echo "0")
+            if [[ "$ANY_<slack-id>" -gt 0 ]]; then
+                AWAITING="true"
+            fi
+            # Last check-in: max of the three epoch fields
+            CHECK_IN_EPOCH=$(jq '[.last_morning_epoch, .last_midday_epoch, .last_evening_epoch] | map(select(. > 0)) | max // 0' "$POLL_STATE_FILE" 2>/dev/null || echo "0")
+        else
+            # Old schema
+            AWAITING=$(jq -r '.awaiting_response // false' "$POLL_STATE_FILE" 2>/dev/null || echo "false")
+            LAST_CHECK_IN=$(jq -r '.last_check_in // ""' "$POLL_STATE_FILE" 2>/dev/null || echo "")
+            if [[ -n "$LAST_CHECK_IN" ]]; then
+                CHECK_IN_EPOCH=$(date -j -u -f '%Y-%m-%dT%H:%M:%SZ' "$LAST_CHECK_IN" '+%s' 2>/dev/null \
+                    || date -u -d "$LAST_CHECK_IN" '+%s' 2>/dev/null \
+                    || echo "0")
+            fi
+        fi
 
-                if [[ "$SINCE_CHECKIN_S" -ge "$<slack-id>E_THRESHOLD_S" ]]; then
-                    HOURS_SINCE=$(( SINCE_CHECKIN_S / 3600 ))
-                    SINCE_ISO=$(epoch_to_iso "$CHECK_IN_EPOCH")
-                    BOTTLENECK=$(jq -n \
-                        --arg agent "$agent" \
-                        --arg type "developer_unresponsive" \
-                        --arg detail "Awaiting response for $HOURS_SINCE hours since last check-in" \
-                        --arg severity "high" \
-                        --arg since "$SINCE_ISO" \
-                        '{
-                            agent: $agent,
-                            type: $type,
-                            detail: $detail,
-                            severity: $severity,
-                            since: $since
-                        }')
-                    BOTTLENECKS=$(echo "$BOTTLENECKS" | jq --argjson b "$BOTTLENECK" '. + [$b]')
-                    log "  BOTTLENECK: $agent developer unresponsive for ${HOURS_SINCE}h"
-                fi
+        if [[ "$AWAITING" == "true" && "$CHECK_IN_EPOCH" != "0" ]]; then
+            SINCE_CHECKIN_S=$(( NOW_EPOCH - CHECK_IN_EPOCH ))
+
+            if [[ "$SINCE_CHECKIN_S" -ge "$<slack-id>E_THRESHOLD_S" ]]; then
+                HOURS_SINCE=$(( SINCE_CHECKIN_S / 3600 ))
+                SINCE_ISO=$(epoch_to_iso "$CHECK_IN_EPOCH")
+                BOTTLENECK=$(jq -n \
+                    --arg agent "$agent" \
+                    --arg type "developer_unresponsive" \
+                    --arg detail "Awaiting response for $HOURS_SINCE hours since last check-in" \
+                    --arg severity "high" \
+                    --arg since "$SINCE_ISO" \
+                    '{
+                        agent: $agent,
+                        type: $type,
+                        detail: $detail,
+                        severity: $severity,
+                        since: $since
+                    }')
+                BOTTLENECKS=$(echo "$BOTTLENECKS" | jq --argjson b "$BOTTLENECK" '. + [$b]')
+                log "  BOTTLENECK: $agent developer unresponsive for ${HOURS_SINCE}h"
             fi
         fi
     fi

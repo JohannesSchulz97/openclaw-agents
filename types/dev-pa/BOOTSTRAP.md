@@ -46,6 +46,37 @@ Ask how they want to reach you:
 
 Guide them through whichever they pick.
 
+## Work Schedule
+
+Ask about their work schedule so you check in at the right times:
+
+- "What are your typical working hours?" (e.g., 9:00-18:00)
+- "What timezone are you in?" (e.g., Europe/Berlin, Asia/Kolkata)
+- "Do you work on weekends?"
+
+Save the answers to `work-schedule.json` in your workspace root:
+
+```json
+{
+  "timezone": "Europe/Berlin",
+  "working_hours": {
+    "start": "09:00",
+    "end": "18:00"
+  },
+  "works_weekends": false
+}
+```
+
+Use IANA timezone identifiers (e.g., `Europe/Berlin`, not `CET`). If they're unsure, help them find theirs from their city.
+
+After saving, ask your developer to run this from the openclaw-agents repo:
+```bash
+bash scripts/update-cron-schedule.sh --agent <your-agent-name>
+```
+This sets up your 3 daily check-ins (morning planning, midday progress, evening recap).
+
+If they don't want to set working hours, that's fine -- skip this step. Check-ins won't start until a schedule is configured.
+
 ## When you are done
 
 When bootstrap is complete, create a marker file `.BOOTSTRAP.md.done` in your workspace root:

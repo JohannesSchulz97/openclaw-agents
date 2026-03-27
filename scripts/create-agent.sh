@@ -174,9 +174,9 @@ if [ -f "$TYPE_DIR/memory/poll-state.json" ]; then
 else
   log_action "Creating memory/poll-state.json with defaults"
   if [ "$DRY_RUN" = false ]; then
-    echo '{"awaiting_response": false}' > "$AGENT_DIR/memory/poll-state.json"
+    echo '{"last_morning_epoch":0,"last_midday_epoch":0,"last_evening_epoch":0,"morning_responded":true,"midday_responded":true,"evening_responded":true,"missed_checkins":0}' > "$AGENT_DIR/memory/poll-state.json"
   else
-    echo '[DRY RUN] Write {"awaiting_response": false} to memory/poll-state.json'
+    echo '[DRY RUN] Write new poll-state.json schema to memory/poll-state.json'
   fi
 fi
 
@@ -193,24 +193,8 @@ fi
 # ------------------------------------------------------------------------------
 # Step 4: Add cron job + apply to live system
 # ------------------------------------------------------------------------------
-log_action "Adding cron job to .openclaw/cron/jobs-config.json"
-
-# shellcheck source=lib/cron-utils.sh
-source "$REPO_ROOT/scripts/lib/cron-utils.sh"
-if [ "$DRY_RUN" = false ]; then
-  add_cron_job "$CRON_CONFIG" "$NAME" "$DISPLAY_NAME" "$SLACK_ID" "$MODEL"
-else
-  echo "[DRY RUN] Would add cron job: $DISPLAY_NAME Check-in (model: $MODEL, slack: $SLACK_ID)"
-fi
-
-# Apply cron config to live system
-log_action "Applying cron config to live system"
-if [ "$DRY_RUN" = false ]; then
-  if ! "$REPO_ROOT/scripts/apply-cron.sh" 2>&1; then
-    echo "Warning: Failed to apply cron config to live system."
-    echo "  Run 'scripts/apply-cron.sh' manually after fixing the issue."
-  fi
-fi
+# No cron jobs until bootstrap — agent must configure work-schedule.json first
+echo "  Note: Check-in cron jobs will be created during bootstrap (work-schedule.json required)."
 
 # ------------------------------------------------------------------------------
 # Step 5: Run stow
@@ -258,7 +242,7 @@ if [ "$DRY_RUN" = false ]; then
 ## Agent: $DISPLAY_NAME
 
 - Slack ID: $SLACK_ID
-- Polling: every 10 minutes, check-in due after 240 min of no interaction
+- Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
 - Model: $MODEL
 "
   LINE_NUM=$(grep -n "^## Useful Commands" "$CLAUDE_MD" | head -1 | cut -d: -f1)
@@ -295,12 +279,9 @@ echo "Shared files synced from types/$TYPE/:"
 echo "  SOUL.md, AGENTS.md, TOOLS.md, HEARTBEAT.md, BOOTSTRAP.md, poll-config.json"
 echo "  scripts/"
 echo ""
-echo "Cron job:"
-echo "  Name:  $DISPLAY_NAME Check-in"
-echo "  Agent: $NAME"
-echo "  Model: $MODEL"
-echo "  Config: .openclaw/cron/jobs-config.json"
-echo "  Applied to live system via apply-cron.sh"
+echo "Cron jobs:"
+echo "  No cron jobs created yet — check-in jobs are created during bootstrap"
+echo "  (agent must configure work-schedule.json first)."
 echo ""
 echo "openclaw.json:"
 echo "  Agent entry, Slack binding, and DM allowlist updated (if openclaw.json exists)."
