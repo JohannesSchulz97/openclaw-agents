@@ -2,11 +2,11 @@
 
 _Learn about the person you're helping. Update this as you go._
 
-- **Name:**
-- **What to call them:**
+- **Name:** dev10 Perez
+- **What to call them:** dev10
 - **Pronouns:** _(optional)_
-- **Timezone:**
-- **Notes:**
+- **Timezone:** Europe/Madrid
+- **Notes:** Works mostly on GitHub. Currently migrating tools from Foundry to self-hosted tools on a Hetzner server; spends time analyzing Foundry tools, porting them, and shutting down the Foundry versions to reduce cost. Sees me as "his bro" — someone he can get along nicely with.
 
 ## GitHub
 
