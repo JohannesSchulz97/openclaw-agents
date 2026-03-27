@@ -19,7 +19,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev1:main",
+      "sessionKey": "agent:dev1:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -42,7 +42,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:<your-org>:main",
+      "sessionKey": "agent:<your-org>:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -65,7 +65,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev10:main",
+      "sessionKey": "agent:dev10:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -88,7 +88,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev10:main",
+      "sessionKey": "agent:dev10:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -111,7 +111,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev10:main",
+      "sessionKey": "agent:dev10:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -134,7 +134,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev10-jean:main",
+      "sessionKey": "agent:dev10-jean:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -157,7 +157,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:tech-manager:monitoring",
+      "sessionKey": "agent:tech-manager:cron:monitoring",
       "delivery": {
         "mode": "none"
       }
@@ -180,7 +180,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:tech-manager:morning-report",
+      "sessionKey": "agent:tech-manager:cron:morning-report",
       "delivery": {
         "mode": "none"
       }
@@ -203,7 +203,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:tech-manager:evening-report",
+      "sessionKey": "agent:tech-manager:cron:evening-report",
       "delivery": {
         "mode": "none"
       }
@@ -226,7 +226,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev3:main",
+      "sessionKey": "agent:dev3:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -249,7 +249,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:<github-username>:main",
+      "sessionKey": "agent:<github-username>:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -272,7 +272,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev5:main",
+      "sessionKey": "agent:dev5:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -295,7 +295,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev6:main",
+      "sessionKey": "agent:dev6:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -318,7 +318,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev7:main",
+      "sessionKey": "agent:dev7:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -341,7 +341,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev8:main",
+      "sessionKey": "agent:dev8:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -364,7 +364,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev9:main",
+      "sessionKey": "agent:dev9:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -387,7 +387,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev10-b:main",
+      "sessionKey": "agent:dev10-b:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -410,7 +410,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev10:main",
+      "sessionKey": "agent:dev10:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -433,7 +433,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev10:main",
+      "sessionKey": "agent:dev10:cron:checkin",
       "delivery": {
         "mode": "none"
       }
@@ -456,7 +456,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev10:main",
+      "sessionKey": "agent:dev10:cron:checkin",
       "delivery": {
         "mode": "none"
       }

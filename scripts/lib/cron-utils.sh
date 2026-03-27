@@ -104,7 +104,7 @@ add_cron_job() {
        --arg name "${display_name} Check-in" \
        --arg message "$message" \
        --arg model "$model" \
-       --arg sessionKey "agent:${agent_name}:main" \
+       --arg sessionKey "agent:${agent_name}:cron:checkin" \
        '.jobs += [{
             id: $id,
             agentId: $agentId,
