@@ -152,7 +152,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "You are the Tech Manager agent. Run your hourly monitoring check.\n\n1. Run `scripts/check-bottlenecks.sh --agents dev1,dev10,dev10,dev10,dev10-jean`\n   Parse the JSON output.\n\n2. Run `scripts/check-missed-checkins.sh --agents dev1,dev10,dev10,dev10,dev10-jean --threshold 3`\n   Parse the JSON output.\n\n3. If BOTH scripts return `all_clear: true`, do nothing. Output NO_ACTION.\n\n4. If there are bottlenecks or missed check-in alerts:\n   - Read IDENTITY.md for the Slack Channel ID\n   - Compose a clear, concise alert message\n   - For bottlenecks: use \ud83d\udea8 prefix, include agent name, type of bottleneck, severity, and how long it's been\n   - For missed check-ins: use \u26a0\ufe0f prefix, include who missed, how many, last known activity\n   - Send via: openclaw message send --channel slack --target channel:<CHANNEL_ID> --message \"<alert>\"\n   \n5. IMPORTANT: Only report genuine issues. Do not send \"all clear\" messages every hour.",
+        "message": "You are the Tech Manager agent. Run your hourly monitoring check.\n\n1. Run `scripts/check-bottlenecks.sh --agents dev1,dev10,dev10,dev10,dev10-jean`\n   Parse the JSON output.\n\n2. Run `scripts/check-missed-checkins.sh --agents dev1,dev10,dev10,dev10,dev10-jean --threshold 3`\n   Parse the JSON output.\n\n3. If BOTH scripts return `all_clear: true`, do nothing. Output NO_ACTION.\n\n4. If there are bottlenecks or missed check-in alerts:\n   - Read IDENTITY.md for the Slack Channel ID\n   - Compose a clear, concise alert message\n   - For bottlenecks: use 🚨 prefix, include agent name, type of bottleneck, severity, and how long it's been\n   - For missed check-ins: use ⚠️ prefix, include who missed, how many, last known activity\n   - Send via: openclaw message send --channel slack --target channel:<CHANNEL_ID> --message \"<alert>\"\n   \n5. IMPORTANT: Only report genuine issues. Do not send \"all clear\" messages every hour.",
         "timeoutSeconds": 180,
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
@@ -175,7 +175,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "You are the Tech Manager agent. Generate your morning status report.\n\n1. Run `scripts/check-status.sh --agents dev1,dev10,dev10,dev10,dev10-jean`\n   Parse the JSON output for overall team status.\n\n2. For each monitored agent, check if they have a github-activity.sh script available:\n   - Read USER.md to get the list of monitored agents\n   - For each agent, check if `~/.openclaw/agents/<agent>/scripts/github-activity.sh` exists\n   - If it does, read that agent's USER.md for their GitHub username(s)\n   - Run the script with --since 24 to get yesterday's activity\n\n3. Read IDENTITY.md for the Slack Channel ID.\n\n4. Compose a structured morning report with these sections:\n   \ud83d\udcca **Morning Status Report \u2014 [DATE]**\n   \n   **Team Overview:** X active, Y awaiting response, Z inactive\n   \n   **Per Developer:**\n   For each agent/developer:\n   - Current status (active/inactive/awaiting response)\n   - GitHub activity summary (PRs, commits, issues from last 24h)\n   - Last interaction time\n   \n   **Notable:** Any patterns, highlights, or concerns\n\n5. Send via: openclaw message send --channel slack --target channel:<CHANNEL_ID> --message \"<report>\"\n\n6. IMPORTANT: Only reference GitHub activity from <your-org> organization. Do NOT query GitHub APIs independently.",
+        "message": "You are the Tech Manager agent. Generate your morning status report.\n\n1. Run `scripts/check-status.sh --agents dev1,dev10,dev10,dev10,dev10-jean`\n   Parse the JSON output for overall team status.\n\n2. For each monitored agent, check if they have a github-activity.sh script available:\n   - Read USER.md to get the list of monitored agents\n   - For each agent, check if `~/.openclaw/agents/<agent>/scripts/github-activity.sh` exists\n   - If it does, read that agent's USER.md for their GitHub username(s)\n   - Run the script with --since 24 to get yesterday's activity\n\n3. Read IDENTITY.md for the Slack Channel ID.\n\n4. Compose a structured morning report with these sections:\n   📊 **Morning Status Report — [DATE]**\n   \n   **Team Overview:** X active, Y awaiting response, Z inactive\n   \n   **Per Developer:**\n   For each agent/developer:\n   - Current status (active/inactive/awaiting response)\n   - GitHub activity summary (PRs, commits, issues from last 24h)\n   - Last interaction time\n   \n   **Notable:** Any patterns, highlights, or concerns\n\n5. Send via: openclaw message send --channel slack --target channel:<CHANNEL_ID> --message \"<report>\"\n\n6. IMPORTANT: Only reference GitHub activity from <your-org> organization. Do NOT query GitHub APIs independently.",
         "timeoutSeconds": 300,
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
@@ -198,35 +198,12 @@
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "You are the Tech Manager agent. Generate your evening status report with resource allocation suggestions.\n\n1. Run `scripts/check-status.sh --agents dev1,dev10,dev10,dev10,dev10-jean`\n   Parse the JSON output.\n\n2. For each monitored agent with github-activity.sh available:\n   - Read the agent's USER.md for GitHub username(s)\n   - Run their github-activity.sh with --since 10 (today's work)\n\n3. Run `scripts/check-bottlenecks.sh --agents dev1,dev10,dev10,dev10,dev10-jean`\n   and `scripts/check-missed-checkins.sh --agents dev1,dev10,dev10,dev10,dev10-jean`\n\n4. Read IDENTITY.md for the Slack Channel ID.\n\n5. Compose a structured evening report:\n   \ud83d\udcca **Evening Status Report \u2014 [DATE]**\n   \n   **Today's Summary:**\n   - Total commits, PRs opened/merged, issues across the team\n   - Per-developer breakdown of what they shipped\n   \n   **Issues & Blockers:**\n   - Any bottlenecks detected\n   - Any missed check-ins\n   - Unresolved items from the day\n   \n   \ud83d\udd04 **Resource Allocation Suggestion:**\n   Based on today's activity, current blockers, and workload:\n   - Who is overloaded / underutilized\n   - Suggested rebalancing or priority shifts\n   - Any recommendations for tomorrow\n   \n   Present this as a suggestion, not a mandate. Be specific and actionable.\n\n6. Send via: openclaw message send --channel slack --target channel:<CHANNEL_ID> --message \"<report>\"\n\n7. IMPORTANT: Only reference GitHub activity from <your-org> organization.",
+        "message": "You are the Tech Manager agent. Generate your evening status report with resource allocation suggestions.\n\n1. Run `scripts/check-status.sh --agents dev1,dev10,dev10,dev10,dev10-jean`\n   Parse the JSON output.\n\n2. For each monitored agent with github-activity.sh available:\n   - Read the agent's USER.md for GitHub username(s)\n   - Run their github-activity.sh with --since 10 (today's work)\n\n3. Run `scripts/check-bottlenecks.sh --agents dev1,dev10,dev10,dev10,dev10-jean`\n   and `scripts/check-missed-checkins.sh --agents dev1,dev10,dev10,dev10,dev10-jean`\n\n4. Read IDENTITY.md for the Slack Channel ID.\n\n5. Compose a structured evening report:\n   📊 **Evening Status Report — [DATE]**\n   \n   **Today's Summary:**\n   - Total commits, PRs opened/merged, issues across the team\n   - Per-developer breakdown of what they shipped\n   \n   **Issues & Blockers:**\n   - Any bottlenecks detected\n   - Any missed check-ins\n   - Unresolved items from the day\n   \n   🔄 **Resource Allocation Suggestion:**\n   Based on today's activity, current blockers, and workload:\n   - Who is overloaded / underutilized\n   - Suggested rebalancing or priority shifts\n   - Any recommendations for tomorrow\n   \n   Present this as a suggestion, not a mandate. Be specific and actionable.\n\n6. Send via: openclaw message send --channel slack --target channel:<CHANNEL_ID> --message \"<report>\"\n\n7. IMPORTANT: Only reference GitHub activity from <your-org> organization.",
         "timeoutSeconds": 300,
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
       "sessionKey": "agent:tech-manager:evening-report",
-      "delivery": {
-        "mode": "none"
-      }
-    },
-    {
-      "id": "0afc3bb1-999c-4a2d-aeb8-ffd531f81528",
-      "agentId": "svea",
-      "name": "Svea Boelcke Check-in",
-      "enabled": true,
-      "schedule": {
-        "kind": "every",
-        "everyMs": 7200000
-      },
-      "sessionTarget": "isolated",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "Run scripts/poll-check.sh. Parse the JSON output.\n\nIf data.due == 0, output ONLY 'NO_ACTION' and nothing else.\n\nIf data.due == 1:\n1. Read USER.md to find the developer's name, context, and GitHub username(s) from the ## GitHub section. Also read IDENTITY.md to find your target Slack user ID.\n2. If one or more GitHub usernames are configured in USER.md, run scripts/github-activity.sh --user <github-usernames> --since 24 (comma-separated if multiple). Parse the output for recent PRs, commits, reviews, and issues. If no GitHub username is configured, or the script fails or returns no data, skip this step and proceed without it -- GitHub activity is enrichment, not a blocker.\nIMPORTANT: Only use GitHub activity data from the script output above. Do NOT independently query GitHub APIs, the Events API, or any other GitHub endpoints. Do NOT reference any repositories outside <your-org> organization. Personal repos are strictly off-limits.\n3. Review your conversation history and memory for recent context about what the developer has been working on.\n4. Compose a check-in message that:\n   a. References specific GitHub activity or recent conversation context\n   b. Asks what they have been working on since the last check-in\n   c. Explicitly asks them to share any work NOT visible in GitHub -- meetings, design discussions, code reviews, research, architecture planning, pairing sessions, mentoring, documentation, or any other contributions\n   d. Asks about current blockers or anything they need help with\n   e. Is warm and specific, not generic. Avoid canned phrases like 'just checking in'.\n5. Send the message using this exact command: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\" -- where <SLACK_ID> is the target user's Slack ID from your identity/config files.\n6. After sending, update memory/poll-state.json: set awaiting_response to true.",
-        "timeoutSeconds": 180,
-        "thinking": "on",
-        "model": "openai-codex/gpt-5.4"
-      },
-      "sessionKey": "agent:svea:main",
       "delivery": {
         "mode": "none"
       }
@@ -462,32 +439,9 @@
       }
     },
     {
-      "id": "6f595233-5d4a-4c7d-87cd-7c0fa5e0d67e",
-      "agentId": "malarvizhi",
-      "name": "Malarvizhi Subramaniyan Check-in",
-      "enabled": true,
-      "schedule": {
-        "kind": "every",
-        "everyMs": 7200000
-      },
-      "sessionTarget": "isolated",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "Run scripts/poll-check.sh. Parse the JSON output.\n\nIf data.due == 0, output ONLY 'NO_ACTION' and nothing else.\n\nIf data.due == 1:\n1. Read USER.md to find the developer's name, context, and GitHub username(s) from the ## GitHub section. Also read IDENTITY.md to find your target Slack user ID.\n2. If one or more GitHub usernames are configured in USER.md, run scripts/github-activity.sh --user <github-usernames> --since 24 (comma-separated if multiple). Parse the output for recent PRs, commits, reviews, and issues. If no GitHub username is configured, or the script fails or returns no data, skip this step and proceed without it -- GitHub activity is enrichment, not a blocker.\nIMPORTANT: Only use GitHub activity data from the script output above. Do NOT independently query GitHub APIs, the Events API, or any other GitHub endpoints. Do NOT reference any repositories outside <your-org> organization. Personal repos are strictly off-limits.\n3. Review your conversation history and memory for recent context about what the developer has been working on.\n4. Compose a check-in message that:\n   a. References specific GitHub activity or recent conversation context\n   b. Asks what they have been working on since the last check-in\n   c. Explicitly asks them to share any work NOT visible in GitHub -- meetings, design discussions, code reviews, research, architecture planning, pairing sessions, mentoring, documentation, or any other contributions\n   d. Asks about current blockers or anything they need help with\n   e. Is warm and specific, not generic. Avoid canned phrases like 'just checking in'.\n5. Send the message using this exact command: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\" -- where <SLACK_ID> is the target user's Slack ID from your identity/config files.\n6. After sending, update memory/poll-state.json: set awaiting_response to true.",
-        "timeoutSeconds": 180,
-        "thinking": "on",
-        "model": "openai-codex/gpt-5.4"
-      },
-      "sessionKey": "agent:malarvizhi:main",
-      "delivery": {
-        "mode": "none"
-      }
-    },
-    {
       "id": "2cb2884c-da56-4fd9-9e11-e21a66019ae7",
-      "agentId": "dev10-g",
-      "name": "dev10 Gudiashvili Check-in",
+      "agentId": "dev10",
+      "name": "dev10 Check-in",
       "enabled": true,
       "schedule": {
         "kind": "every",
@@ -502,7 +456,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev10-g:main",
+      "sessionKey": "agent:dev10:main",
       "delivery": {
         "mode": "none"
       }
