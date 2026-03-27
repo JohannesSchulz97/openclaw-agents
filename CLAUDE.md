@@ -209,6 +209,7 @@ bash scripts/apply-cron.sh
 ## Agent: dev3
 
 - Slack ID: <slack-id>
+- GitHub: <github-username>
 - Check-in: every 2 hours (due after 240 min of no interaction)
 - Model: openai-codex/gpt-5.4
 
