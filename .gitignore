@@ -7,6 +7,7 @@
 .openclaw/agents/*/memory/daily/
 .openclaw/agents/*/memory/archives/
 .openclaw/agents/*/memory/poll-state.json
+.openclaw/agents/*/memory/*.md
 
 # Runtime cron state - managed by openclaw, not stow
 .openclaw/cron/jobs.json
