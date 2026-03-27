@@ -283,6 +283,10 @@ bash scripts/apply-cron.sh
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
 - Model: openai-codex/gpt-5.4
 
+## Image Generation (Gemini Nano Banana)
+
+API key stored at `~/.openclaw/credentials/gemini-nano-banana.json`. Default model: Nano Banana 2, fallback: Nano Banana Pro. Do NOT commit this key to the repository.
+
 ## Useful Commands
 
 ```bash
