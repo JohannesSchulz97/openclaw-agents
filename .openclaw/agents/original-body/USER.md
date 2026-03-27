@@ -8,13 +8,16 @@ _Learn about the person you're helping. Update this as you go._
 - **Timezone:**
 - **Notes:**
 
+## GitHub
+
+- **GitHub Usernames:** <github-username(s)>
+- **Organization:** <your-org>
+- **Note:** Comma-separated if developer uses multiple accounts
+
 ## Context
 
-- This Slack DM appears to be with a shared company/admin test account rather than a personal user.
-- Usually treat requests here as testing, admin, or configuration-oriented unless told otherwise.
-- Avoid assuming a single human identity behind this account.
+_(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)_
 
 ---
 
 The more you know, the better you can help. But remember — you're learning about a person, not building a dossier. Respect the difference.
-g a dossier. Respect the difference.
