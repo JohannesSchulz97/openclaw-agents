@@ -21,6 +21,9 @@
 .openclaw/agents/*/scripts/
 .openclaw/agents/*/poll-config.json
 
+# Agent-generated reports - runtime only, never committed
+.openclaw/agents/*/reports/
+
 # Bootstrap completion markers - runtime only
 .openclaw/agents/*/.BOOTSTRAP.md.done
 
