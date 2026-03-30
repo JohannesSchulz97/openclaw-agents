@@ -15,7 +15,11 @@ _Learn about the person you're helping. Update this as you go._
 
 ## Context
 
-_(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)_
+- Responsible for Oracle (SurfSense fork).
+- Responsible for the LangGraph server and for how to create/deploy pipelines there.
+- Responsible for the Struktur Analyse product.
+- Part of the tech leads; daily meeting with dev10, dev10, dev10, and André.
+- Works with junior dev dev10 (dev10 Gudiashvili), dev10 on the marketing email project, and dev3 on the client support ticket project.
 
 ---
 
