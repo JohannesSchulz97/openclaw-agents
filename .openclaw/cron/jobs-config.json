@@ -348,8 +348,8 @@
     },
     {
       "id": "2d4d4192-ffc3-47c3-bf96-7a21e4c3b540",
-      "agentId": "dev10-b",
-      "name": "dev10 Bakuradze Check-in",
+      "agentId": "dev10",
+      "name": "dev10 Check-in",
       "enabled": true,
       "schedule": {
         "kind": "every",
@@ -364,7 +364,7 @@
         "thinking": "on",
         "model": "openai-codex/gpt-5.4"
       },
-      "sessionKey": "agent:dev10-b:cron:checkin",
+      "sessionKey": "agent:dev10:cron:checkin",
       "delivery": {
         "mode": "none"
       }

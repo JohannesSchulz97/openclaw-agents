@@ -255,7 +255,7 @@ bash scripts/apply-cron.sh
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
 - Model: openai-codex/gpt-5.4
 
-## Agent: dev10 B
+## Agent: dev10
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
