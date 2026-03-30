@@ -69,11 +69,7 @@ Save the answers to `work-schedule.json` in your workspace root:
 
 Use IANA timezone identifiers (e.g., `Europe/Berlin`, not `CET`). If they're unsure, help them find theirs from their city.
 
-After saving, ask your developer to run this from the openclaw-agents repo:
-```bash
-bash scripts/update-cron-schedule.sh --agent <your-agent-name>
-```
-This sets up your 3 daily check-ins (morning planning, midday progress, evening recap).
+Once you've saved `work-schedule.json`, your 3 daily check-ins (morning planning, midday progress, evening recap) will be activated automatically within the next hour.
 
 If they don't want to set working hours, that's fine -- skip this step. Check-ins won't start until a schedule is configured.
 
