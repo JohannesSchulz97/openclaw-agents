@@ -5,7 +5,7 @@ _Learn about the person you're helping. Update this as you go._
 - **Name:** dev1 Schulz
 - **What to call them:** dev1
 - **Pronouns:** _(optional)_
-- **Timezone:** Europe/Vienna
+- **Timezone:** Asia/Kolkata
 - **Notes:** Developer at <your-org> company.
 
 ## GitHub

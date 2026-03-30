@@ -151,6 +151,8 @@ bash scripts/sync-agents.sh
 cd ~/openclaw-agents/.openclaw && stow --no-folding -t ~/.openclaw .
 ```
 
+**Important:** Per-agent files (`IDENTITY.md`, `USER.md`, `.agent-type`) and `memory/` contents are excluded from stow via `.openclaw/.stow-local-ignore`. These files are created by `create-agent.sh` and modified by agents at runtime. They exist as real files in `~/.openclaw/`, not symlinks. If you add a new agent, run `scripts/migrate-per-agent-files.sh` after stow to ensure per-agent files are real.
+
 To pull live changes from `~/.openclaw/` back into the repo (e.g., if OpenClaw modified a file in place):
 
 ```bash

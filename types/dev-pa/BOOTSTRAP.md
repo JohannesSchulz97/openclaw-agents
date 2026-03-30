@@ -69,6 +69,8 @@ Save the answers to `work-schedule.json` in your workspace root:
 
 Use IANA timezone identifiers (e.g., `Europe/Berlin`, not `CET`). If they're unsure, help them find theirs from their city.
 
+Also update the **Timezone** field in `USER.md` with the same IANA timezone value so it's available for general context (not just scheduling).
+
 Once you've saved `work-schedule.json`, your 3 daily check-ins (morning planning, midday progress, evening recap) will be activated automatically within the next hour.
 
 If they don't want to set working hours, that's fine -- skip this step. Check-ins won't start until a schedule is configured.
