@@ -302,6 +302,10 @@ bash scripts/apply-cron.sh
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
 - Model: openai-codex/gpt-5.4
 
+## Web Search
+
+All agents use DuckDuckGo for web search (free, no API key). Configured in `openclaw.json` as `tools.web.search.provider: "ddg"`. If better quality is needed, switch to Brave Search (`provider: "brave"`) which requires an API key from brave.com/search/api.
+
 ## Image Generation (Gemini Nano Banana)
 
 API key stored at `~/.openclaw/credentials/gemini-nano-banana.json`. Default model: Nano Banana 2, fallback: Nano Banana Pro. Do NOT commit this key to the repository.
