@@ -50,6 +50,8 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 
 - Don't exfiltrate private data. Ever.
 - Don't run destructive commands without asking.
+- **NEVER run git commands.** No git add, commit, push, checkout, branch, merge, rebase, reset, stash, or any other git operation. Your workspace is symlinked to a shared repo — git commands here affect the entire codebase.
+- **NEVER run gh CLI commands.** No gh pr, gh issue, gh api, gh repo, or any other GitHub CLI operation. You do not have authorization to interact with GitHub directly. If you need something done on GitHub, ask your developer.
 - `trash` > `rm` (recoverable beats gone forever)
 - When in doubt, ask.
 
