@@ -62,6 +62,8 @@ TOTAL=0
 ACTIVE_TODAY=0
 AWAITING_COUNT=0
 INACTIVE=0
+BOOTSTRAPPED_COUNT=0
+CURRENTLY_WORKING=0
 
 for agent in "${AGENT_LIST[@]}"; do
     agent=$(echo "$agent" | xargs)  # trim whitespace
@@ -183,6 +185,51 @@ for agent in "${AGENT_LIST[@]}"; do
         fi
     fi
 
+    # ── Work schedule ───────────────────────
+    WORK_SCHEDULE_FILE="$AGENT_DIR/memory/work-schedule.json"
+    WORK_SCHEDULE="null"
+    IS_BOOTSTRAPPED="false"
+    IS_WORKING_HOURS="false"
+
+    if [[ -f "$WORK_SCHEDULE_FILE" ]]; then
+        WORK_SCHEDULE=$(jq '.' "$WORK_SCHEDULE_FILE" 2>/dev/null || echo "null")
+        if [[ "$WORK_SCHEDULE" != "null" ]]; then
+            IS_BOOTSTRAPPED="true"
+
+            TZ_NAME=$(echo "$WORK_SCHEDULE" | jq -r '.timezone // ""')
+            WH_START=$(echo "$WORK_SCHEDULE" | jq -r '.working_hours.start // ""')
+            WH_END=$(echo "$WORK_SCHEDULE" | jq -r '.working_hours.end // ""')
+            WORKS_WEEKENDS=$(echo "$WORK_SCHEDULE" | jq -r '.works_weekends // false')
+
+            if [[ -n "$TZ_NAME" && -n "$WH_START" && -n "$WH_END" ]]; then
+                DOW=$(TZ="$TZ_NAME" date +%u)   # 1=Mon … 7=Sun
+                if [[ "$WORKS_WEEKENDS" == "false" && ( "$DOW" -eq 6 || "$DOW" -eq 7 ) ]]; then
+                    IS_WORKING_HOURS="false"
+                else
+                    CUR_H=$(TZ="$TZ_NAME" date +%-H)
+                    CUR_M=$(TZ="$TZ_NAME" date +%-M)
+                    CUR_MINS=$(( 10#$CUR_H * 60 + 10#$CUR_M ))
+
+                    START_H=${WH_START%%:*}; START_M=${WH_START##*:}
+                    END_H=${WH_END%%:*};   END_M=${WH_END##*:}
+                    START_MINS=$(( 10#$START_H * 60 + 10#$START_M ))
+                    END_MINS=$(( 10#$END_H * 60 + 10#$END_M ))
+
+                    if [[ "$CUR_MINS" -ge "$START_MINS" && "$CUR_MINS" -lt "$END_MINS" ]]; then
+                        IS_WORKING_HOURS="true"
+                    fi
+                fi
+            fi
+        fi
+    fi
+
+    if [[ "$IS_BOOTSTRAPPED" == "true" ]]; then
+        BOOTSTRAPPED_COUNT=$((BOOTSTRAPPED_COUNT + 1))
+    fi
+    if [[ "$IS_WORKING_HOURS" == "true" ]]; then
+        CURRENTLY_WORKING=$((CURRENTLY_WORKING + 1))
+    fi
+
     # ── Track inactive ──────────────────────
     if [[ -z "$LAST_SESSION_ACTIVITY" && "$SESSIONS_TODAY" -eq 0 ]]; then
         INACTIVE=$((INACTIVE + 1))
@@ -197,6 +244,9 @@ for agent in "${AGENT_LIST[@]}"; do
         --argjson poll_state "$POLL_STATE" \
         --argjson has_notes "$HAS_RECENT_NOTES" \
         --arg note_date "${LATEST_NOTE_DATE:-}" \
+        --argjson work_schedule "$WORK_SCHEDULE" \
+        --argjson is_bootstrapped "$IS_BOOTSTRAPPED" \
+        --argjson is_working_hours "$IS_WORKING_HOURS" \
         '{
             name: $name,
             last_session_activity: (if $last_activity == "" then null else $last_activity end),
@@ -204,7 +254,10 @@ for agent in "${AGENT_LIST[@]}"; do
             awaiting_response: $awaiting,
             poll_state: $poll_state,
             has_recent_notes: $has_notes,
-            latest_note_date: (if $note_date == "" then null else $note_date end)
+            latest_note_date: (if $note_date == "" then null else $note_date end),
+            work_schedule: $work_schedule,
+            is_bootstrapped: $is_bootstrapped,
+            is_working_hours: $is_working_hours
         }')
 
     AGENT_RESULTS=$(echo "$AGENT_RESULTS" | jq --argjson entry "$AGENT_ENTRY" '. + [$entry]')
@@ -217,16 +270,20 @@ DATA=$(jq -n \
     --argjson active "$ACTIVE_TODAY" \
     --argjson awaiting "$AWAITING_COUNT" \
     --argjson inactive "$INACTIVE" \
+    --argjson bootstrapped "$BOOTSTRAPPED_COUNT" \
+    --argjson currently_working "$CURRENTLY_WORKING" \
     '{
         agents: $agents,
         summary: {
             total_agents: $total,
             active_today: $active,
             awaiting_response: $awaiting,
-            inactive: $inactive
+            inactive: $inactive,
+            bootstrapped: $bootstrapped,
+            currently_working: $currently_working
         }
     }')
 
-log "Status check complete: $TOTAL agents, $ACTIVE_TODAY active today, $AWAITING_COUNT awaiting response"
+log "Status check complete: $TOTAL agents, $ACTIVE_TODAY active today, $AWAITING_COUNT awaiting response, $BOOTSTRAPPED_COUNT bootstrapped, $CURRENTLY_WORKING currently working"
 
 json_success "check-status" "$DATA"
