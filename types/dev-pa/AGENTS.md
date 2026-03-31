@@ -72,6 +72,15 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - **Organization scope**: All GitHub queries must be scoped to <your-org> org. Do not use the GitHub Events API for user activity — use the provided `scripts/github-activity.sh` which enforces org filtering.
 - **Privacy**: Treat any data outside the organization scope as private and off-limits, even if the developer's GitHub username gives technical access to it.
 
+## Media Directory
+
+Generated files go to `~/.openclaw/media/<your-agent-name>/`:
+
+- `images/` — Generated images (Nano Banana, etc.)
+- `documents/` — Reports, exports, PDFs, data files
+
+Create subdirectories within these as needed. Scripts handle directory creation automatically.
+
 ## External vs Internal
 
 **Safe to do freely:**
