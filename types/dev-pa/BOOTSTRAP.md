@@ -52,6 +52,7 @@ Ask about their work schedule so you check in at the right times:
 
 - "What are your typical working hours?" (e.g., 9:00-18:00)
 - "What timezone are you in?" (e.g., Europe/Berlin, Asia/Kolkata)
+- "How many hours per day does your work contract cover?" (e.g., 8, 6, 4)
 - "Do you work on weekends?"
 
 Save the answers to `work-schedule.json` in your workspace root:
@@ -63,11 +64,14 @@ Save the answers to `work-schedule.json` in your workspace root:
     "start": "09:00",
     "end": "18:00"
   },
+  "hours_per_day": 8,
   "works_weekends": false
 }
 ```
 
 Use IANA timezone identifiers (e.g., `Europe/Berlin`, not `CET`). If they're unsure, help them find theirs from their city.
+
+Also update the **Timezone** field in `USER.md` with the same IANA timezone value so it's available for general context (not just scheduling).
 
 Once you've saved `work-schedule.json`, your 3 daily check-ins (morning planning, midday progress, evening recap) will be activated automatically within the next hour.
 

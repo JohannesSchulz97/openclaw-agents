@@ -128,7 +128,8 @@ validate_timezone() {
 # parse_work_schedule <json_file>
 #
 # Reads work-schedule.json and sets:
-#   WS_TIMEZONE, WS_START_HOUR, WS_END_HOUR, WS_WORKS_WEEKENDS
+#   WS_TIMEZONE, WS_START_HOUR, WS_END_HOUR, WS_WORKS_WEEKENDS,
+#   WS_HOURS_PER_DAY (empty string if not set in JSON)
 #
 # Returns 1 if file missing or invalid.
 # --------------------------------------------------------------------------- #
@@ -151,14 +152,15 @@ parse_work_schedule() {
         .timezone // "UTC",
         (.working_hours.start // "09:00" | split(":")[0] | tonumber),
         (.working_hours.end // "18:00" | split(":")[0] | tonumber),
-        (.works_weekends // false | tostring)
+        (.works_weekends // false | tostring),
+        (.hours_per_day // empty | tostring)
     ] | @tsv' "$json_file" 2>/dev/null) || {
         echo "Error: Failed to parse work schedule: $json_file" >&2
         return 1
     }
 
     # Read tab-separated values
-    IFS=$'\t' read -r WS_TIMEZONE WS_START_HOUR WS_END_HOUR WS_WORKS_WEEKENDS <<< "$parsed"
+    IFS=$'\t' read -r WS_TIMEZONE WS_START_HOUR WS_END_HOUR WS_WORKS_WEEKENDS WS_HOURS_PER_DAY <<< "$parsed"
 
     # Validate that we got numeric hours
     if ! [[ "$WS_START_HOUR" =~ ^[0-9]+$ ]] || ! [[ "$WS_END_HOUR" =~ ^[0-9]+$ ]]; then

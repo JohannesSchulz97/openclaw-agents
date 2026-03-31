@@ -1,0 +1,11 @@
+# Per-agent files: created by create-agent.sh, modified by agents at runtime.
+# Stow must NEVER create symlinks for these — they must remain real files.
+agents/[^/]+/IDENTITY\.md
+agents/[^/]+/USER\.md
+agents/[^/]+/\.agent-type
+
+# Agent runtime state: written by agents during operation.
+agents/[^/]+/memory
+
+# Bootstrap completion markers (gitignored, but protect just in case).
+agents/[^/]+/\.BOOTSTRAP\.md\.done
