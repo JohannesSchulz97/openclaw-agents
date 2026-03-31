@@ -138,6 +138,150 @@
       "delivery": {
         "mode": "none"
       }
+    },
+    {
+      "id": "9b813b65-08b9-4fd1-a004-9a4930c26b45",
+      "agentId": "dev10",
+      "name": "dev10 Morning Check-in",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 11 * * 1-5",
+        "tz": "Asia/Tbilisi"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/checkin-guard.sh morning. Parse the JSON output.\\n\\nIf data.skip == true, output ONLY 'NO_ACTION' and nothing else.\\n\\nIf data.skip == false:\\n1. Read USER.md to find the developer's name, context, and GitHub username(s). Read IDENTITY.md for your target Slack user ID.\\n2. If GitHub usernames configured, run scripts/github-activity.sh --user <github-usernames> --since 16 (overnight activity). Parse for recent PRs, commits, reviews. Skip if no username or script fails.\\nIMPORTANT: Only use GitHub data from script output. Do NOT query GitHub APIs independently. Only <your-org> org repos.\\n3. Review conversation history and memory for recent context.\\n4. Compose a SHORT morning check-in (2-3 sentences max) that:\\n   a. Greets them for the start of their day\\n   b. If relevant, mention carry-over from the previous workday or overnight activity -- do NOT list commits/PRs. If today is Monday and works_weekends is false in work-schedule.json, refer to carry-over from Friday/last week rather than yesterday.\\n   c. Asks what they're planning to focus on today\\n   d. Tone: energetic, forward-looking, planning-oriented\\n5. If data.prev_unanswered == true, add a brief gentle note (e.g., \"Didn't hear back yesterday -- no worries, just making sure nothing's stuck.\")\\n6. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\" -- where <SLACK_ID> is from IDENTITY.md.",
+        "timeoutSeconds": 180,
+        "thinking": "on",
+        "model": "openai-codex/gpt-5.4"
+      },
+      "sessionKey": "agent:dev10:cron:morning",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "7b77747f-83bc-4b50-9acb-8751b5e2fa01",
+      "agentId": "dev10",
+      "name": "dev10 Midday Check-in",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 15 * * 1-5",
+        "tz": "Asia/Tbilisi"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/checkin-guard.sh midday. Parse the JSON output.\\n\\nIf data.skip == true, output ONLY 'NO_ACTION' and nothing else.\\n\\nIf data.skip == false:\\n1. Read USER.md to find the developer's name, context, and GitHub username(s). Read IDENTITY.md for your target Slack user ID.\\n2. If GitHub usernames configured, run scripts/github-activity.sh --user <github-usernames> --since 6 (today's work so far). Parse for recent activity. Skip if no username or script fails.\\nIMPORTANT: Only use GitHub data from script output. Do NOT query GitHub APIs independently. Only <your-org> org repos.\\n3. Review conversation history and memory for what they said this morning.\\n4. Compose a SHORT midday check-in (2-3 sentences max) that:\\n   a. Acknowledges the day is underway\\n   b. Asks what's keeping them busy, including beyond what's visible in GitHub\\n   c. Asks if they need help with anything\\n   d. Tone: collaborative, curious, supportive\\n5. If data.prev_unanswered == true, mention briefly and move on.\\n6. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\" -- where <SLACK_ID> is from IDENTITY.md.",
+        "timeoutSeconds": 180,
+        "thinking": "on",
+        "model": "openai-codex/gpt-5.4"
+      },
+      "sessionKey": "agent:dev10:cron:midday",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "a9308509-04e0-4acf-bb8b-7dc58906ab94",
+      "agentId": "dev10",
+      "name": "dev10 Evening Check-in",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "30 18 * * 1-5",
+        "tz": "Asia/Tbilisi"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/checkin-guard.sh evening. Parse the JSON output.\\n\\nIf data.skip == true, output ONLY 'NO_ACTION' and nothing else.\\n\\nIf data.skip == false:\\n1. Read USER.md to find the developer's name, context, and GitHub username(s). Read IDENTITY.md for your target Slack user ID.\\n2. If GitHub usernames configured, run scripts/github-activity.sh --user <github-usernames> --since 10 (today's full activity). Parse for recent activity. Skip if no username or script fails.\\nIMPORTANT: Only use GitHub data from script output. Do NOT query GitHub APIs independently. Only <your-org> org repos.\\n3. Review conversation history and memory for what happened today.\\n4. Compose a SHORT evening check-in (2-3 sentences max) that:\\n   a. Acknowledges the day is winding down\\n   b. Asks how the day went -- what went well, what didn't. If today is Friday and works_weekends is false in work-schedule.json, ask what to carry over to next week and add a brief weekend sign-off. Otherwise ask what to carry over tomorrow.\\n   c. Tone: reflective, appreciative, wrap-up oriented\\n5. If data.prev_unanswered == true and data.missed_checkins >= 2, note gently (\"Haven't heard from you today -- hope everything's OK. No pressure, just here if you need anything.\")\\n6. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\" -- where <SLACK_ID> is from IDENTITY.md.",
+        "timeoutSeconds": 180,
+        "thinking": "on",
+        "model": "openai-codex/gpt-5.4"
+      },
+      "sessionKey": "agent:dev10:cron:evening",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "7945dea8-23fe-4bcd-99ce-87c505026de4",
+      "agentId": "dev10",
+      "name": "dev10 Morning Check-in",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 8 * * 1-5",
+        "tz": "Europe/Madrid"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/checkin-guard.sh morning. Parse the JSON output.\\n\\nIf data.skip == true, output ONLY 'NO_ACTION' and nothing else.\\n\\nIf data.skip == false:\\n1. Read USER.md to find the developer's name, context, and GitHub username(s). Read IDENTITY.md for your target Slack user ID.\\n2. If GitHub usernames configured, run scripts/github-activity.sh --user <github-usernames> --since 16 (overnight activity). Parse for recent PRs, commits, reviews. Skip if no username or script fails.\\nIMPORTANT: Only use GitHub data from script output. Do NOT query GitHub APIs independently. Only <your-org> org repos.\\n3. Review conversation history and memory for recent context.\\n4. Compose a SHORT morning check-in (2-3 sentences max) that:\\n   a. Greets them for the start of their day\\n   b. If relevant, mention carry-over from the previous workday or overnight activity -- do NOT list commits/PRs. If today is Monday and works_weekends is false in work-schedule.json, refer to carry-over from Friday/last week rather than yesterday.\\n   c. Asks what they're planning to focus on today\\n   d. Tone: energetic, forward-looking, planning-oriented\\n5. If data.prev_unanswered == true, add a brief gentle note (e.g., \"Didn't hear back yesterday -- no worries, just making sure nothing's stuck.\")\\n6. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\" -- where <SLACK_ID> is from IDENTITY.md.",
+        "timeoutSeconds": 180,
+        "thinking": "on",
+        "model": "openai-codex/gpt-5.4"
+      },
+      "sessionKey": "agent:dev10:cron:morning",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "55fe33ee-112f-470f-accb-6e03d499aaa8",
+      "agentId": "dev10",
+      "name": "dev10 Midday Check-in",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 13 * * 1-5",
+        "tz": "Europe/Madrid"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/checkin-guard.sh midday. Parse the JSON output.\\n\\nIf data.skip == true, output ONLY 'NO_ACTION' and nothing else.\\n\\nIf data.skip == false:\\n1. Read USER.md to find the developer's name, context, and GitHub username(s). Read IDENTITY.md for your target Slack user ID.\\n2. If GitHub usernames configured, run scripts/github-activity.sh --user <github-usernames> --since 6 (today's work so far). Parse for recent activity. Skip if no username or script fails.\\nIMPORTANT: Only use GitHub data from script output. Do NOT query GitHub APIs independently. Only <your-org> org repos.\\n3. Review conversation history and memory for what they said this morning.\\n4. Compose a SHORT midday check-in (2-3 sentences max) that:\\n   a. Acknowledges the day is underway\\n   b. Asks what's keeping them busy, including beyond what's visible in GitHub\\n   c. Asks if they need help with anything\\n   d. Tone: collaborative, curious, supportive\\n5. If data.prev_unanswered == true, mention briefly and move on.\\n6. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\" -- where <SLACK_ID> is from IDENTITY.md.",
+        "timeoutSeconds": 180,
+        "thinking": "on",
+        "model": "openai-codex/gpt-5.4"
+      },
+      "sessionKey": "agent:dev10:cron:midday",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "97cfd6b8-39f7-4c7a-8962-ed70199e3310",
+      "agentId": "dev10",
+      "name": "dev10 Evening Check-in",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "30 17 * * 1-5",
+        "tz": "Europe/Madrid"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/checkin-guard.sh evening. Parse the JSON output.\\n\\nIf data.skip == true, output ONLY 'NO_ACTION' and nothing else.\\n\\nIf data.skip == false:\\n1. Read USER.md to find the developer's name, context, and GitHub username(s). Read IDENTITY.md for your target Slack user ID.\\n2. If GitHub usernames configured, run scripts/github-activity.sh --user <github-usernames> --since 10 (today's full activity). Parse for recent activity. Skip if no username or script fails.\\nIMPORTANT: Only use GitHub data from script output. Do NOT query GitHub APIs independently. Only <your-org> org repos.\\n3. Review conversation history and memory for what happened today.\\n4. Compose a SHORT evening check-in (2-3 sentences max) that:\\n   a. Acknowledges the day is winding down\\n   b. Asks how the day went -- what went well, what didn't. If today is Friday and works_weekends is false in work-schedule.json, ask what to carry over to next week and add a brief weekend sign-off. Otherwise ask what to carry over tomorrow.\\n   c. Tone: reflective, appreciative, wrap-up oriented\\n5. If data.prev_unanswered == true and data.missed_checkins >= 2, note gently (\"Haven't heard from you today -- hope everything's OK. No pressure, just here if you need anything.\")\\n6. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\" -- where <SLACK_ID> is from IDENTITY.md.",
+        "timeoutSeconds": 180,
+        "thinking": "on",
+        "model": "openai-codex/gpt-5.4"
+      },
+      "sessionKey": "agent:dev10:cron:evening",
+      "delivery": {
+        "mode": "none"
+      }
     }
   ]
 }

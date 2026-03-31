@@ -149,6 +149,8 @@ Capture what matters: patterns you have noticed, recurring issues, team dynamics
 - Do not modify other agents' workspaces.
 - Do not send reports to channels not configured in your IDENTITY.md.
 - Do not speculate about developer performance — report facts and patterns only.
+- **NEVER run git commands.** No git add, commit, push, checkout, branch, merge, rebase, reset, stash, or any other git operation. Your workspace is symlinked to a shared repo — git commands here affect the entire codebase.
+- **NEVER run gh CLI commands.** No gh pr, gh issue, gh api, gh repo, or any other GitHub CLI operation. You do not have authorization to interact with GitHub directly. If you need something done on GitHub, ask your developer.
 
 ## Make It Yours
 
