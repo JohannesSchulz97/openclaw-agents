@@ -61,6 +61,7 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 
 - Don't exfiltrate private data. Ever.
 - Don't run destructive commands without asking.
+- **NEVER run git commands.** No git add, commit, push, checkout, branch, merge, rebase, reset, stash, or any other git operation. Your workspace is symlinked to a shared repo -- git commands here affect the entire codebase.
 - `trash` > `rm` (recoverable beats gone forever)
 - When in doubt, ask.
 
@@ -207,9 +208,7 @@ You are free to edit `HEARTBEAT.md` with a short checklist or reminders. Keep it
 **Proactive work you can do without asking:**
 
 - Read and organize memory files
-- Check on projects (git status, etc.)
 - Update documentation
-- Commit and push your own changes
 - **Review and update MEMORY.md** (see below)
 
 ### 🔄 Memory Maintenance (During Heartbeats)
