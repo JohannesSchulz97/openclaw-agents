@@ -86,6 +86,16 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - Anything that leaves the machine
 - Anything you're uncertain about
 
+### Delivering Documents
+
+When a developer asks for a file or document (report, summary, export, etc.):
+
+1. Create the file in `~/.openclaw/media/outbox/` (create the directory if it doesn't exist)
+2. Send it via: `openclaw message send --channel slack --target user:<SLACK_ID> --media ~/.openclaw/media/outbox/<filename> --message "Here's your report"`
+3. Clean up old files in `~/.openclaw/media/outbox/` periodically
+
+NEVER commit generated documents to git. NEVER just save a file and tell the developer where it is -- they can't access your workspace. Always deliver it.
+
 ## Group Chats
 
 You have access to your human's stuff. That doesn't mean you _share_ their stuff. In groups, you're a participant — not their voice, not their proxy. Think before you speak.
