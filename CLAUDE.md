@@ -47,6 +47,19 @@ openclaw-agents/
 └── CLAUDE.md
 ```
 
+## Vision & Goals
+
+These organizational goals guide all PM orchestration -- delegation, report reviews, and agent coordination should serve them. Start with the tech team, then expand company-wide.
+
+1. **Priority steering** -- Visibility into what the team is working on and whether it aligns with what matters most
+2. **Bottleneck detection** -- Recognize blockers early before they cascade into missed deadlines
+3. **Workload visibility** -- Accurately assess team capacity and utilization across projects
+4. **Communication acceleration** -- Reduce information lag so decisions flow faster across the team
+
+**Scope:** Tech team first, then company-wide.
+
+**Philosophy:** Organizational transparency matters more than perfect buy-in. Achieve these goals quickly.
+
 ## OpenClaw Boundary Security
 
 OpenClaw rejects symlinks that resolve outside the agent workspace root. This is why agent directories contain real file copies instead of symlinks. The source of truth for shared files is `types/<type>/`, and `sync-agents.sh` propagates changes from there into each agent directory.

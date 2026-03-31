@@ -1,0 +1,9 @@
+{
+  "timezone": "Europe/Madrid",
+  "working_hours": {
+    "start": "08:30",
+    "end": "18:00"
+  },
+  "works_weekends": false,
+  "notes": "Sometimes takes a midday break and may continue working until late; weekends only in emergencies."
+}
