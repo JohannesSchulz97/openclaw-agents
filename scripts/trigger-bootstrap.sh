@@ -160,11 +160,23 @@ audit_agent() {
 
   # Check work schedule
   local has_schedule=false
-  if [[ -f "$agent_dir/memory/work-schedule.json" ]] || [[ -f "$agent_dir/work-schedule.json" ]]; then
+  local schedule_file=""
+  if [[ -f "$agent_dir/memory/work-schedule.json" ]]; then
     has_schedule=true
+    schedule_file="$agent_dir/memory/work-schedule.json"
+  elif [[ -f "$agent_dir/work-schedule.json" ]]; then
+    has_schedule=true
+    schedule_file="$agent_dir/work-schedule.json"
   fi
   if [[ "$has_schedule" != true ]]; then
     missing+=("work schedule (timezone, working hours)")
+  else
+    # Check for hours_per_day inside work-schedule.json
+    local hours_per_day
+    hours_per_day=$(jq -r '.hours_per_day // empty' "$schedule_file" 2>/dev/null)
+    if [[ -z "$hours_per_day" ]]; then
+      missing+=("hours_per_day")
+    fi
   fi
 
   # Determine status

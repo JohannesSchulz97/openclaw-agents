@@ -2,8 +2,8 @@
   "timezone": "Asia/Tbilisi",
   "working_hours": {
     "start": "11:00",
-    "end": "19:00"
+    "end": "20:00"
   },
-  "works_weekends": false,
+  "works_weekends": "depends",
   "hours_per_day": 8
 }

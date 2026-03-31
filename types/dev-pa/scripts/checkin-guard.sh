@@ -58,7 +58,8 @@ if [[ ! -f "$POLL_STATE_FILE" ]]; then
         last_midday_epoch: 0,
         last_evening_epoch: 0,
         missed_checkins: 0,
-        awaiting_response: false
+        checkin_dispatched: false,
+        last_state_date: ""
     }' > "$POLL_STATE_FILE"
 fi
 
@@ -102,6 +103,35 @@ LAST_MORNING_EPOCH=$(jq -r '.last_morning_epoch // 0' "$POLL_STATE_FILE" 2>/dev/
 LAST_MIDDAY_EPOCH=$(jq -r '.last_midday_epoch // 0' "$POLL_STATE_FILE" 2>/dev/null || echo "0")
 LAST_EVENING_EPOCH=$(jq -r '.last_evening_epoch // 0' "$POLL_STATE_FILE" 2>/dev/null || echo "0")
 MISSED_CHECKINS=$(jq -r '.missed_checkins // 0' "$POLL_STATE_FILE" 2>/dev/null || echo "0")
+LAST_STATE_DATE=$(jq -r '.last_state_date // ""' "$POLL_STATE_FILE" 2>/dev/null || echo "")
+
+# ── Bug 1: State consistency validation ──────
+# If X_responded is true but last_X_epoch is 0, the state is inconsistent — reset the flag
+if [[ "$MORNING_RESPONDED" == "true" && "$LAST_MORNING_EPOCH" == "0" ]]; then
+    log "State inconsistency: morning_responded=true but last_morning_epoch=0, resetting flag"
+    MORNING_RESPONDED=false
+fi
+if [[ "$MIDDAY_RESPONDED" == "true" && "$LAST_MIDDAY_EPOCH" == "0" ]]; then
+    log "State inconsistency: midday_responded=true but last_midday_epoch=0, resetting flag"
+    MIDDAY_RESPONDED=false
+fi
+if [[ "$EVENING_RESPONDED" == "true" && "$LAST_EVENING_EPOCH" == "0" ]]; then
+    log "State inconsistency: evening_responded=true but last_evening_epoch=0, resetting flag"
+    EVENING_RESPONDED=false
+fi
+
+# ── Bug 3: Inter-day state hygiene ───────────
+TODAY_DATE=$(date -u +%Y-%m-%d)
+if [[ -n "$LAST_STATE_DATE" && "$LAST_STATE_DATE" != "$TODAY_DATE" ]]; then
+    log "Day-boundary reset: last_state_date=$LAST_STATE_DATE, today=$TODAY_DATE — resetting daily state"
+    MORNING_RESPONDED=false
+    MIDDAY_RESPONDED=false
+    EVENING_RESPONDED=false
+    LAST_MORNING_EPOCH=0
+    LAST_MIDDAY_EPOCH=0
+    LAST_EVENING_EPOCH=0
+    MISSED_CHECKINS=0
+fi
 
 # Determine if any human session is newer than the last check-in of each type
 # If so, mark that type as responded
@@ -182,6 +212,7 @@ jq -n \
     --argjson last_evening "$LAST_EVENING_EPOCH" \
     --argjson missed "$MISSED_CHECKINS" \
     --argjson awaiting "$(if [[ "$SKIP" == "true" ]]; then echo false; else echo true; fi)" \
+    --arg state_date "$TODAY_DATE" \
     '{
         morning_responded: $morning_responded,
         midday_responded: $midday_responded,
@@ -190,7 +221,8 @@ jq -n \
         last_midday_epoch: $last_midday,
         last_evening_epoch: $last_evening,
         missed_checkins: $missed,
-        awaiting_response: $awaiting
+        checkin_dispatched: $awaiting,
+        last_state_date: $state_date
     }' > "$tmp_state" 2>/dev/null && mv "$tmp_state" "$POLL_STATE_FILE"
 
 log "Agent: $AGENT_NAME, type: $CHECKIN_TYPE, skip: $SKIP, reason: ${REASON:-none}, prev_unanswered: $PREV_UNANSWERED, missed: $MISSED_CHECKINS"

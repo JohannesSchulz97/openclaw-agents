@@ -47,6 +47,19 @@ openclaw-agents/
 └── CLAUDE.md
 ```
 
+## Vision & Goals
+
+These organizational goals guide all PM orchestration -- delegation, report reviews, and agent coordination should serve them. Start with the tech team, then expand company-wide.
+
+1. **Priority steering** -- Visibility into what the team is working on and whether it aligns with what matters most
+2. **Bottleneck detection** -- Recognize blockers early before they cascade into missed deadlines
+3. **Workload visibility** -- Accurately assess team capacity and utilization across projects
+4. **Communication acceleration** -- Reduce information lag so decisions flow faster across the team
+
+**Scope:** Tech team first, then company-wide.
+
+**Philosophy:** Organizational transparency matters more than perfect buy-in. Achieve these goals quickly.
+
 ## OpenClaw Boundary Security
 
 OpenClaw rejects symlinks that resolve outside the agent workspace root. This is why agent directories contain real file copies instead of symlinks. The source of truth for shared files is `types/<type>/`, and `sync-agents.sh` propagates changes from there into each agent directory.
@@ -141,19 +154,23 @@ QMD is an alternative memory backend by Tobi Lutke. To enable:
 
 ## Sync and Stow Workflow
 
-After editing shared files in `types/`:
+After editing shared files in `types/`, run sync and stow **sequentially in a single command**:
 
 ```bash
-# Propagate type changes to all agent directories
-bash scripts/sync-agents.sh
-
-# Stow into ~/.openclaw/
-cd ~/openclaw-agents/.openclaw && stow --no-folding -t ~/.openclaw .
+# WARNING: These steps MUST run sequentially (&&), never in parallel.
+# Running stow --adopt before sync completes will overwrite freshly-synced
+# files in .openclaw/ with stale copies from ~/.openclaw/, destroying your changes.
+bash scripts/sync-agents.sh && cd ~/openclaw-agents/.openclaw && stow --adopt --no-folding -t ~/.openclaw . && stow --no-folding -t ~/.openclaw .
 ```
+
+The combined command does three things in order:
+1. `sync-agents.sh` -- propagates type changes into `.openclaw/agents/*/`
+2. `stow --adopt` -- pulls any live runtime changes from `~/.openclaw/` back into the repo (so stow does not conflict with files agents modified at runtime)
+3. `stow` -- pushes the repo state (now including both synced type files and adopted runtime changes) into `~/.openclaw/`
 
 **Important:** Per-agent files (`IDENTITY.md`, `USER.md`, `.agent-type`) and `memory/` contents are excluded from stow via `.openclaw/.stow-local-ignore`. These files are created by `create-agent.sh` and modified by agents at runtime. They exist as real files in `~/.openclaw/`, not symlinks. If you add a new agent, run `scripts/migrate-per-agent-files.sh` after stow to ensure per-agent files are real.
 
-To pull live changes from `~/.openclaw/` back into the repo (e.g., if OpenClaw modified a file in place):
+To pull live changes from `~/.openclaw/` back into the repo **without syncing** (e.g., if OpenClaw modified a file in place and no type changes were made):
 
 ```bash
 cd ~/openclaw-agents/.openclaw && stow --adopt --no-folding -t ~/.openclaw .
@@ -285,6 +302,10 @@ bash scripts/apply-cron.sh
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
 - Model: openai-codex/gpt-5.4
 
+## Web Search
+
+All agents use DuckDuckGo for web search (free, no API key). Configured in `openclaw.json` as `tools.web.search.provider: "ddg"`. If better quality is needed, switch to Brave Search (`provider: "brave"`) which requires an API key from brave.com/search/api.
+
 ## Image Generation (Gemini Nano Banana)
 
 API key stored at `~/.openclaw/credentials/gemini-nano-banana.json`. Default model: Nano Banana 2, fallback: Nano Banana Pro. Do NOT commit this key to the repository.
@@ -292,11 +313,8 @@ API key stored at `~/.openclaw/credentials/gemini-nano-banana.json`. Default mod
 ## Useful Commands
 
 ```bash
-# Propagate type changes to agent directories
-bash scripts/sync-agents.sh
-
-# Stow agent configs to ~/.openclaw/
-cd ~/openclaw-agents/.openclaw && stow --no-folding -t ~/.openclaw .
+# Sync type changes and stow to ~/.openclaw/ (must be sequential)
+bash scripts/sync-agents.sh && cd ~/openclaw-agents/.openclaw && stow --adopt --no-folding -t ~/.openclaw . && stow --no-folding -t ~/.openclaw .
 
 # Apply cron config to runtime jobs.json
 bash scripts/apply-cron.sh
