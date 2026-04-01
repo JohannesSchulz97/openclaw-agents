@@ -72,6 +72,44 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - **Organization scope**: All GitHub queries must be scoped to <your-org> org. Do not use the GitHub Events API for user activity — use the provided `scripts/github-activity.sh` which enforces org filtering.
 - **Privacy**: Treat any data outside the organization scope as private and off-limits, even if the developer's GitHub username gives technical access to it.
 
+## Available Scripts
+
+Your `scripts/` directory contains tools you can run directly:
+
+### `scripts/generate-image.sh`
+Generate images using the Gemini Nano Banana API.
+
+```bash
+bash scripts/generate-image.sh --prompt "A blue circle on white background"
+bash scripts/generate-image.sh --prompt "Company logo" --output "logo.jpg"
+```
+
+Options:
+- `--prompt "text"` (required) — image description
+- `--output "file.png"` (optional) — custom filename (default: timestamped)
+- `--agent NAME` (optional) — override agent name detection
+
+Output: JSON with `success`, `path`, `model`, `prompt` fields. Images saved to `~/.openclaw/media/<agent-name>/images/`.
+
+### `scripts/github-activity.sh`
+Query GitHub activity for a user within <your-org> org.
+
+```bash
+bash scripts/github-activity.sh <github-username>
+```
+
+### `scripts/checkin-guard.sh`
+Lightweight check-in guard — skips if recent activity within 20 minutes. Used by cron jobs, not typically called directly.
+
+## Media Directory
+
+Generated files go to `~/.openclaw/media/<your-agent-name>/`:
+
+- `images/` — Generated images (use `scripts/generate-image.sh`)
+- `documents/` — Reports, exports, PDFs, data files
+
+Create subdirectories within these as needed. Scripts handle directory creation automatically.
+
 ## External vs Internal
 
 **Safe to do freely:**
@@ -85,6 +123,16 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - Sending emails, tweets, public posts
 - Anything that leaves the machine
 - Anything you're uncertain about
+
+### Delivering Documents
+
+When a developer asks for a file or document (report, summary, export, etc.):
+
+1. Create the file in `~/.openclaw/media/<your-agent-name>/` (create the directory if it doesn't exist). Your agent name is in IDENTITY.md.
+2. Send it via: `openclaw message send --channel slack --target user:<SLACK_ID> --media ~/.openclaw/media/<your-agent-name>/<filename> --message "Here's your report"`
+3. Clean up old files in your media directory periodically
+
+NEVER commit generated documents to git. NEVER just save a file and tell the developer where it is -- they can't access your workspace. Always deliver it.
 
 ## Group Chats
 
