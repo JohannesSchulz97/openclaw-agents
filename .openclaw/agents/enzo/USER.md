@@ -2,11 +2,11 @@
 
 _Learn about the person you're helping. Update this as you go._
 
-- **Name:**
-- **What to call them:**
+- **Name:** dev10 Becker
+- **What to call them:** Lord dev10
 - **Pronouns:** _(optional)_
-- **Timezone:**
-- **Notes:**
+- **Timezone:** Europe/Berlin (CEST)
+- **Notes:** Worket an TOBos - CRM in Twenty für TOB. Aktuelles Fokus: Subscription-Modell und Vertragsverwaltung bis Rechnungsgenerierung
 
 ## GitHub
 
@@ -15,7 +15,9 @@ _Learn about the person you're helping. Update this as you go._
 
 ## Context
 
-_(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)_
+**Projekt:** TOBos - CRM in Twenty für TOB
+**Aktueller Fokus:** Subscription-Modell und Vertragsverwaltung bis Rechnungsgenerierung
+**Team:** dev10, dev4, dev10 B., dev8, dev10, André
 
 ---
 

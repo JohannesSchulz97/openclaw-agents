@@ -11,6 +11,11 @@
 # Fields NOT settable via `openclaw cron edit`:
 #   - delivery.mode (no CLI flag; use openclaw cron edit <id> --no-deliver to disable)
 #   - payload.kind (implicitly set by --message for agentTurn)
+#   - payload.model clearing (no --clear-model flag; Phase 2b patches jobs.json directly)
+#
+# NOTE: After Phase 2b patches jobs.json, a gateway restart is needed for
+#       in-memory state to reflect the cleared model. The script does NOT
+#       restart the gateway automatically.
 
 set -euo pipefail
 
@@ -161,7 +166,7 @@ build_cmd_args() {
   [ -n "$SESSION_TARGET" ] && CMD+=(--session "$SESSION_TARGET")
   [ -n "$WAKE_MODE" ]      && CMD+=(--wake "$WAKE_MODE")
   [ -n "$MESSAGE" ]        && CMD+=(--message "$MESSAGE")
-  [ -n "$MODEL" ]          && CMD+=(--model "$MODEL")
+  [ -n "$MODEL" ] && CMD+=(--model "$MODEL")
   [ -n "$THINKING" ]       && CMD+=(--thinking "$THINKING")
   [ -n "$TIMEOUT_SEC" ]    && CMD+=(--timeout-seconds "$TIMEOUT_SEC")
   [ -n "$SESSION_KEY" ]    && CMD+=(--session-key "$SESSION_KEY")
@@ -175,6 +180,7 @@ build_cmd_args() {
 # Main
 # --------------------------------------------------------------------------- #
 ERRORS=0
+CLEAR_MODEL_IDS=()   # gateway IDs needing model cleared (no --clear-model in CLI)
 
 JOB_COUNT=$(jq '.jobs | length' "$CONFIG_FILE")
 echo "Reconciling gateway with $JOB_COUNT config job(s) from $CONFIG_FILE"
@@ -272,11 +278,43 @@ for i in $(seq 0 $((JOB_COUNT - 1))); do
         ERRORS=$((ERRORS + 1))
       fi
     fi
+    # Track jobs needing model cleared (config has no model, CLI has no --clear-model)
+    local_model=$(echo "$JOB" | jq -r '.payload.model // empty')
+    if [ -z "$local_model" ]; then
+      CLEAR_MODEL_IDS+=("$GATEWAY_ID")
+    fi
   fi
 done
 
 [ "$EDIT_COUNT" -eq 0 ] && echo "  (none)"
 echo ""
+
+# --------------------------------------------------------------------------- #
+# Phase 2b: CLEAR MODEL — patch jobs.json directly (no --clear-model in CLI)
+# --------------------------------------------------------------------------- #
+JOBS_JSON="$HOME/.openclaw/cron/jobs.json"
+
+if [ "${#CLEAR_MODEL_IDS[@]}" -gt 0 ] && [ -f "$JOBS_JSON" ]; then
+  echo "=== Phase 2b: CLEAR MODEL ==="
+  for CID in "${CLEAR_MODEL_IDS[@]}"; do
+    CID_NAME=$(jq -r --arg id "$CID" '.jobs[] | select(.id == $id) | .name' "$JOBS_JSON")
+    echo "  CLEAR MODEL: $CID_NAME ($CID)"
+    if [ "$DRY_RUN" = true ]; then
+      echo "    [DRY RUN] jq: set .payload.model = null for $CID"
+    else
+      TMP_JSON=$(mktemp)
+      if jq --arg id "$CID" '(.jobs[] | select(.id == $id) | .payload.model) = null' "$JOBS_JSON" > "$TMP_JSON" && [ -s "$TMP_JSON" ]; then
+        mv "$TMP_JSON" "$JOBS_JSON"
+        echo "    OK"
+      else
+        echo "    FAILED" >&2
+        rm -f "$TMP_JSON"
+        ERRORS=$((ERRORS + 1))
+      fi
+    fi
+  done
+  echo ""
+fi
 
 # --------------------------------------------------------------------------- #
 # Phase 3: REMOVE — gateway jobs whose agentId is NOT in config
@@ -302,8 +340,12 @@ else
         is_orphan=true
       fi
     else
-      # Fallback for jobs without sessionKey: check by agentId
-      if ! echo "$CONFIG_AGENT_IDS" | grep -qx "$GW_AGENT_ID"; then
+      # Jobs without sessionKey are orphans when ALL config jobs have sessionKeys.
+      # This catches legacy duplicates created before sessionKey was enforced.
+      # Fallback: if no config jobs have sessionKeys, check by agentId.
+      if [ -n "$CONFIG_SESSION_KEYS" ]; then
+        is_orphan=true
+      elif ! echo "$CONFIG_AGENT_IDS" | grep -qx "$GW_AGENT_ID"; then
         is_orphan=true
       fi
     fi

@@ -1,0 +1,15 @@
+{
+  "timezone": "Europe/Zurich",
+  "working_hours": {
+    "start": "09:00",
+    "end": "18:00"
+  },
+  "hours_per_day": 8,
+  "works_weekends": false,
+  "check_in_times": {
+    "morning": "07:30",
+    "midday": "12:00",
+    "evening": "19:30"
+  },
+  "notes": "Flexible start/end times: can be 07:00-17:00 or 10:00-midnight. Works 100% at TOB, typically more than the theoretical 40h/week. Does not work weekends. Prefers first check-in of the day at 07:30."
+}
