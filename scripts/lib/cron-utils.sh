@@ -126,8 +126,7 @@ add_cron_job() {
                 kind: "agentTurn",
                 message: $message,
                 timeoutSeconds: 180,
-                thinking: "medium",
-                model: $model
+                thinking: "medium"
             },
             sessionKey: $sessionKey,
             delivery: {
@@ -220,8 +219,7 @@ add_cron_jobs() {
                     kind: "agentTurn",
                     message: $message,
                     timeoutSeconds: 180,
-                    thinking: "medium",
-                    model: $model
+                    thinking: "medium"
                 },
                 sessionKey: $sessionKey,
                 delivery: {
