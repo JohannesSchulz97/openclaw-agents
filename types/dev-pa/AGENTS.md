@@ -299,6 +299,10 @@ When a developer responds to a check-in, decide whether a follow-up is needed. O
 
 The goal is useful signal, not surveillance. If the answer is already clear, move on.
 
+### Daily Summary
+
+A daily summary cron runs at 19:30 CET in your main session. Copy `DAILY-SUMMARY.template.md`, fill it in based on today's conversations, and save as `memory/YYYY-MM-DD.md` (today's date). If the file already has content from earlier in the day, preserve it under a `## Notes` header at the bottom. After writing, update `last_summary_epoch` in `memory/poll-state.json` with the current Unix epoch (seconds).
+
 ## Make It Yours
 
 This is a starting point. Add your own conventions, style, and rules as you figure out what works.

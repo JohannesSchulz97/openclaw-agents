@@ -5,7 +5,8 @@
 # Functions:
 #   check_dependencies   — verify jq is installed
 #   generate_uuid        — produce a new UUID v4
-#   add_cron_job         — append a job entry to the cron config
+#   add_cron_job         — append a job entry to the cron config (DEPRECATED)
+#   add_cron_jobs        — add 3 check-in + 1 summary job to the cron config
 #   remove_cron_job      — delete a job entry by agentId
 
 set -euo pipefail
@@ -109,7 +110,6 @@ add_cron_job() {
        --arg agentId "$agent_name" \
        --arg name "${display_name} Check-in" \
        --arg message "$message" \
-       --arg model "$model" \
        --arg sessionKey "agent:${agent_name}:cron:checkin" \
        '.jobs += [{
             id: $id,
@@ -120,7 +120,7 @@ add_cron_job() {
                 kind: "every",
                 everyMs: 7200000
             },
-            sessionTarget: "isolated",
+            sessionTarget: "session:main",
             wakeMode: "now",
             payload: {
                 kind: "agentTurn",
@@ -140,7 +140,7 @@ add_cron_job() {
 }
 
 # --------------------------------------------------------------------------- #
-# add_cron_jobs — add 3 time-of-day check-in jobs (morning, midday, evening)
+# add_cron_jobs — add 3 time-of-day check-in jobs (morning, midday, evening) + 1 daily summary job
 #
 # Usage: add_cron_jobs <cron_file> <agent_name> <display_name> <model> <start_hour> <end_hour> <timezone> <works_weekends>
 # --------------------------------------------------------------------------- #
@@ -201,9 +201,9 @@ add_cron_jobs() {
            --arg agentId "$agent_name" \
            --arg name "${display_name} ${name_suffix}" \
            --arg message "$message" \
-           --arg model "$model" \
            --arg cronExpr "$cron_expr" \
            --arg tz "$timezone" \
+           --arg sessionKey "agent:${agent_name}:cron:${type}" \
            '.jobs += [{
                 id: $id,
                 agentId: $agentId,
@@ -223,6 +223,7 @@ add_cron_jobs() {
                     thinking: "medium",
                     model: $model
                 },
+                sessionKey: $sessionKey,
                 delivery: {
                     mode: "none"
                 }
@@ -231,6 +232,55 @@ add_cron_jobs() {
         mv "$tmp_file" "$cron_file"
         echo "Added cron job '${display_name} ${name_suffix}' for agent '${agent_name}' (id: ${job_id})"
     done
+
+    # Add daily summary job — runs at 19:30 CET (before tech-manager evening report at 20:00 CET)
+    local summary_id summary_message
+    summary_id=$(generate_uuid)
+    summary_message="This is the daily summary cron. Read DAILY-SUMMARY.template.md for the output format.\n\n1. Read memory/poll-state.json. Check for \`last_summary_epoch\`.\n   - If it exists, only summarize conversations AFTER that epoch.\n   - If missing, summarize the full day.\n\n2. Review today's conversations in this session (check-ins and ad-hoc messages). Fill in each template section:\n   - **## Focus:** What the developer worked on today, in their own words.\n   - **## Blockers:** What's stuck, who/what is blocking, since when. Write \`- None\` if nothing mentioned.\n   - **## Notes:** Anything else worth surfacing — decisions, handoffs, context.\n\n3. Compute today's date as YYYY-MM-DD. Save as \`memory/YYYY-MM-DD.md\`.\n   - If the file already has content, preserve existing content under ## Notes.\n   - If sections already exist (re-run), replace them. Do not duplicate headers.\n\n4. Update memory/poll-state.json: set \`last_summary_epoch\` to current Unix epoch (seconds).\n\n5. Keep it factual. Use the developer's own words. Do NOT fabricate items. Do NOT include GitHub activity, session metadata, or internal agent activity."
+
+    local summary_cron_expr
+    if [[ "$works_weekends" == "true" ]]; then
+        summary_cron_expr="30 19 * * *"
+    else
+        summary_cron_expr="30 19 * * 1-5"
+    fi
+
+    local tmp_file
+    tmp_file=$(mktemp)
+    trap "rm -f '$tmp_file'" RETURN
+
+    jq --arg id "$summary_id" \
+       --arg agentId "$agent_name" \
+       --arg name "${display_name} Daily Summary" \
+       --arg message "$summary_message" \
+       --arg cronExpr "$summary_cron_expr" \
+       --arg sessionKey "agent:${agent_name}:cron:summary" \
+       '.jobs += [{
+            id: $id,
+            agentId: $agentId,
+            name: $name,
+            enabled: true,
+            schedule: {
+                kind: "cron",
+                cronExpr: $cronExpr,
+                tz: "Europe/Berlin"
+            },
+            sessionTarget: "session:main",
+            wakeMode: "now",
+            payload: {
+                kind: "agentTurn",
+                message: $message,
+                timeoutSeconds: 180,
+                thinking: "medium"
+            },
+            sessionKey: $sessionKey,
+            delivery: {
+                mode: "none"
+            }
+        }]' "$cron_file" > "$tmp_file"
+
+    mv "$tmp_file" "$cron_file"
+    echo "Added cron job '${display_name} Daily Summary' for agent '${agent_name}' (id: ${summary_id})"
 }
 
 # --------------------------------------------------------------------------- #
