@@ -61,6 +61,16 @@ Each agent's `memory/` directory contains daily notes (`YYYY-MM-DD.md`) with con
 - Blockers or issues mentioned in conversation
 - Decisions made and their rationale
 
+### Structured Daily Notes
+
+Dev-pa agents write structured daily summaries to `memory/YYYY-MM-DD.md` at end of day. Each note has three sections:
+
+- **Focus** — what was worked on
+- **Blockers** — what is stuck or waiting (parsed automatically by bottleneck detection)
+- **Notes** — anything else worth capturing
+
+Use `scripts/collect-daily-notes.sh` to gather all agents' notes for a given date (default: today). Output is plain text to stdout. Accepts `--date YYYY-MM-DD`, `--quiet`.
+
 ### Developer GitHub Activity
 
 If available in a monitored agent's scripts directory:
