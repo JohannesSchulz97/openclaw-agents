@@ -204,8 +204,9 @@ for agent in "${AGENT_LIST[@]}"; do
         fi
     fi
 
-    # ── Check daily notes for blocked keywords ──
+    # ── Check daily notes for blockers ─────────
     MEMORY_DIR="$AGENT_DIR/memory"
+    FOUND_STRUCTURED_BLOCKERS="false"
 
     if [[ -d "$MEMORY_DIR" ]]; then
         # Check recent daily notes (last 3 days)
@@ -213,34 +214,87 @@ for agent in "${AGENT_LIST[@]}"; do
             | sort -r | head -3 || true)
 
         if [[ -n "$RECENT_NOTES" ]]; then
-            MATCHED_KEYWORDS=""
+            # ── Phase 1: Structured ## Blockers section ──
             while IFS= read -r note_file; do
                 [[ -z "$note_file" ]] && continue
-                # Case-insensitive grep for blocked keywords
-                MATCHES=$(grep -iEo "$BLOCKED_KEYWORDS" "$note_file" 2>/dev/null | sort -u | tr '\n' ',' | sed 's/,$//' || true)
-                if [[ -n "$MATCHES" ]]; then
-                    MATCHED_KEYWORDS="$MATCHES"
-                    NOTE_DATE=$(basename "$note_file" .md)
-                    break  # Report only the most recent match
+                NOTE_DATE=$(basename "$note_file" .md)
+
+                # Extract lines between ## Blockers and next ## (or EOF)
+                BLOCKER_LINES=$(sed -n '/^## Blockers/,/^## /{/^## Blockers/d;/^## /d;p;}' "$note_file" 2>/dev/null || true)
+
+                # Parse list items (lines starting with - or *)
+                if [[ -n "$BLOCKER_LINES" ]]; then
+                    while IFS= read -r line; do
+                        # Skip empty lines
+                        [[ -z "$(echo "$line" | tr -d '[:space:]')" ]] && continue
+                        # Match list items
+                        if [[ "$line" =~ ^[[:space:]]*[-*][[:space:]]+(.*) ]]; then
+                            ITEM="${BASH_REMATCH[1]}"
+                            [[ -z "$ITEM" ]] && continue
+
+                            # Try to extract "since YYYY-MM-DD"
+                            SINCE_DATE=""
+                            if [[ "$ITEM" =~ since[[:space:]]+([0-9]{4}-[0-9]{2}-[0-9]{2}) ]]; then
+                                SINCE_DATE="${BASH_REMATCH[1]}"
+                            fi
+
+                            BOTTLENECK=$(jq -n \
+                                --arg agent "$agent" \
+                                --arg type "structured_blocker" \
+                                --arg detail "$ITEM" \
+                                --arg severity "high" \
+                                --arg since "$SINCE_DATE" \
+                                --arg note_date "$NOTE_DATE" \
+                                '{
+                                    agent: $agent,
+                                    type: $type,
+                                    detail: $detail,
+                                    severity: $severity,
+                                    since: (if $since == "" then null else $since end),
+                                    note_date: $note_date
+                                }')
+                            BOTTLENECKS=$(echo "$BOTTLENECKS" | jq --argjson b "$BOTTLENECK" '. + [$b]')
+                            FOUND_STRUCTURED_BLOCKERS="true"
+                            log "  BOTTLENECK: $agent structured blocker: $ITEM"
+                        fi
+                    done <<< "$BLOCKER_LINES"
                 fi
+
+                # Only check the most recent note with structured blockers
+                [[ "$FOUND_STRUCTURED_BLOCKERS" == "true" ]] && break
             done <<< "$RECENT_NOTES"
 
-            if [[ -n "$MATCHED_KEYWORDS" ]]; then
-                BOTTLENECK=$(jq -n \
-                    --arg agent "$agent" \
-                    --arg type "blocked_keywords" \
-                    --arg detail "Daily note ($NOTE_DATE) contains: $MATCHED_KEYWORDS" \
-                    --arg severity "medium" \
-                    --arg since "" \
-                    '{
-                        agent: $agent,
-                        type: $type,
-                        detail: $detail,
-                        severity: $severity,
-                        since: null
-                    }')
-                BOTTLENECKS=$(echo "$BOTTLENECKS" | jq --argjson b "$BOTTLENECK" '. + [$b]')
-                log "  BOTTLENECK: $agent daily notes mention: $MATCHED_KEYWORDS"
+            # ── Phase 2: Keyword grep fallback (only if no structured blockers) ──
+            if [[ "$FOUND_STRUCTURED_BLOCKERS" == "false" ]]; then
+                MATCHED_KEYWORDS=""
+                while IFS= read -r note_file; do
+                    [[ -z "$note_file" ]] && continue
+                    # Case-insensitive grep for blocked keywords
+                    MATCHES=$(grep -iEo "$BLOCKED_KEYWORDS" "$note_file" 2>/dev/null | sort -u | tr '\n' ',' | sed 's/,$//' || true)
+                    if [[ -n "$MATCHES" ]]; then
+                        MATCHED_KEYWORDS="$MATCHES"
+                        NOTE_DATE=$(basename "$note_file" .md)
+                        break  # Report only the most recent match
+                    fi
+                done <<< "$RECENT_NOTES"
+
+                if [[ -n "$MATCHED_KEYWORDS" ]]; then
+                    BOTTLENECK=$(jq -n \
+                        --arg agent "$agent" \
+                        --arg type "blocked_keywords" \
+                        --arg detail "Daily note ($NOTE_DATE) contains: $MATCHED_KEYWORDS" \
+                        --arg severity "medium" \
+                        --arg since "" \
+                        '{
+                            agent: $agent,
+                            type: $type,
+                            detail: $detail,
+                            severity: $severity,
+                            since: null
+                        }')
+                    BOTTLENECKS=$(echo "$BOTTLENECKS" | jq --argjson b "$BOTTLENECK" '. + [$b]')
+                    log "  BOTTLENECK: $agent daily notes mention: $MATCHED_KEYWORDS"
+                fi
             fi
         fi
     fi
