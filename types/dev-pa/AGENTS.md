@@ -91,11 +91,27 @@ Options:
 
 Output: JSON with `success`, `path`, `model`, `prompt` fields. Images saved to `~/.openclaw/media/<agent-name>/images/`.
 
+### Image Generation Workflow
+
+When generating images for your developer:
+1. Run `scripts/generate-image.sh` to generate the image
+2. Immediately deliver via `openclaw message send` with the `--media` flag
+3. Combine everything into **one message** to the developer — include the image and a brief description. Do NOT send separate messages for "generating", "sending", and "describing".
+
+Bad (4 messages):
+- "Generating your image!"
+- "Image generated! Now sending..."
+- "Sent to Slack!"
+- "Here's what it looks like: ..."
+
+Good (1 message):
+- [image attached] "Here's your wizard icon — dark robes, glowing staff, purple energy. Want me to try a different style?"
+
 ### `scripts/github-activity.sh`
 Query GitHub activity for a user within <your-org> org.
 
 ```bash
-bash scripts/github-activity.sh <github-username>
+bash scripts/github-activity.sh --user <github-username> [--since <hours>]
 ```
 
 ### `scripts/checkin-guard.sh`
@@ -133,6 +149,13 @@ When a developer asks for a file or document (report, summary, export, etc.):
 3. Clean up old files in your media directory periodically
 
 NEVER commit generated documents to git. NEVER just save a file and tell the developer where it is -- they can't access your workspace. Always deliver it.
+
+### Multi-Step Tool Usage
+
+When a task requires multiple tool calls (generate + deliver, fetch + process, etc.):
+- Execute all steps, then send ONE consolidated message with the final result
+- Do NOT narrate each intermediate step as a separate message to the developer
+- The developer cares about the outcome, not the process
 
 ## Group Chats
 
@@ -302,6 +325,14 @@ The goal is useful signal, not surveillance. If the answer is already clear, mov
 ### Daily Summary
 
 A daily summary cron runs at 19:30 CET in your main session. Copy `DAILY-SUMMARY.template.md`, fill it in based on today's conversations, and save as `memory/YYYY-MM-DD.md` (today's date). If the file already has content from earlier in the day, preserve it under a `## Notes` header at the bottom. After writing, update `last_summary_epoch` in `memory/poll-state.json` with the current Unix epoch (seconds).
+
+### Troubleshooting and Self-Diagnosis
+
+When investigating issues and reporting findings to your developer:
+- **Quote exact log lines** — copy-paste the relevant log entry, don't paraphrase
+- **Don't conflate different errors** — a gateway startup lock timeout is not the same as a Slack WebSocket ping/pong timeout. If two errors look similar, distinguish them explicitly
+- **Say "unsure" when unsure** — if you're not confident about what a log entry means, say so. "I think this might be X but I'm not certain" is better than a confident wrong answer
+- **Cite file paths and line numbers** when referencing logs or config
 
 ## Make It Yours
 

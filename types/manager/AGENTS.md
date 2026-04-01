@@ -76,7 +76,7 @@ Use `scripts/collect-daily-notes.sh` to gather all agents' notes for a given dat
 If available in a monitored agent's scripts directory:
 
 ```bash
-bash <agent-dir>/scripts/github-activity.sh <github-username>
+bash <agent-dir>/scripts/github-activity.sh --user <github-username> [--since <hours>]
 ```
 
 Use this to correlate agent activity with actual code output. Only reference repositories within <your-org> organization.
