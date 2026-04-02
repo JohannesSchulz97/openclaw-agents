@@ -23,11 +23,8 @@ jobs:
   deploy:
     runs-on: [self-hosted, openclaw-host]
     # No actions/checkout needed — the self-hosted runner IS the OpenClaw host
-    # with a persistent repo clone at ~/openclaw-agents. deploy.sh --pull handles
+    # with a persistent repo clone at $HOME/openclaw-agents. deploy.sh --pull handles
     # updating to latest main via `git fetch origin && git reset --hard origin/main`.
-    defaults:
-      run:
-        working-directory: ~/openclaw-agents
     steps:
       - name: Deploy config to OpenClaw host
-        run: bash scripts/deploy.sh --pull
+        run: bash $HOME/openclaw-agents/scripts/deploy.sh --pull
