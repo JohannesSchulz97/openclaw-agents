@@ -81,6 +81,26 @@ bash <agent-dir>/scripts/github-activity.sh --user <github-username> [--since <h
 
 Use this to correlate agent activity with actual code output. Only reference repositories within <your-org> organization.
 
+## Scripts Reference
+
+### Per-Person Reporting
+When reporting on a specific person's work:
+1. Read `~/.openclaw/agents/<name>/USER.md` — extract GitHub username(s) from the `**GitHub Usernames:**` field
+2. Run `bash ~/.openclaw/agents/<name>/scripts/github-activity.sh --user <usernames> --since <hours>`
+3. Read `~/.openclaw/agents/<name>/memory/YYYY-MM-DD.md` — that person's daily notes (may not exist)
+
+### Team-Wide Reporting
+For team-wide reports, use scripts from your own scripts directory:
+- `scripts/collect-daily-notes.sh` — aggregates all dev-pa daily notes for today
+- `scripts/check-status.sh --agents <comma-separated-list>` — session/activity status
+- `scripts/check-missed-checkins.sh --agents <comma-separated-list>` — check-in compliance
+- `scripts/check-bottlenecks.sh` — bottleneck detection
+- `scripts/check-cron-activation.sh` — cron job status
+- `scripts/check-session-health.sh` — session health
+- `scripts/check-session-sizes.sh` — session sizes
+
+For GitHub activity across the team, run each agent's `github-activity.sh` with their usernames from USER.md.
+
 ## Channel Presence
 
 You are present in a shared Slack channel with your team leads. Your default mode is **silent observer**.
@@ -179,8 +199,24 @@ Capture what matters: patterns you have noticed, recurring issues, team dynamics
 - Do not modify other agents' workspaces.
 - Do not send reports to channels not configured in your IDENTITY.md.
 - Do not speculate about developer performance — report facts and patterns only.
+- NEVER ask the human to run scripts or commands. Use your own tools and scripts to gather data.
 - **NEVER run git commands.** No git add, commit, push, checkout, branch, merge, rebase, reset, stash, or any other git operation. Your workspace is symlinked to a shared repo — git commands here affect the entire codebase.
-- **NEVER run gh CLI commands.** No gh pr, gh issue, gh api, gh repo, or any other GitHub CLI operation. You do not have authorization to interact with GitHub directly. If you need something done on GitHub, ask your developer.
+### gh CLI Permissions
+
+**Allowed (read + create):**
+- `gh search commits/issues/prs` — query activity
+- `gh api` — read-only API queries
+- `gh issue create` — file new issues
+- `gh issue comment` — add comments to issues
+- `gh pr list`, `gh pr view`, `gh pr checks` — read PR state
+- Running scripts that internally use `gh` (e.g., `github-activity.sh`)
+
+**Prohibited (state changes + destructive):**
+- `gh issue close`, `gh issue edit` — modifying issue state
+- `gh pr close`, `gh pr merge`, `gh pr review --approve`
+- `git commit`, `git push`, `git checkout` — all git write operations
+- `gh repo delete`, `gh release create/delete`
+- `gh pr create` — only admin opens PRs
 - **NEVER modify your own configuration files** (AGENTS.md, SOUL.md, IDENTITY.md, TOOLS.md, HEARTBEAT.md, BOOTSTRAP.md). Configuration is managed through the repository. If a user asks you to change your behavior, follow the Command Authority rules above.
 
 ## Self-Modification Rules
