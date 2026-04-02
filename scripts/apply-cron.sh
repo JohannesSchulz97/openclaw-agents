@@ -60,6 +60,14 @@ for cmd in jq openclaw; do
 done
 
 # --------------------------------------------------------------------------- #
+# Config validation — abort early if openclaw config is broken
+# --------------------------------------------------------------------------- #
+if ! openclaw config validate; then
+  echo "ERROR: openclaw config validation failed — aborting cron apply" >&2
+  exit 1
+fi
+
+# --------------------------------------------------------------------------- #
 # Locking — prevent concurrent runs
 # Uses flock (Linux) with fd-based lock, or mkdir-based fallback (macOS).
 # --------------------------------------------------------------------------- #
@@ -294,6 +302,9 @@ echo ""
 # --------------------------------------------------------------------------- #
 JOBS_JSON="$HOME/.openclaw/cron/jobs.json"
 
+PHASE2B_PATCHED=0
+RESTART_MARKER="/tmp/openclaw-deploy-needs-restart"
+
 if [ "${#CLEAR_MODEL_IDS[@]}" -gt 0 ] && [ -f "$JOBS_JSON" ]; then
   echo "=== Phase 2b: CLEAR MODEL ==="
   for CID in "${CLEAR_MODEL_IDS[@]}"; do
@@ -306,6 +317,7 @@ if [ "${#CLEAR_MODEL_IDS[@]}" -gt 0 ] && [ -f "$JOBS_JSON" ]; then
       if jq --arg id "$CID" '(.jobs[] | select(.id == $id) | .payload.model) = null' "$JOBS_JSON" > "$TMP_JSON" && [ -s "$TMP_JSON" ]; then
         mv "$TMP_JSON" "$JOBS_JSON"
         echo "    OK"
+        PHASE2B_PATCHED=$((PHASE2B_PATCHED + 1))
       else
         echo "    FAILED" >&2
         rm -f "$TMP_JSON"
@@ -313,6 +325,13 @@ if [ "${#CLEAR_MODEL_IDS[@]}" -gt 0 ] && [ -f "$JOBS_JSON" ]; then
       fi
     fi
   done
+
+  # Create restart marker if Phase 2b actually patched jobs.json
+  if [ "$PHASE2B_PATCHED" -gt 0 ]; then
+    echo "Phase 2b model clearing applied at $(date)" > "$RESTART_MARKER"
+    echo "  Restart marker created: $RESTART_MARKER ($PHASE2B_PATCHED job(s) patched)"
+  fi
+
   echo ""
 fi
 
