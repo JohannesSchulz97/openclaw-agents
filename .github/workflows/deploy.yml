@@ -27,9 +27,7 @@ jobs:
     # updating to latest main via `git fetch origin && git reset --hard origin/main`.
     steps:
       - name: Deploy config to OpenClaw host
-        run: |
-          echo "Intentional failure to test Slack notification (remove after test)"
-          exit 1
+        run: bash $HOME/openclaw-agents/scripts/deploy.sh --pull
 
       - name: Notify Slack on failure
         if: failure()
@@ -37,4 +35,4 @@ jobs:
           openclaw message send \
             --channel slack \
             --target "channel:<channel-id>" \
-            --message "Deploy failed for commit ${{ github.sha }} by ${{ github.actor }}. Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            --message "Deploy failed for commit ${{ github.sha }} by ${{ github.actor }}. Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }} cc <@<slack-id>>"
