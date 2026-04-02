@@ -80,7 +80,7 @@ generate_uuid() {
 #   agent_name   — agent identifier (e.g. "dev1")
 #   display_name — human-readable name (e.g. "dev1")
 #   slack_id     — Slack user ID (e.g. "<slack-id>")
-#   model        — model identifier (e.g. "openai-codex/gpt-5.4")
+#   model        — model identifier (e.g. "glm-5")
 # --------------------------------------------------------------------------- #
 add_cron_job() {
     local cron_file="${1:?Usage: add_cron_job <cron_file> <agent_name> <display_name> <slack_id> <model>}"

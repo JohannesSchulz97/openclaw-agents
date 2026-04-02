@@ -45,7 +45,7 @@ DISPLAY_NAME=$(echo "$AGENT_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=
 
 # Get model from existing job if any, otherwise default
 MODEL=$(jq -r --arg aid "$AGENT_NAME" '.jobs[] | select(.agentId == $aid) | .payload.model' "$CRON_CONFIG" 2>/dev/null | head -1)
-MODEL="${MODEL:-openai-codex/gpt-5.4}"
+MODEL="${MODEL:-glm-5}"
 
 # Remove existing jobs for this agent
 echo "Removing existing cron jobs for '$AGENT_NAME'..."

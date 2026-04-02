@@ -189,118 +189,101 @@ bash scripts/apply-cron.sh
 - Slack ID: <slack-id>
 - GitHub: <github-username>, <manager-agent>
 - Heartbeat: every 10 minutes | Check-ins: 05:00/12:30/19:30 IST, Mon-Fri (pilot)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev10 Jean
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: <your-org>
 
 - Slack ID: <slack-id>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev3
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev4
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev5
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev6
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev7
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev8
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev9
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Agent: dev10
 
 - Slack ID: <slack-id>
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
-- Model: openai-codex/gpt-5.4
 
 ## Web Search
 
