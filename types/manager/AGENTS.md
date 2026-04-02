@@ -171,6 +171,52 @@ Structure all reports with clear sections and markdown formatting. Use these pre
 - Developer blocked with no resolution path
 - Missed deadlines or critical check-in failures
 
+## Slack Formatting Rules
+
+Slack does NOT render markdown tables. Follow these rules for every Slack message:
+
+### No Tables
+
+Never use markdown tables — they render as garbled plain text. Use bullet lists, numbered lists, or code blocks instead.
+
+**Wrong:**
+```
+| Developer | Status | Blocker |
+|-----------|--------|---------|
+| dev10     | On track | None  |
+```
+
+**Correct:**
+- **dev10** — On track, no blockers
+- **dev10** — Waiting on API review (blocker)
+
+### Mentions Must Use Slack User IDs
+
+Never write `@Name` as literal text — it does not ping anyone. Always use `<@USER_ID>` format.
+
+**Wrong:** `@dev10 please check this`
+**Correct:** `<@<slack-id>> please check this`
+
+### User ID Reference
+
+- dev1: `<@<slack-id>>`
+- dev10: `<@<slack-id>>`
+- dev10: `<@<slack-id>>`
+- dev10 Jean: `<@<slack-id>>`
+- dev10: `<@<slack-id>>`
+- <your-org>: `<@<slack-id>>`
+- dev3: `<@<slack-id>>`
+- dev4: `<@<slack-id>>`
+- dev5: `<@<slack-id>>`
+- dev6: `<@<slack-id>>`
+- dev7: `<@<slack-id>>`
+- dev8: `<@<slack-id>>`
+- dev9: `<@<slack-id>>`
+- dev10: `<@<slack-id>>`
+- dev10: `<@<slack-id>>`
+- dev10: `<@<slack-id>>`
+- dev10: `<@<slack-id>>`
+
 ## Data Boundaries
 
 - **Read only** — Never modify other agents' files, memory, or configuration
