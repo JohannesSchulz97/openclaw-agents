@@ -160,4 +160,52 @@ cc <@<slack-id>>"
 
 done <<< "$loop_alerts"
 
+# ── GitHub Actions Runner Health Check ──────────────────────────────────────
+RUNNER_MARKER="/tmp/openclaw-runner-alert-sent"
+RUNNER_COOLDOWN_SECS=3600  # 1 hour
+
+runner_is_loaded() {
+  launchctl list 2>/dev/null | grep -q "actions.runner.<your-org>-openclaw-agents"
+}
+
+runner_marker_is_stale() {
+  # True if marker doesn't exist or is older than cooldown
+  [[ ! -f "$RUNNER_MARKER" ]] && return 0
+  local marker_age=$(( $(date +%s) - $(stat -f %m "$RUNNER_MARKER" 2>/dev/null || echo 0) ))
+  (( marker_age >= RUNNER_COOLDOWN_SECS ))
+}
+
+if runner_is_loaded; then
+  # Runner is up — send recovery if we previously alerted
+  if [[ -f "$RUNNER_MARKER" ]]; then
+    recovery_msg="GitHub Actions runner (openclaw-host) is back online. Deploy pipeline restored.
+
+cc <@<slack-id>>"
+    openclaw message send \
+      --channel slack \
+      --target "channel:${ALERT_CHANNEL}" \
+      -m "$recovery_msg" \
+      2>/dev/null || log "WARN: Failed to send runner recovery Slack alert"
+    rm -f "$RUNNER_MARKER"
+    log "RUNNER: recovered — alert cleared"
+  fi
+else
+  # Runner is down
+  log "RUNNER: self-hosted runner not loaded"
+  if runner_marker_is_stale; then
+    down_msg="GitHub Actions runner (openclaw-host) is not running. Deploy pipeline will not trigger. Restart with: cd ~/actions-runner && ./svc.sh start
+
+cc <@<slack-id>>"
+    openclaw message send \
+      --channel slack \
+      --target "channel:${ALERT_CHANNEL}" \
+      -m "$down_msg" \
+      2>/dev/null || log "WARN: Failed to send runner-down Slack alert"
+    touch "$RUNNER_MARKER"
+    log "RUNNER: alert sent — next alert suppressed for ${RUNNER_COOLDOWN_SECS}s"
+  else
+    log "RUNNER: still down — alert suppressed (cooldown active)"
+  fi
+fi
+
 exit 0
