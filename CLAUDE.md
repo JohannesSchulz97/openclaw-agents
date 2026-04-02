@@ -310,6 +310,22 @@ All agents use DuckDuckGo for web search (free, no API key). Configured in `open
 
 API key stored at `~/.openclaw/credentials/gemini-nano-banana.json`. Default model: Nano Banana 2, fallback: Nano Banana Pro. Do NOT commit this key to the repository.
 
+## Deployment Architecture
+
+The repo on the OpenClaw host is a **deployment cache**, not a development workspace. All changes go through PRs from a dev machine.
+
+```
+Dev Machine  ──PR──▶  GitHub (main)  ──Actions──▶  OpenClaw Host (deploy cache)
+```
+
+**Key rules:**
+- **Never develop on the host.** The host repo has git hooks blocking commits and branch switches. It always tracks `main`.
+- **All changes go through PRs.** Push to main triggers `.github/workflows/deploy.yml`, which runs `deploy.sh --pull` on the self-hosted runner.
+- **`deploy.sh` handles the full sequence:** git pull → `sync-agents.sh` → stow (adopt then push) → `apply-cron.sh`. Always sequential, never parallel.
+- **Deploy failures notify `#<manager-agent>-feedback`** (Slack channel `<channel-id>`) automatically.
+
+This separation prevents the class of incidents where development operations (branch switching, manual stow, direct commits) corrupt live agent state. See issue #99 for the full incident history.
+
 ## Useful Commands
 
 ```bash
