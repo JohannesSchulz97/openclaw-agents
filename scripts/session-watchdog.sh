@@ -9,6 +9,8 @@
 #
 # Usage: bash scripts/session-watchdog.sh
 # Exit 0 always (watchdog must never crash the scheduler)
+#
+# Install: cp scripts/com.openclaw-agents.session-watchdog.plist ~/Library/LaunchAgents/ && launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.openclaw-agents.session-watchdog.plist
 
 set -uo pipefail
 
