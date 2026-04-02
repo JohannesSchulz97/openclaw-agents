@@ -37,4 +37,4 @@ jobs:
           openclaw message send \
             --channel slack \
             --target "channel:<channel-id>" \
-            --text "Deploy failed for commit ${{ github.sha }} by ${{ github.actor }}. Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            --message "Deploy failed for commit ${{ github.sha }} by ${{ github.actor }}. Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
