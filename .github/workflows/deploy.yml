@@ -1,0 +1,33 @@
+# Automated deployment of openclaw-agents config to the OpenClaw host.
+#
+# Runs on a self-hosted runner labelled "openclaw-host".
+#
+# Self-hosted runner setup:
+#   1. On the OpenClaw host, install the GitHub Actions runner:
+#      https://github.com/<your-org>/openclaw-agents/settings/actions/runners/new
+#   2. Assign the label "openclaw-host" during setup.
+#   3. Configure the runner as a service so it starts on boot:
+#      cd actions-runner && sudo ./svc.sh install && sudo ./svc.sh start
+#   4. Ensure openclaw, stow, jq, and git are on PATH for the runner user.
+#   5. The runner's working directory should be (or contain) the openclaw-agents
+#      repo clone that stow deploys from.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, openclaw-host]
+    # No actions/checkout needed — the self-hosted runner IS the OpenClaw host
+    # with a persistent repo clone at ~/openclaw-agents. deploy.sh --pull handles
+    # updating to latest main via `git fetch origin && git reset --hard origin/main`.
+    defaults:
+      run:
+        working-directory: ~/openclaw-agents
+    steps:
+      - name: Deploy config to OpenClaw host
+        run: bash scripts/deploy.sh --pull
