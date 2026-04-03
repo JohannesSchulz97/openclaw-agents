@@ -110,7 +110,7 @@ add_agent_entry() {
             model: $model
         }]' \
         --arg name "$agent_name" \
-        --arg workspace "${repo_root}/.openclaw/agents/${agent_name}" \
+        --arg workspace "${openclaw_dir}/agents/${agent_name}" \
         --arg agentDir "${openclaw_dir}/agents/${agent_name}/agent" \
         --arg model "$model"
 
