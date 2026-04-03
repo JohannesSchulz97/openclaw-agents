@@ -68,7 +68,8 @@ if [ "$PULL" = true ]; then
     log "  (dry-run) would run: git fetch origin && git reset --hard origin/main"
   else
     cd "$REPO_ROOT"
-    git fetch origin && git reset --hard origin/main
+    git fetch origin || fail "git fetch failed — check git credentials for the runner service user"
+    git reset --hard origin/main || fail "git reset --hard origin/main failed"
     log "  OK — now at $(git rev-parse --short HEAD)"
 
     # Verify we fetched the expected commit (GITHUB_SHA set by Actions)
@@ -77,7 +78,8 @@ if [ "$PULL" = true ]; then
       if [ "$actual" != "$GITHUB_SHA" ]; then
         log "WARN: HEAD ($actual) != GITHUB_SHA ($GITHUB_SHA), retrying in 5s..."
         sleep 5
-        git fetch origin && git reset --hard origin/main
+        git fetch origin || fail "git fetch failed on retry"
+        git reset --hard origin/main || fail "git reset failed on retry"
         actual=$(git rev-parse HEAD)
         if [ "$actual" != "$GITHUB_SHA" ]; then
           fail "HEAD ($actual) still != GITHUB_SHA ($GITHUB_SHA) after retry — aborting to prevent stale deploy"
