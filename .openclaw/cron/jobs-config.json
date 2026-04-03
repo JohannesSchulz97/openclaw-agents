@@ -144,7 +144,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * *",
+        "cronExpr": "0 20 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u07lthhbbl2",
@@ -236,7 +236,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u088a9d6a57",
@@ -328,7 +328,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u09l59gj3qt",
@@ -420,7 +420,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u09a9k7bgta",
@@ -512,7 +512,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u0ae37ygtpa",
@@ -604,7 +604,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u0998266edq",
@@ -696,7 +696,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u09r2aydckz",
@@ -788,7 +788,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u099grragmp",
@@ -880,7 +880,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u08mcd8qvmk",
@@ -972,7 +972,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u08mbgcsfmf",
@@ -1064,7 +1064,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u0adn2mdh4m",
@@ -1156,7 +1156,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u0afyr6856x",
@@ -1248,7 +1248,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u0891uze0p7",
@@ -1340,7 +1340,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u0aglv1en92",
@@ -1432,7 +1432,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u07h87k34qj",
@@ -1524,7 +1524,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u0ad8usrpqs",
@@ -1616,7 +1616,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "30 19 * * 1-5",
+        "cronExpr": "0 20 * * 1-5",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "session:slack:direct:u0af8p99l6q",
