@@ -70,6 +70,21 @@ if [ "$PULL" = true ]; then
     cd "$REPO_ROOT"
     git fetch origin && git reset --hard origin/main
     log "  OK — now at $(git rev-parse --short HEAD)"
+
+    # Verify we fetched the expected commit (GITHUB_SHA set by Actions)
+    if [ -n "${GITHUB_SHA:-}" ]; then
+      actual=$(git rev-parse HEAD)
+      if [ "$actual" != "$GITHUB_SHA" ]; then
+        log "WARN: HEAD ($actual) != GITHUB_SHA ($GITHUB_SHA), retrying in 5s..."
+        sleep 5
+        git fetch origin && git reset --hard origin/main
+        actual=$(git rev-parse HEAD)
+        if [ "$actual" != "$GITHUB_SHA" ]; then
+          fail "HEAD ($actual) still != GITHUB_SHA ($GITHUB_SHA) after retry — aborting to prevent stale deploy"
+        fi
+        log "  OK after retry — now at $(git rev-parse --short HEAD)"
+      fi
+    fi
   fi
 fi
 

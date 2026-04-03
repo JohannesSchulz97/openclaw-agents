@@ -32,6 +32,8 @@ jobs:
     steps:
       - name: Deploy config to OpenClaw host
         run: bash $HOME/openclaw-agents/scripts/deploy.sh --pull
+        env:
+          GITHUB_SHA: ${{ github.sha }}
 
       - name: Notify Slack on failure
         if: failure()
