@@ -141,11 +141,18 @@ add_cron_job() {
 # --------------------------------------------------------------------------- #
 # add_cron_jobs — add 3 time-of-day check-in jobs (morning, midday, evening) + 1 daily summary job
 #
-# Usage: add_cron_jobs <cron_file> <agent_name> <display_name> <model> <start_hour> <end_hour> <timezone> <works_weekends>
+# Usage: add_cron_jobs <cron_file> <agent_name> <display_name> <model> <start_hour> <end_hour> <timezone> <works_weekends> <slack_id>
 # --------------------------------------------------------------------------- #
 add_cron_jobs() {
     local cron_file="$1" agent_name="$2" display_name="$3" model="$4"
     local start_hour="${5:-9}" end_hour="${6:-18}" timezone="${7:-UTC}" works_weekends="${8:-false}"
+    local slack_id="${9:-}"
+
+    # Derive session target: use DM session if Slack ID provided, otherwise fall back to session:main
+    local session_target="session:main"
+    if [[ -n "$slack_id" ]]; then
+        session_target="session:slack:direct:$(echo "$slack_id" | tr '[:upper:]' '[:lower:]')"
+    fi
 
     if [[ ! -f "$cron_file" ]]; then
         echo "Error: Cron file not found: $cron_file" >&2
@@ -203,6 +210,7 @@ add_cron_jobs() {
            --arg cronExpr "$cron_expr" \
            --arg tz "$timezone" \
            --arg sessionKey "agent:${agent_name}:cron:${type}" \
+           --arg sessionTarget "$session_target" \
            '.jobs += [{
                 id: $id,
                 agentId: $agentId,
@@ -213,7 +221,7 @@ add_cron_jobs() {
                     cronExpr: $cronExpr,
                     tz: $tz
                 },
-                sessionTarget: "session:main",
+                sessionTarget: $sessionTarget,
                 wakeMode: "now",
                 payload: {
                     kind: "agentTurn",
@@ -253,6 +261,7 @@ add_cron_jobs() {
        --arg message "$summary_message" \
        --arg cronExpr "$summary_cron_expr" \
        --arg sessionKey "agent:${agent_name}:cron:summary" \
+       --arg sessionTarget "$session_target" \
        '.jobs += [{
             id: $id,
             agentId: $agentId,
@@ -263,7 +272,7 @@ add_cron_jobs() {
                 cronExpr: $cronExpr,
                 tz: "Europe/Berlin"
             },
-            sessionTarget: "session:main",
+            sessionTarget: $sessionTarget,
             wakeMode: "now",
             payload: {
                 kind: "agentTurn",

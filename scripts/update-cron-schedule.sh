@@ -47,6 +47,18 @@ DISPLAY_NAME=$(echo "$AGENT_NAME" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=
 MODEL=$(jq -r --arg aid "$AGENT_NAME" '.jobs[] | select(.agentId == $aid) | .payload.model' "$CRON_CONFIG" 2>/dev/null | head -1)
 MODEL="${MODEL:-glm-5}"
 
+# Get Slack ID from IDENTITY.md (check live dir first, then repo)
+SLACK_ID=""
+for identity_dir in "$HOME/.openclaw/agents/$AGENT_NAME" "$REPO_ROOT/.openclaw/agents/$AGENT_NAME"; do
+    if [[ -f "$identity_dir/IDENTITY.md" ]]; then
+        SLACK_ID=$(grep -oP '(?<=\*\*Slack User ID:\*\* )U[A-Z0-9]+' "$identity_dir/IDENTITY.md" 2>/dev/null || true)
+        [[ -n "$SLACK_ID" ]] && break
+    fi
+done
+if [[ -z "$SLACK_ID" ]]; then
+    echo "Warning: No Slack ID found in IDENTITY.md for '$AGENT_NAME' — cron jobs will use session:main" >&2
+fi
+
 # Remove existing jobs for this agent
 echo "Removing existing cron jobs for '$AGENT_NAME'..."
 remove_cron_job "$CRON_CONFIG" "$AGENT_NAME" 2>/dev/null || true
@@ -55,7 +67,7 @@ remove_cron_job "$CRON_CONFIG" "$AGENT_NAME" 2>/dev/null || true
 echo "Adding 3 time-of-day check-in jobs for '$AGENT_NAME'..."
 echo "  Schedule: ${WS_START_HOUR}:00-${WS_END_HOUR}:00 ${WS_TIMEZONE} (weekends: ${WS_WORKS_WEEKENDS})"
 add_cron_jobs "$CRON_CONFIG" "$AGENT_NAME" "$DISPLAY_NAME" "$MODEL" \
-    "$WS_START_HOUR" "$WS_END_HOUR" "$WS_TIMEZONE" "$WS_WORKS_WEEKENDS"
+    "$WS_START_HOUR" "$WS_END_HOUR" "$WS_TIMEZONE" "$WS_WORKS_WEEKENDS" "$SLACK_ID"
 
 # Apply to gateway
 echo "Applying cron changes to gateway..."

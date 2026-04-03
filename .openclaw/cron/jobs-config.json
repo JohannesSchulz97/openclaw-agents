@@ -78,7 +78,7 @@
         "cronExpr": "0 11 * * 1-5",
         "tz": "Asia/Tbilisi"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u0ae37ygtpa",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -101,7 +101,7 @@
         "cronExpr": "0 15 * * 1-5",
         "tz": "Asia/Tbilisi"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u0ae37ygtpa",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -124,7 +124,7 @@
         "cronExpr": "30 18 * * 1-5",
         "tz": "Asia/Tbilisi"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u0ae37ygtpa",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -147,7 +147,7 @@
         "cronExpr": "0 8 * * 1-5",
         "tz": "Europe/Madrid"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u0998266edq",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -170,7 +170,7 @@
         "cronExpr": "0 13 * * 1-5",
         "tz": "Europe/Madrid"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u0998266edq",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -193,7 +193,7 @@
         "cronExpr": "30 17 * * 1-5",
         "tz": "Europe/Madrid"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u0998266edq",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -216,7 +216,7 @@
         "cronExpr": "30 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u0ae37ygtpa",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -239,7 +239,7 @@
         "cronExpr": "30 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u0998266edq",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -262,7 +262,7 @@
         "cronExpr": "0 9 * * 1-5",
         "tz": "Europe/Vienna"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u07lthhbbl2",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -285,7 +285,7 @@
         "cronExpr": "0 13 * * 1-5",
         "tz": "Europe/Vienna"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u07lthhbbl2",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -308,7 +308,7 @@
         "cronExpr": "30 16 * * 1-5",
         "tz": "Europe/Vienna"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u07lthhbbl2",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -331,7 +331,7 @@
         "cronExpr": "30 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u07lthhbbl2",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -354,7 +354,7 @@
         "cronExpr": "0 5 * * 1-5",
         "tz": "Asia/Kolkata"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u09l59gj3qt",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -377,7 +377,7 @@
         "cronExpr": "30 12 * * 1-5",
         "tz": "Asia/Kolkata"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u09l59gj3qt",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -400,7 +400,7 @@
         "cronExpr": "30 19 * * 1-5",
         "tz": "Asia/Kolkata"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u09l59gj3qt",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -423,7 +423,7 @@
         "cronExpr": "30 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u09l59gj3qt",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -446,7 +446,7 @@
         "cronExpr": "0 11 * * 1-5",
         "tz": "Asia/Tbilisi"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u09a9k7bgta",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -469,7 +469,7 @@
         "cronExpr": "30 15 * * 1-5",
         "tz": "Asia/Tbilisi"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u09a9k7bgta",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -492,7 +492,7 @@
         "cronExpr": "30 19 * * 1-5",
         "tz": "Asia/Tbilisi"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u09a9k7bgta",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -515,7 +515,7 @@
         "cronExpr": "30 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u09a9k7bgta",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -538,7 +538,7 @@
         "cronExpr": "0 8 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u088a9d6a57",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -561,7 +561,7 @@
         "cronExpr": "0 14 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u088a9d6a57",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -584,7 +584,7 @@
         "cronExpr": "30 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u088a9d6a57",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -607,7 +607,7 @@
         "cronExpr": "30 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u088a9d6a57",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -630,7 +630,7 @@
         "cronExpr": "0 9 * * 1-5",
         "tz": "Europe/Zurich"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u09r2aydckz",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -653,7 +653,7 @@
         "cronExpr": "30 13 * * 1-5",
         "tz": "Europe/Zurich"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u09r2aydckz",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -676,7 +676,7 @@
         "cronExpr": "30 17 * * 1-5",
         "tz": "Europe/Zurich"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u09r2aydckz",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -699,7 +699,7 @@
         "cronExpr": "30 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:direct:u09r2aydckz",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
