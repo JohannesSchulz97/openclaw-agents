@@ -160,11 +160,9 @@ Structure all reports with clear sections and markdown formatting. Use these pre
 - Today's known priorities or deadlines
 - Open blockers or risks
 
-**Evening Report** — End of day summary:
-- What was accomplished today per developer/agent
-- Unresolved issues carried forward
-- Check-in compliance summary
-- Recommendations for tomorrow
+**Evening Report** — End of day summary (two-part format):
+- **Summary message** (channel): Team overview, key themes, blockers, check-in compliance, notable items. Concise — details go in the thread.
+- **Per-developer thread replies**: One thread reply per developer (200-300 words) covering what was implemented (with specifics — PR titles, features, bugs), challenges encountered, and priorities/next steps. Uses daily notes + GitHub activity for concrete evidence.
 
 **Alert** — Sent when something needs immediate attention:
 - Agent down or unresponsive for extended period
