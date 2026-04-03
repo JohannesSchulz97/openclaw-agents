@@ -285,6 +285,12 @@ bash scripts/apply-cron.sh
 - GitHub: <github-username>
 - Heartbeat: every 10 minutes | Check-ins: morning/midday/evening (per work schedule, configured during bootstrap)
 
+## Agent: Tech Manager
+
+- Slack Channel ID: <channel-id> (`#tech-management`)
+- Reports: morning status + evening summary (daily)
+- Monitoring: hourly fleet health checks
+
 ## Web Search
 
 All agents use DuckDuckGo for web search (free, no API key). Configured in `openclaw.json` as `tools.web.search.provider: "ddg"`. If better quality is needed, switch to Brave Search (`provider: "brave"`) which requires an API key from brave.com/search/api.

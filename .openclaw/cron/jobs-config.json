@@ -10,7 +10,7 @@
         "kind": "every",
         "everyMs": 3600000
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:channel:c0ap3lr6ads",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -32,7 +32,7 @@
         "kind": "every",
         "everyMs": 86400000
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:channel:c0ap3lr6ads",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -55,7 +55,7 @@
         "cronExpr": "0 20 * * *",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:main",
+      "sessionTarget": "session:slack:channel:c0ap3lr6ads",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
