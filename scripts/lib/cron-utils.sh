@@ -125,7 +125,7 @@ add_cron_job() {
             payload: {
                 kind: "agentTurn",
                 message: $message,
-                timeoutSeconds: 180,
+                timeoutSeconds: 300,
                 thinking: "medium"
             },
             sessionKey: $sessionKey,
@@ -226,7 +226,7 @@ add_cron_jobs() {
                 payload: {
                     kind: "agentTurn",
                     message: $message,
-                    timeoutSeconds: 180,
+                    timeoutSeconds: 300,
                     thinking: "medium"
                 },
                 sessionKey: $sessionKey,
@@ -277,7 +277,7 @@ add_cron_jobs() {
             payload: {
                 kind: "agentTurn",
                 message: $message,
-                timeoutSeconds: 180,
+                timeoutSeconds: 300,
                 thinking: "medium"
             },
             sessionKey: $sessionKey,
