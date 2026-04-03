@@ -3,6 +3,7 @@
 agents/[^/]+/IDENTITY\.md
 agents/[^/]+/USER\.md
 agents/[^/]+/\.agent-type
+agents/[^/]+/bootstrap-state\.json
 
 # Agent runtime state: written by agents during operation.
 agents/[^/]+/memory

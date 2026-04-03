@@ -51,7 +51,7 @@ MODEL="${MODEL:-glm-5}"
 SLACK_ID=""
 for identity_dir in "$HOME/.openclaw/agents/$AGENT_NAME" "$REPO_ROOT/.openclaw/agents/$AGENT_NAME"; do
     if [[ -f "$identity_dir/IDENTITY.md" ]]; then
-        SLACK_ID=$(grep -oP '(?<=\*\*Slack User ID:\*\* )U[A-Z0-9]+' "$identity_dir/IDENTITY.md" 2>/dev/null || true)
+        SLACK_ID=$(sed -n 's/.*\*\*Slack User ID:\*\* \(U[A-Z0-9]*\).*/\1/p' "$identity_dir/IDENTITY.md" 2>/dev/null | head -1 || true)
         [[ -n "$SLACK_ID" ]] && break
     fi
 done

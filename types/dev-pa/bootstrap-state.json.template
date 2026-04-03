@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "bootstrap_complete": false,
+  "fields": {
+    "slack_id": {
+      "completed": false,
+      "auto_detected": false,
+      "value": null,
+      "required": true,
+      "description": "Your Slack user ID for direct messages. This is detected automatically when your agent is created."
+    },
+    "github_usernames": {
+      "completed": false,
+      "auto_detected": false,
+      "value": null,
+      "required": true,
+      "description": "Your GitHub username(s) within <your-org> organization. Used to track your contributions and activity across repos."
+    },
+    "developer_name": {
+      "completed": false,
+      "auto_detected": false,
+      "value": null,
+      "required": true,
+      "description": "Your full name so I know who I'm working with."
+    },
+    "developer_timezone": {
+      "completed": false,
+      "auto_detected": false,
+      "value": null,
+      "required": true,
+      "description": "Your timezone (e.g. Europe/Berlin, Asia/Tbilisi) so I can check in at times that make sense for you."
+    },
+    "work_schedule": {
+      "completed": false,
+      "auto_detected": false,
+      "value": null,
+      "required": true,
+      "description": "Your typical working hours (e.g. 09:00-18:00), how many hours per day your contract covers, and whether you work on weekends."
+    },
+    "agent_identity": {
+      "completed": false,
+      "auto_detected": false,
+      "value": null,
+      "required": false,
+      "ask_count": 0,
+      "max_asks": 2,
+      "description": "Optional: give me a name, personality, vibe, and emoji. This makes our interactions more personal -- but it's totally fine to skip this."
+    }
+  }
+}

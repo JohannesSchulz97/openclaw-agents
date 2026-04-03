@@ -191,13 +191,49 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# Step 4: Add cron job + apply to live system
+# Step 4: Create bootstrap-state.json with auto-detected fields
 # ------------------------------------------------------------------------------
-# No cron jobs until bootstrap — agent must configure work-schedule.json first
-echo "  Note: Check-in cron jobs will be created during bootstrap (work-schedule.json required)."
+BOOTSTRAP_STATE="$AGENT_DIR/bootstrap-state.json"
+BOOTSTRAP_TEMPLATE="$REPO_ROOT/types/$TYPE/bootstrap-state.json.template"
+
+if [ -f "$BOOTSTRAP_TEMPLATE" ]; then
+  log_action "Creating bootstrap-state.json with auto-detected fields"
+  if [ "$DRY_RUN" = false ]; then
+    # Copy template and pre-fill slack_id
+    jq --arg sid "$SLACK_ID" \
+      '.fields.slack_id.completed = true | .fields.slack_id.auto_detected = true | .fields.slack_id.value = $sid' \
+      "$BOOTSTRAP_TEMPLATE" > "$BOOTSTRAP_STATE"
+
+    # Try to auto-detect GitHub username(s) from CLAUDE.md
+    GITHUB_USERS=$(grep -A5 "^## Agent: $DISPLAY_NAME" "$REPO_ROOT/CLAUDE.md" 2>/dev/null \
+      | sed -n 's/^- GitHub: \(.*\)/\1/p' | head -1 || true)
+    if [ -n "$GITHUB_USERS" ]; then
+      tmp=$(mktemp)
+      jq --arg g "$GITHUB_USERS" \
+        '.fields.github_usernames.completed = true | .fields.github_usernames.auto_detected = true | .fields.github_usernames.value = $g' \
+        "$BOOTSTRAP_STATE" > "$tmp" && mv "$tmp" "$BOOTSTRAP_STATE"
+      echo "  Auto-detected GitHub username(s): $GITHUB_USERS"
+    fi
+  else
+    echo "[DRY RUN] Would create bootstrap-state.json with slack_id=$SLACK_ID"
+  fi
+fi
 
 # ------------------------------------------------------------------------------
-# Step 5: Run stow
+# Step 5: Add default CET cron jobs (replaced with personalized schedule after bootstrap)
+# ------------------------------------------------------------------------------
+log_action "Adding default CET check-in cron jobs for '$NAME'"
+if [ "$DRY_RUN" = false ]; then
+  source "$REPO_ROOT/scripts/lib/cron-utils.sh"
+  add_cron_jobs "$CRON_CONFIG" "$NAME" "$DISPLAY_NAME" "$MODEL" \
+    9 17 "Europe/Berlin" "false" "$SLACK_ID"
+  echo "  Default schedule: 09:00/13:00/16:30 CET (will be personalized after bootstrap)"
+else
+  echo "[DRY RUN] Would add default CET cron jobs for '$NAME'"
+fi
+
+# ------------------------------------------------------------------------------
+# Step 6: Run stow
 # ------------------------------------------------------------------------------
 log_action "Running stow to create symlinks in ~/.openclaw/"
 if [ "$DRY_RUN" = false ]; then
@@ -205,7 +241,7 @@ if [ "$DRY_RUN" = false ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Step 6: Register agent in openclaw.json
+# Step 7: Register agent in openclaw.json
 # ------------------------------------------------------------------------------
 OPENCLAW_UTILS="$REPO_ROOT/scripts/lib/openclaw-utils.sh"
 OPENCLAW_CONFIG="$HOME/.openclaw/openclaw.json"
@@ -232,7 +268,7 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# Step 7: Update CLAUDE.md
+# Step 8: Update CLAUDE.md
 # ------------------------------------------------------------------------------
 CLAUDE_MD="$REPO_ROOT/CLAUDE.md"
 
@@ -263,7 +299,7 @@ if [ "$DRY_RUN" = false ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# Step 8: Print summary
+# Step 9: Print summary
 # ------------------------------------------------------------------------------
 echo ""
 echo "=========================================="
@@ -271,27 +307,16 @@ echo "Agent '$NAME' created successfully!"
 echo "=========================================="
 echo ""
 echo "Files created:"
-echo "  .openclaw/agents/$NAME/IDENTITY.md          (copied from template)"
-echo "  .openclaw/agents/$NAME/USER.md              (copied from template)"
+echo "  .openclaw/agents/$NAME/IDENTITY.md           (from template)"
+echo "  .openclaw/agents/$NAME/USER.md               (from template)"
+echo "  .openclaw/agents/$NAME/bootstrap-state.json  (auto-detected fields pre-filled)"
 echo "  .openclaw/agents/$NAME/memory/poll-state.json"
 echo ""
-echo "Shared files synced from types/$TYPE/:"
-echo "  SOUL.md, AGENTS.md, TOOLS.md, HEARTBEAT.md, BOOTSTRAP.md, poll-config.json"
-echo "  scripts/"
-echo ""
 echo "Cron jobs:"
-echo "  No cron jobs created yet — check-in jobs are created during bootstrap"
-echo "  (agent must configure work-schedule.json first)."
-echo ""
-echo "openclaw.json:"
-echo "  Agent entry, Slack binding, and DM allowlist updated (if openclaw.json exists)."
-echo ""
-echo "CLAUDE.md updated with agent info."
-echo ""
-echo "Stow applied: ~/.openclaw/ symlinks are live."
+echo "  Default CET schedule (09:00/13:00/16:30 Europe/Berlin)"
+echo "  Will be personalized after developer provides timezone + work hours."
 echo ""
 echo "Next steps:"
-echo "  1. Edit .openclaw/agents/$NAME/IDENTITY.md with agent personality"
-echo "  2. Edit .openclaw/agents/$NAME/USER.md with user context"
-echo "  3. Restart the gateway: openclaw gateway restart"
-echo "  4. Run: openclaw cron run <job-id>  (to trigger first bootstrap session)"
+echo "  1. Restart the gateway: openclaw gateway restart"
+echo "  2. Run: bash scripts/apply-cron.sh"
+echo "  3. The agent will proactively reach out to the developer via Slack."
