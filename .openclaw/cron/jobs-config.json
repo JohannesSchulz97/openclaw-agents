@@ -27,7 +27,7 @@
       "id": "c4e6a9b1-2d7f-4c83-a5e8-9b0d1f3c7a2e",
       "agentId": "tech-manager",
       "name": "Tech Manager Morning Status Report",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "every",
         "everyMs": 86400000
