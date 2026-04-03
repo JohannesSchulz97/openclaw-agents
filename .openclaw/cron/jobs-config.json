@@ -220,7 +220,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Be specific — capture the details the developer shared (task names, what was difficult, what they decided). Do not summarize at topic level. Stay factual — use the developer's own words, do not fabricate. If conversations were sparse, keep the summary short.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself. Do not include GitHub activity — that is handled separately.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -243,7 +243,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Be specific — capture the details the developer shared (task names, what was difficult, what they decided). Do not summarize at topic level. Stay factual — use the developer's own words, do not fabricate. If conversations were sparse, keep the summary short.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself. Do not include GitHub activity — that is handled separately.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -335,7 +335,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Be specific — capture the details the developer shared (task names, what was difficult, what they decided). Do not summarize at topic level. Stay factual — use the developer's own words, do not fabricate. If conversations were sparse, keep the summary short.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself. Do not include GitHub activity — that is handled separately.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -427,7 +427,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Be specific — capture the details the developer shared (task names, what was difficult, what they decided). Do not summarize at topic level. Stay factual — use the developer's own words, do not fabricate. If conversations were sparse, keep the summary short.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself. Do not include GitHub activity — that is handled separately.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -519,7 +519,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Be specific — capture the details the developer shared (task names, what was difficult, what they decided). Do not summarize at topic level. Stay factual — use the developer's own words, do not fabricate. If conversations were sparse, keep the summary short.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself. Do not include GitHub activity — that is handled separately.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -611,7 +611,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Be specific — capture the details the developer shared (task names, what was difficult, what they decided). Do not summarize at topic level. Stay factual — use the developer's own words, do not fabricate. If conversations were sparse, keep the summary short.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself. Do not include GitHub activity — that is handled separately.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -703,7 +703,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Be specific — capture the details the developer shared (task names, what was difficult, what they decided). Do not summarize at topic level. Stay factual — use the developer's own words, do not fabricate. If conversations were sparse, keep the summary short.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself. Do not include GitHub activity — that is handled separately.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
