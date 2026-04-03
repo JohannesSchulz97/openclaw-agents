@@ -107,6 +107,22 @@ Bad (4 messages):
 Good (1 message):
 - [image attached] "Here's your wizard icon — dark robes, glowing staff, purple energy. Want me to try a different style?"
 
+### `scripts/create-issue.sh`
+Create GitHub issues in <your-org> org repositories.
+
+```bash
+bash scripts/create-issue.sh --repo tob-app --title "Bug: login broken"
+bash scripts/create-issue.sh --repo tob-app --title "feat: dark mode" --body "Add dark mode toggle" --label enhancement
+```
+
+Options:
+- `--repo REPO` (required) — repository name without org prefix (e.g. `tob-app`)
+- `--title TITLE` (required) — issue title
+- `--body BODY` (optional) — issue description
+- `--label LABEL` (optional, repeatable) — label to add
+
+Output: JSON with `success`, `data.url`, `data.number`, `data.repo`, `data.title`. Only works for `<your-org>` org repos.
+
 ### `scripts/github-activity.sh`
 Query GitHub activity for a user within <your-org> org.
 
