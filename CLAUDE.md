@@ -315,6 +315,8 @@ Dev Machine  ──PR──▶  GitHub (main)  ──Actions──▶  OpenClaw 
 
 This separation prevents the class of incidents where development operations (branch switching, manual stow, direct commits) corrupt live agent state. See issue #99 for the full incident history.
 
+**Issues and tasks must clearly distinguish work by machine.** When creating issues or planning tasks, always separate what needs to happen on the dev machine (code changes, PRs) from what needs to happen on the OpenClaw host (runtime config like `openclaw.json`, memory file operations, gateway restarts, cron triggers). Use clear labels like "Dev machine:" and "Host:" in task lists. This prevents confusion about where each step runs and avoids accidental development on the host.
+
 ## Useful Commands
 
 ```bash
