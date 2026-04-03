@@ -289,7 +289,11 @@ for i in $(seq 0 $((JOB_COUNT - 1))); do
     # Track jobs needing model cleared (config has no model, CLI has no --clear-model)
     local_model=$(echo "$JOB" | jq -r '.payload.model // empty')
     if [ -z "$local_model" ]; then
-      CLEAR_MODEL_IDS+=("$GATEWAY_ID")
+      # Only clear if gateway job actually has a non-null model set
+      gw_model=$(echo "$GATEWAY_JOBS" | jq -r --arg id "$GATEWAY_ID" '.jobs[] | select(.id == $id) | .payload.model // empty')
+      if [ -n "$gw_model" ]; then
+        CLEAR_MODEL_IDS+=("$GATEWAY_ID")
+      fi
     fi
   fi
 done
