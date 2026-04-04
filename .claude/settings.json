@@ -2,42 +2,62 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash",
-        "inputPatterns": [".*openclaw\\s+.*"],
+        "matcher": "Edit",
+        "inputPatterns": [".*jobs-config\\.json.*"],
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/blockers/openclaw.sh"
+            "command": ".claude/hooks/dev/cron-conventions.sh"
           }
         ]
       },
       {
-        "matcher": "Bash",
-        "inputPatterns": [".*launchctl.*"],
+        "matcher": "Write",
+        "inputPatterns": [".*jobs-config\\.json.*"],
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/blockers/launchctl.sh"
+            "command": ".claude/hooks/dev/cron-conventions.sh"
           }
         ]
       },
       {
-        "matcher": "Bash",
-        "inputPatterns": [".*security\\s+(add|delete)-generic-password.*"],
+        "matcher": "Edit",
+        "inputPatterns": [".*types/.*/scripts/.*\\.sh.*"],
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/blockers/keychain.sh"
+            "command": ".claude/hooks/dev/script-conventions.sh"
           }
         ]
       },
       {
-        "matcher": "Bash",
-        "inputPatterns": [".*(~|/)\\.*openclaw.*"],
+        "matcher": "Write",
+        "inputPatterns": [".*types/.*/scripts/.*\\.sh.*"],
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/blockers/workspace.sh"
+            "command": ".claude/hooks/dev/script-conventions.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "inputPatterns": [".*types/.*/(?:AGENTS|SOUL|TOOLS|BOOTSTRAP|HEARTBEAT)\\.md.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/workspace-layer.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "inputPatterns": [".*types/.*/(?:AGENTS|SOUL|TOOLS|BOOTSTRAP|HEARTBEAT)\\.md.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/workspace-layer.sh"
           }
         ]
       }
