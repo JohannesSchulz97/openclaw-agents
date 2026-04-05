@@ -91,6 +91,19 @@ if [ "$PULL" = true ]; then
 fi
 
 # --------------------------------------------------------------------------- #
+# Validate architectural invariants
+# --------------------------------------------------------------------------- #
+log "=== Validating invariants ==="
+if [ "$DRY_RUN" = true ]; then
+  log "  (dry-run) would run: bash scripts/validate-invariants.sh"
+else
+  if ! bash "$REPO_ROOT/scripts/validate-invariants.sh"; then
+    fail "Invariant validation failed — aborting deploy. See docs/invariants.md"
+  fi
+  log "  OK"
+fi
+
+# --------------------------------------------------------------------------- #
 # Deploy sequence (strictly sequential)
 # --------------------------------------------------------------------------- #
 log "=== Deploy sequence ==="

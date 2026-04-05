@@ -3,6 +3,66 @@
     "PreToolUse": [
       {
         "matcher": "Edit",
+        "inputPatterns": [".*\\.openclaw/agents/.*/(?:SOUL|AGENTS|TOOLS|HEARTBEAT|BOOTSTRAP)\\.md.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/block-direct-shared-edit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "inputPatterns": [".*\\.openclaw/agents/.*/(?:SOUL|AGENTS|TOOLS|HEARTBEAT|BOOTSTRAP)\\.md.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/block-direct-shared-edit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "inputPatterns": [".*\\.openclaw/agents/.*/scripts/.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/block-direct-script-edit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "inputPatterns": [".*\\.openclaw/agents/.*/scripts/.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/block-direct-script-edit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "inputPatterns": [".*\\.github/workflows/deploy\\.yml.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/block-deploy-workflow.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "inputPatterns": [".*\\.github/workflows/deploy\\.yml.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/block-deploy-workflow.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
         "inputPatterns": [".*jobs-config\\.json.*"],
         "hooks": [
           {
@@ -58,6 +118,68 @@
           {
             "type": "command",
             "command": ".claude/hooks/dev/workspace-layer.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "inputPatterns": [".*CLAUDE\\.md$"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/claude-md-guard.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "inputPatterns": [".*CLAUDE\\.md$"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/claude-md-guard.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit",
+        "inputPatterns": [".*jobs-config\\.json.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/validate-cron.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "inputPatterns": [".*jobs-config\\.json.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/validate-cron.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "inputPatterns": [".*\\.gitignore.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/validate-gitignore.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "inputPatterns": [".*\\.gitignore.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/dev/validate-gitignore.sh"
           }
         ]
       }

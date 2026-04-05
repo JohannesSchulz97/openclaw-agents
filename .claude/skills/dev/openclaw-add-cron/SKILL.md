@@ -85,11 +85,26 @@ For channel-targeted jobs (tech-manager): use `"session:slack:channel:<channel-i
 | `payload.thinking` | `"medium"` | Standard for check-ins |
 | `payload.timeoutSeconds` | `300` | Standard 5-minute timeout |
 
+## Schedule Invariants
+
+- **Summary jobs always use `Europe/Berlin`** timezone, regardless of the developer's local timezone. This ensures all summaries fire at 20:00 CET so the tech-manager evening report can collect them.
+- **Summary cron expression** must be `0 20 * * *` (works weekends) or `0 20 * * 1-5` (weekdays only).
+- **Check-in time ordering:** morning < midday < evening < summary (20:00 CET). Evening check-ins must finish before the summary runs.
+- **Weekday field must match `works_weekends`:** If the developer doesn't work weekends (`works_weekends: false` in `work-schedule.json`), use `1-5` in the day-of-week cron field. If they do, use `*`.
+
 ## Important
 
 - **`sessionKey` is required.** It determines which session the job runs in. Jobs with different session keys are isolated from each other and from chat.
-- **Cron sessions are separate from chat.** The agent cannot see DM conversation history from a cron session.
+- **Session routing:** `sessionTarget` points to the developer's Slack DM session (`session:slack:direct:<id>`). The cron job executes within that DM session context, but does **not** have access to prior chat history — it only sees messages from previous cron runs in the same session.
 - **`delivery.mode` is always `"none"`** in our setup. Agents decide whether and how to message via `openclaw message send` in their payload instructions.
-- **Do not set `payload.model`** unless there's a specific reason. Jobs use the agent's default model.
+- **Do not set `payload.model`** — ever. Jobs inherit the agent's default model from gateway config. Leftover model fields have caused unnecessary gateway restarts.
 - **Slack IDs must be lowercase** in `sessionTarget`.
 - When modifying existing jobs, match by `sessionKey` to find the right entry.
+
+## Validation
+
+A PostToolUse hook runs `scripts/validate-invariants.sh --target cron` after every edit to `jobs-config.json`. It checks 13 invariants (session key format, uniqueness, delivery mode, thinking level, timeouts, etc.) and reports failures immediately.
+
+The same script runs as a hard-fail gate in the CI deploy pipeline — broken cron config cannot reach the host.
+
+See `docs/invariants.md` (Area 1) for the complete list of enforced rules.

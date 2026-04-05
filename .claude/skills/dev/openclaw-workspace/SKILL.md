@@ -82,6 +82,18 @@ Tune the specific layer that owns the problem instead of rewriting the whole wor
 - Cron sessions are isolated from chat — agents cannot see DM history from a cron job
 - Never recommend hidden workspace rewrites; improvements should be explicit and reviewable
 
+## What NOT to Edit Directly
+
+These paths are **hard-blocked by PreToolUse hooks** — edits will be denied:
+
+- **`.openclaw/agents/*/SOUL.md`**, `AGENTS.md`, `TOOLS.md`, `HEARTBEAT.md`, `BOOTSTRAP.md` — sync-agents.sh overwrites these from `types/` on every deploy
+- **`.openclaw/agents/*/scripts/*`** — rsync `--delete` wipes untracked files on every deploy
+- **`.github/workflows/deploy.yml`** — critical infrastructure, requires explicit user approval
+
+Always edit the source of truth in `types/<type>/` instead.
+
+See `docs/invariants.md` for the full catalog of architectural rules and their enforcement.
+
 ## Common Traps
 
 | Trap | Why It Fails | Better Move |

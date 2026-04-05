@@ -119,7 +119,8 @@ Reference these for patterns:
 
 ## Important
 
-- Scripts go in `types/<type>/scripts/`, NOT in `.openclaw/agents/<name>/scripts/`. The type directory is the source of truth.
+- Scripts go in `types/<type>/scripts/`, NOT in `.openclaw/agents/<name>/scripts/`. The type directory is the source of truth. A PreToolUse hook will **hard block** edits to `.openclaw/agents/*/scripts/` — those are wiped by `rsync --delete` on every deploy.
 - New `.sh` files in `types/<type>/scripts/` are automatically picked up by `sync-agents.sh` (it rsyncs the entire `scripts/` directory). No need to edit `SHARED_FILES`.
 - Dependency check: if the script needs `jq`, `gh`, `curl`, etc., check for it early and fail with `json_error` if missing.
 - The `parse_quiet_flag` function is available in json-response.sh but optional — use it if your script benefits from a quiet mode.
+- **macOS/BSD compatibility required:** The dev machine runs macOS with BSD tools. Do NOT use `grep -oP` (Perl regex, GNU-only) or GNU awk `IGNORECASE`. Use `sed` for regex extraction, `tolower()` for awk case-insensitive matching. See `docs/invariants.md` (Area 4.3).
