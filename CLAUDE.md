@@ -180,6 +180,31 @@ The tech-manager agent has 3 jobs: `monitoring` (hourly), `morning-report`, `eve
 - **Cron expression:** `"kind": "cron", "cronExpr": "0 9 * * *", "tz": "Europe/Berlin"` (standard 5-field cron)
 - **Interval:** `"kind": "every", "everyMs": 3600000` (milliseconds)
 
+## Architectural Invariants
+
+This repo has a formal invariants system to prevent recurring breakage. See `docs/invariants.md` for the full catalog.
+
+### Enforcement
+
+- **`scripts/validate-invariants.sh`** — 14 machine checks (cron config + gitignore). Runs in CI as a hard-fail deploy gate and via PostToolUse hooks during editing.
+- **PreToolUse hooks** — hard-block edits to `.openclaw/agents/*/` shared files and scripts (must use `types/` instead), block `deploy.yml` edits without approval, and fire-once deny on `jobs-config.json`, type scripts, workspace config files, and `CLAUDE.md` to force reading the relevant skill first.
+- **PostToolUse hooks** — validate `jobs-config.json` and `.gitignore` after every edit, report violations immediately.
+
+### Keeping invariants up to date
+
+When fixing a bug or correcting a broken pattern, ask yourself: **is this a rule that must always hold?** If a fix reveals a structural constraint (e.g., "sessionTarget must be lowercase", "scripts must be BSD-compatible"), it's likely an invariant.
+
+**Workflow for new invariants:**
+1. When you discover a potential invariant during a fix, ask the user: *"This looks like an architectural invariant — should I add it to `docs/invariants.md`?"*
+2. If confirmed, add it to `docs/invariants.md` with the appropriate tag:
+   - `[ENFORCED]` — if you also add a check to `scripts/validate-invariants.sh`
+   - `[HOOKED]` — if a PreToolUse hook covers it but no machine validation
+   - `[DOCUMENTED]` — if it's convention-only
+3. If machine-enforceable, add a check function to `validate-invariants.sh` (the CI gate will enforce it automatically).
+4. Reference the fix commit/issue in the rationale.
+
+**Do not add invariants silently.** Always confirm with the user first — not every fix implies a permanent rule.
+
 ## Agents
 
 | Agent | Slack ID | GitHub | Type |
