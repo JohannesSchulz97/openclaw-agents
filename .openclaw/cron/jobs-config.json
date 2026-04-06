@@ -69,6 +69,30 @@
       }
     },
     {
+      "id": "e7a2b1c3-4d5f-6a89-b0c1-d2e3f4a5b6c7",
+      "agentId": "tech-manager",
+      "name": "Tech Manager Weekly Update Check",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 0 * * 1",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:channel:c0ap3lr6ads",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "You are the Tech Manager agent. Run the weekly OpenClaw update check.\n\nPHASE 1 — GATHER VERSION DATA\n\n1. Run `bash scripts/check-updates.sh` and parse the JSON output.\n2. If all components show update_available == false, log \"All components up to date\" and output NO_ACTION. Stop here.\n\nPHASE 2 — ANALYZE IMPACT\n\nFor each component with an available update:\n\n3. Read the release_notes from the JSON output.\n4. Analyze the impact against our specific setup:\n   - OpenClaw: 18 agents, ~71 cron jobs, LCM plugin, QMD memory backend, Slack channel integrations, session management. Known issues: failover bug (openclaw/openclaw#58751), cron scheduler catch-up bug (openclaw/openclaw#60083).\n   - lossless-claw: DAG-based context compaction, LCM database, session summarization. Past incident: DB bloat (#166).\n   - QMD: Memory backend, BM25 + vector search, better-sqlite3 native module, per-agent QMD collections.\n\n5. Classify the overall risk:\n   - **LOW RISK**: All updates are patch versions (x.y.Z only), release notes mention no breaking changes, no changes to cron/plugin/config/memory systems we use.\n   - **RISKY**: Any major or minor version bump, breaking changes mentioned, changes to scheduling/plugin/config/memory systems, or if you cannot confidently assess the impact.\n\nPHASE 3 — TAKE ACTION\n\n6. If LOW RISK:\n   a. Write the marker file: `echo \"auto-apply\" > /tmp/openclaw-update-requested`\n   b. Compose and send a Slack message to #<manager-agent>-feedback:\n      - Subject: \"Weekly Update Check — Auto-applying low-risk updates\"\n      - For each component: current version → new version\n      - Brief impact summary (why it's safe)\n      - Note: \"Update will be applied automatically within 30 minutes via launchd.\"\n      - End with: cc <@<slack-id>>\n   c. Send via: openclaw message send --channel slack --target channel:<channel-id> --message \"<message>\"\n\n7. If RISKY:\n   a. Do NOT write the marker file.\n   b. Compose and send a Slack message to #<manager-agent>-feedback:\n      - Subject: \"Weekly Update Check — Manual review recommended\"\n      - For each component: current version → new version\n      - Detailed impact analysis: what changed, what could break, what to watch for\n      - Recommendation: apply or wait\n      - Manual command: `bash scripts/update-openclaw.sh --apply`\n      - End with: cc <@<slack-id>>\n   c. Send via: openclaw message send --channel slack --target channel:<channel-id> --message \"<message>\"\n\nIMPORTANT:\n- Be specific in your analysis. Reference our actual configuration, not generic risks.\n- If release notes are empty or unavailable, classify as RISKY (unknown changes).\n- Slack formatting: no tables, use bullet lists and bold headers.",
+        "model": "gemini-pro",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:tech-manager:cron:update-check",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
       "id": "ab64dd63-81ac-4180-91f4-1363a158d4c8",
       "agentId": "dev10",
       "name": "dev10 Morning Check-in",

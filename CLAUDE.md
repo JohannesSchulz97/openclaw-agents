@@ -244,7 +244,7 @@ Alternative memory backend by Tobi Lutke. Installed via `npm i -g @tobilu/qmd`. 
 - **Fallback:** `fw-glm5` -- unlimited, auto-activates on rate limit
 - **Specialist:** `google/gemini-3.1-pro-preview` (alias `gemini-pro`) -- difficult cron tasks only, not in fallback chain
 
-Configured in `openclaw.json` under `agents.defaults.model`. Per-agent overrides removed; all agents inherit defaults. Cron jobs inherit too (no model field in payloads). Google API key at `~/.openclaw/credentials/gemini-nano-banana.json` (shared with image generation).
+Configured in `openclaw.json` under `agents.defaults.model`. Per-agent overrides removed; all agents inherit defaults. Cron jobs inherit too (no model field in payloads), except the weekly update-check job which uses `gemini-pro` for higher-quality risk analysis. Google API key at `~/.openclaw/credentials/gemini-nano-banana.json` (shared with image generation).
 
 ## Web Search
 
@@ -257,8 +257,38 @@ API key stored at `~/.openclaw/credentials/gemini-nano-banana.json`. Default mod
 ## OpenClaw Installation
 
 ```bash
-pnpm add -g openclaw
+npm i -g openclaw
 ```
+
+## Updating OpenClaw & Plugins
+
+Three components are tracked: OpenClaw (`npm i -g openclaw`), lossless-claw (`openclaw plugins install`), and QMD (`npm i -g @tobilu/qmd`).
+
+### Automated weekly check
+
+Every Monday at 00:00 CET, the tech-manager runs `check-updates.sh` via cron (using Gemini Pro for analysis). It compares versions, fetches changelogs, and assesses impact against our setup:
+- **Low risk** (patch only, no breaking changes): writes `/tmp/openclaw-update-requested` marker and notifies `#<manager-agent>-feedback`. A launchd job at 00:30 picks up the marker and runs the update.
+- **Risky** (major/minor bump, breaking changes): notifies `#<manager-agent>-feedback` with analysis and manual command only.
+
+### Manual update
+
+```bash
+# Check versions (no changes)
+bash scripts/update-openclaw.sh
+
+# Apply all updates
+bash scripts/update-openclaw.sh --apply
+
+# Update a single component
+bash scripts/update-openclaw.sh --apply --component openclaw
+```
+
+The apply sequence: backup `openclaw.json` → update packages → `openclaw doctor --fix` → `openclaw config validate` → restart gateway (if validation passes) → notify Slack.
+
+**Constraints:**
+- `openclaw doctor --fix` is required after every OpenClaw update (LaunchAgent plist hardcodes binary path)
+- Never restart the gateway without running `openclaw config validate` first
+- `openclaw.json` is backed up to `~/.openclaw/backups/` before every update
 
 ## Useful Commands
 

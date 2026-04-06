@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- NOTE: Paths are hardcoded for /Users/<hostname> (launchd does not support env vars). Update paths if deploying on a different user account. -->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.openclaw-agents.update-check</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>-c</string>
+		<string>MARKER="/tmp/openclaw-update-requested"; LOG="/Users/<hostname>/.openclaw/logs/update-check-launchd.log"; mkdir -p "$(dirname "$LOG")"; if [ -f "$MARKER" ]; then echo "[$(date '+%Y-%m-%d %H:%M:%S')] Marker found, running update-openclaw.sh --apply" >> "$LOG"; /bin/bash /Users/<hostname>/openclaw-agents/scripts/update-openclaw.sh --apply >> "$LOG" 2>&1; rm -f "$MARKER"; echo "[$(date '+%Y-%m-%d %H:%M:%S')] Update complete, marker removed" >> "$LOG"; else echo "[$(date '+%Y-%m-%d %H:%M:%S')] No marker, skipping" >> "$LOG"; fi</string>
+	</array>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Weekday</key>
+		<integer>1</integer>
+		<key>Hour</key>
+		<integer>0</integer>
+		<key>Minute</key>
+		<integer>30</integer>
+	</dict>
+	<key>RunAtLoad</key>
+	<false/>
+	<key>StandardOutPath</key>
+	<string>/Users/<hostname>/.openclaw/logs/update-check-launchd.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/<hostname>/.openclaw/logs/update-check-launchd.log</string>
+</dict>
+</plist>
