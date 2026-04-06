@@ -240,7 +240,7 @@ Alternative memory backend by Tobi Lutke. Installed via `bun install -g https://
 
 ## Web Search
 
-All agents use DuckDuckGo for web search (free, no API key). Configured in `openclaw.json` as `tools.web.search.provider: "ddg"`. If better quality is needed, switch to Brave Search (`provider: "brave"`) which requires an API key from brave.com/search/api.
+All agents use DuckDuckGo for web search (free, no API key). Configured in `openclaw.json` as `tools.web.search.provider: "duckduckgo"`. If better quality is needed, switch to Brave Search (`provider: "brave"`) which requires an API key from brave.com/search/api.
 
 ## Image Generation (Gemini Nano Banana)
 
