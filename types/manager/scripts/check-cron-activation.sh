@@ -32,6 +32,8 @@ if [[ -z "$REPO_ROOT" ]]; then
     exit 1
 fi
 
+source "$REPO_ROOT/scripts/lib/schedule-utils.sh"
+
 # ── Args ─────────────────────────────────────
 AGENTS=""
 
@@ -67,7 +69,20 @@ for agent in "${AGENT_LIST[@]}"; do
     agent=$(echo "$agent" | xargs)  # trim whitespace
     AGENT_PATH="$AGENT_DIR_BASE/$agent"
 
-    # Check if work-schedule.json exists
+    # Gap 1 fix: backfill work-schedule.json from bootstrap-state.json
+    if [[ ! -f "$AGENT_PATH/work-schedule.json" ]]; then
+        BS_FILE="$AGENT_PATH/bootstrap-state.json"
+        if [[ -f "$BS_FILE" ]]; then
+            BS_COMPLETE=$(jq -r '.bootstrap_complete' "$BS_FILE" 2>/dev/null || echo "false")
+            WS_VALUE=$(jq -r '.fields.work_schedule.value // empty' "$BS_FILE" 2>/dev/null || true)
+            if [[ "$BS_COMPLETE" == "true" && -n "$WS_VALUE" && "$WS_VALUE" != "null" ]]; then
+                jq -r '.fields.work_schedule.value' "$BS_FILE" > "$AGENT_PATH/work-schedule.json"
+                log "Backfilled work-schedule.json for $agent from bootstrap-state.json"
+            fi
+        fi
+    fi
+
+    # Still no schedule — skip
     if [[ ! -f "$AGENT_PATH/work-schedule.json" ]]; then
         SKIPPED+=("$agent:no_schedule")
         continue
@@ -79,6 +94,25 @@ for agent in "${AGENT_LIST[@]}"; do
     HAS_EVENING=$(echo "$GATEWAY_JOBS" | jq -r --arg sk "agent:${agent}:cron:evening" '.jobs[] | select(.sessionKey == $sk) | .id' 2>/dev/null | head -1 || true)
 
     if [[ -n "$HAS_MORNING" && -n "$HAS_MIDDAY" && -n "$HAS_EVENING" ]]; then
+        # Gap 2 fix: detect schedule drift — compare existing cron vs work-schedule.json
+        MORNING_CRON=$(echo "$GATEWAY_JOBS" | jq -r --arg sk "agent:${agent}:cron:morning" '.jobs[] | select(.sessionKey == $sk) | .schedule.cronExpr' 2>/dev/null | head -1 || true)
+        MORNING_TZ=$(echo "$GATEWAY_JOBS" | jq -r --arg sk "agent:${agent}:cron:morning" '.jobs[] | select(.sessionKey == $sk) | .schedule.tz' 2>/dev/null | head -1 || true)
+
+        if parse_work_schedule "$AGENT_PATH/work-schedule.json" 2>/dev/null; then
+            compute_checkin_times "$WS_START_HOUR" "$WS_END_HOUR" 2>/dev/null || true
+            EXPECTED_MORNING_CRON=$(build_cron_expr "$MORNING_HOUR" "$MORNING_MIN" "$WS_WORKS_WEEKENDS")
+
+            if [[ "$MORNING_CRON" != "$EXPECTED_MORNING_CRON" || "$MORNING_TZ" != "$WS_TIMEZONE" ]]; then
+                log "Schedule drift for $agent: gateway=$MORNING_CRON ($MORNING_TZ), expected=$EXPECTED_MORNING_CRON ($WS_TIMEZONE)"
+                if bash "$REPO_ROOT/scripts/update-cron-schedule.sh" --agent "$agent" 2>&1; then
+                    ACTIVATED+=("$agent")
+                else
+                    ERRORS+=("$agent:schedule_update_failed")
+                fi
+                continue
+            fi
+        fi
+
         SKIPPED+=("$agent:already_active")
         continue
     fi
