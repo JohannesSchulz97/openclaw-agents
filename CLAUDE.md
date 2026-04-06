@@ -236,7 +236,15 @@ Lossless Context Management plugin by Martian Engineering. Replaces OpenClaw's b
 
 ### QMD Memory Backend
 
-Alternative memory backend by Tobi Lutke. Installed via `bun install -g https://github.com/tobi/qmd`. Configured in `~/.openclaw/openclaw.json` under `memory.backend`.
+Alternative memory backend by Tobi Lutke. Installed via `npm i -g @tobilu/qmd`. Configured in `~/.openclaw/openclaw.json` under `memory.backend`.
+
+## Models
+
+- **Primary:** `openai-codex/gpt-5.4` -- conversations and routine cron jobs
+- **Fallback:** `fw-glm5` -- unlimited, auto-activates on rate limit
+- **Specialist:** `google/gemini-3.1-pro-preview` (alias `gemini-pro`) -- difficult cron tasks only, not in fallback chain
+
+Configured in `openclaw.json` under `agents.defaults.model`. Per-agent overrides removed; all agents inherit defaults. Cron jobs inherit too (no model field in payloads). Google API key at `~/.openclaw/credentials/gemini-nano-banana.json` (shared with image generation).
 
 ## Web Search
 
