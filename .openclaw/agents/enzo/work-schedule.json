@@ -1,9 +1,0 @@
-{
-  "timezone": "Europe/Berlin",
-  "working_hours": {
-    "start": "08:00",
-    "end": "20:00"
-  },
-  "hours_per_day": 12,
-  "works_weekends": false
-}
