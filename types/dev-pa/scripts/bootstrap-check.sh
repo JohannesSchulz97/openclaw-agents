@@ -117,6 +117,24 @@ auto_detect() {
         fi
     fi
 
+    # Agent identity from IDENTITY.md (non-empty Name: field)
+    if [[ "$(jq -r '.fields.agent_identity.completed' "$STATE_FILE")" == "false" ]]; then
+        local identity_name=""
+        if [[ -f "$IDENTITY_FILE" ]]; then
+            identity_name=$(sed -n 's/.*\*\*Name:\*\* \(.\+\)/\1/p' "$IDENTITY_FILE" 2>/dev/null | head -1 || true)
+            # Skip empty or placeholder values
+            if [[ "$identity_name" == "_" || -z "$identity_name" ]]; then
+                identity_name=""
+            fi
+        fi
+        if [[ -n "$identity_name" ]]; then
+            local tmp; tmp=$(mktemp)
+            jq --arg v "$identity_name" '.fields.agent_identity.completed=true | .fields.agent_identity.auto_detected=true | .fields.agent_identity.value=$v' "$STATE_FILE" > "$tmp" && mv "$tmp" "$STATE_FILE"
+            log "Auto-detected agent_identity: $identity_name"
+            changed=true
+        fi
+    fi
+
     echo "$changed"
 }
 
