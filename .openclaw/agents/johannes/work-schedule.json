@@ -1,9 +1,0 @@
-{
-  "timezone": "Asia/Kolkata",
-  "working_hours": {
-    "start": "05:00",
-    "end": "20:00"
-  },
-  "works_weekends": false,
-  "hours_per_day": 4
-}

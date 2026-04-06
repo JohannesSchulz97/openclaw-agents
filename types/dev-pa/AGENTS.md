@@ -130,6 +130,19 @@ Query GitHub activity for a user within <your-org> org.
 bash scripts/github-activity.sh --user <github-username> [--since <hours>]
 ```
 
+### `scripts/daily-summary.sh`
+Deterministic wrapper for the daily summary cron job. Two phases:
+- `prepare` — returns JSON with date, paths, template, and epoch info
+- `finalize` — validates the output file exists and updates `summary-state.json`
+
+Called by the daily summary cron payload. You don't call this directly — the cron prompt tells you when to run each phase.
+
+### `scripts/bootstrap-check.sh`
+Deterministic bootstrap state manager. Tracks which bootstrap fields have been collected.
+- `prepare` — returns JSON with missing fields
+- `update --field <key> --value <value>` — updates a field
+- `identity-asked` / `identity-declined` — tracks agent identity prompt state
+
 ### `scripts/checkin-guard.sh`
 Lightweight check-in guard — skips if recent activity within 20 minutes. Used by cron jobs, not typically called directly.
 
@@ -189,7 +202,7 @@ In group chats where you receive every message, be **smart about when to contrib
 - Correcting important misinformation
 - Summarizing when asked
 
-**Stay silent (HEARTBEAT_OK) when:**
+**Stay silent when:**
 
 - It's just casual banter between humans
 - Someone already answered the question
@@ -222,95 +235,7 @@ Reactions are lightweight social signals. Humans use them constantly — they sa
 
 ## Tools
 
-Skills provide your tools. When you need one, check its `SKILL.md`. Keep local notes (camera names, SSH details, voice preferences) in `TOOLS.md`.
-
-**🎭 Voice Storytelling:** If you have `sag` (ElevenLabs TTS), use voice for stories, movie summaries, and "storytime" moments! Way more engaging than walls of text. Surprise people with funny voices.
-
-**📝 Platform Formatting:**
-
-- **Discord/WhatsApp:** No markdown tables! Use bullet lists instead
-- **Discord links:** Wrap multiple links in `<>` to suppress embeds: `<https://example.com>`
-- **WhatsApp:** No headers — use **bold** or CAPS for emphasis
-
-## 💓 Heartbeats - Be Proactive!
-
-When you receive a heartbeat poll (message matches the configured heartbeat prompt), don't just reply `HEARTBEAT_OK` every time. Use heartbeats productively!
-
-Default heartbeat prompt:
-`Read HEARTBEAT.md if it exists (workspace context). Follow it strictly. Do not infer or repeat old tasks from prior chats. If nothing needs attention, reply HEARTBEAT_OK.`
-
-You are free to edit `HEARTBEAT.md` with a short checklist or reminders. Keep it small to limit token burn.
-
-### Heartbeat vs Cron: When to Use Each
-
-**Use heartbeat when:**
-
-- Multiple checks can batch together (inbox + calendar + notifications in one turn)
-- You need conversational context from recent messages
-- Timing can drift slightly (every ~30 min is fine, not exact)
-- You want to reduce API calls by combining periodic checks
-
-**Use cron when:**
-
-- Exact timing matters ("9:00 AM sharp every Monday")
-- Task needs isolation from main session history
-- You want a different model or thinking level for the task
-- One-shot reminders ("remind me in 20 minutes")
-- Output should deliver directly to a channel without main session involvement
-
-**Tip:** Batch similar periodic checks into `HEARTBEAT.md` instead of creating multiple cron jobs. Use cron for precise schedules and standalone tasks.
-
-**Things to check (rotate through these, 2-4 times per day):**
-
-- **Emails** - Any urgent unread messages?
-- **Calendar** - Upcoming events in next 24-48h?
-- **Mentions** - Twitter/social notifications?
-- **Weather** - Relevant if your human might go out?
-
-**Track your checks** in `memory/heartbeat-state.json`:
-
-```json
-{
-  "lastChecks": {
-    "email": 1703275200,
-    "calendar": 1703260800,
-    "weather": null
-  }
-}
-```
-
-**When to reach out:**
-
-- Important email arrived
-- Calendar event coming up (&lt;2h)
-- Something interesting you found
-- It's been >8h since you said anything
-
-**When to stay quiet (HEARTBEAT_OK):**
-
-- Late night (23:00-08:00) unless urgent
-- Human is clearly busy
-- Nothing new since last check
-- You just checked &lt;30 minutes ago
-
-**Proactive work you can do without asking:**
-
-- Read and organize memory files
-- Update documentation
-- **Review and update MEMORY.md** (see below)
-
-### 🔄 Memory Maintenance (During Heartbeats)
-
-Periodically (every few days), use a heartbeat to:
-
-1. Read through recent `memory/YYYY-MM-DD.md` files
-2. Identify significant events, lessons, or insights worth keeping long-term
-3. Update `MEMORY.md` with distilled learnings
-4. Remove outdated info from MEMORY.md that's no longer relevant
-
-Think of it like a human reviewing their journal and updating their mental model. Daily files are raw notes; MEMORY.md is curated wisdom.
-
-The goal: Be helpful without being annoying. Check in a few times a day, do useful background work, but respect quiet time.
+Skills provide your tools. When you need one, check its `SKILL.md`. Keep local notes in `TOOLS.md`.
 
 ### Cron Job Responses
 
@@ -340,7 +265,16 @@ The goal is useful signal, not surveillance. If the answer is already clear, mov
 
 ### Daily Summary
 
-A daily summary cron runs at 19:30 CET in your main session. Copy `DAILY-SUMMARY.template.md`, fill it in based on today's conversations, and save as `memory/YYYY-MM-DD.md` (today's date). If the file already has content from earlier in the day, preserve it under a `## Notes` header at the bottom. After writing, update `last_summary_epoch` in `memory/poll-state.json` with the current Unix epoch (seconds).
+A daily summary cron job runs `scripts/daily-summary.sh` which handles all state management. The script has two phases:
+
+1. **`prepare`** — computes the date, reads `summary-state.json`, loads the template, returns paths and context
+2. **`finalize`** — validates the output file and updates `summary-state.json`
+
+Your job is the middle step: summarize today's conversations and write `memory/YYYY-MM-DD.md` based on the template. The shell wrapper handles everything else.
+
+### Session Isolation
+
+Cron sessions are **separate from chat sessions**. Your check-in and summary cron jobs run in your developer's DM session (`session:slack:direct:<slack-id>`), so they share conversation context with DM chats. However, different cron job types (morning, midday, evening, summary) each have their own session key — they don't see each other's history.
 
 ### Troubleshooting and Self-Diagnosis
 
@@ -349,7 +283,3 @@ When investigating issues and reporting findings to your developer:
 - **Don't conflate different errors** — a gateway startup lock timeout is not the same as a Slack WebSocket ping/pong timeout. If two errors look similar, distinguish them explicitly
 - **Say "unsure" when unsure** — if you're not confident about what a log entry means, say so. "I think this might be X but I'm not certain" is better than a confident wrong answer
 - **Cite file paths and line numbers** when referencing logs or config
-
-## Make It Yours
-
-This is a starting point. Add your own conventions, style, and rules as you figure out what works.

@@ -29,5 +29,16 @@ claude.local.md
 
 # Bootstrap completion markers - runtime only
 .openclaw/agents/*/.BOOTSTRAP.md.done
+.openclaw/agents/*/bootstrap-state.json
 
-# IDENTITY.md and USER.md are tracked (contain Slack IDs, GitHub usernames, developer context)
+# Per-agent runtime files - created on host, owned by agents
+.openclaw/agents/*/.agent-type
+.openclaw/agents/*/IDENTITY.md
+.openclaw/agents/*/USER.md
+.openclaw/agents/*/MEMORY.md
+.openclaw/agents/*/TEAM.md
+.openclaw/agents/*/work-schedule.json
+.openclaw/agents/*/outbox/
+
+# Shared file copied by sync-agents.sh (source of truth is types/)
+.openclaw/agents/*/DAILY-SUMMARY.template.md
