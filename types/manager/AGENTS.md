@@ -32,7 +32,7 @@ Your responsibilities:
 
 Read `USER.md` for the list of agents you monitor, their directories, and their developers. For each monitored agent, you have read access to:
 
-- Their `memory/` directory (daily notes, poll state, context)
+- Their `memory/` directory (daily notes, work schedule, context)
 - Their `IDENTITY.md` and `USER.md` (configuration)
 - Their session metadata (via OpenClaw CLI)
 
@@ -48,10 +48,7 @@ Use this to check which agents have active sessions, when they last responded, a
 
 ### Agent Check-in Compliance
 
-Each agent's `memory/poll-state.json` tracks their last interaction timestamps. Use this to detect:
-
-- Agents that have not checked in within their expected interval
-- Patterns of missed or late check-ins over time
+Use `scripts/check-missed-checkins.sh --agents <list>` to detect developers who have been silent for 12+ hours based on their last DM interaction timestamp (from `sessions/sessions.json`).
 
 ### Agent Memory
 
@@ -98,8 +95,7 @@ For team-wide reports, use scripts from your own scripts directory:
 - `scripts/check-cron-activation.sh` — cron job status
 - `scripts/check-session-health.sh` — session health
 - `scripts/check-session-sizes.sh` — session sizes
-
-For GitHub activity across the team, run each agent's `github-activity.sh` with their usernames from USER.md.
+- `scripts/collect-github-activity.sh [--since <hours>]` — collects GitHub activity for all dev-pa agents (reads usernames from each agent's USER.md, flags agents with missing usernames)
 
 ## Channel Presence
 
