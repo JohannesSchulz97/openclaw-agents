@@ -37,7 +37,7 @@ extract_github_usernames() {
     local usernames=""
 
     if [[ -f "$user_file" ]]; then
-        usernames=$(sed -n 's/.*\*\*GitHub Usernames\?\*\*:[[:space:]]*//p' "$user_file" \
+        usernames=$(sed -n 's/.*[*][*]GitHub Usernames:[*][*][[:space:]]*//p' "$user_file" \
             | head -1 \
             | sed 's/[[:space:]]*$//' || true)
     fi
