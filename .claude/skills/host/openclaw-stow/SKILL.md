@@ -1,58 +1,62 @@
 ---
 name: openclaw-stow
-description: Re-deploy OpenClaw config files via GNU Stow, automatically resolving the known jobs.json conflict
+description: "Emergency manual stow intervention — only use when deploy.sh stow step fails or symlinks are broken"
 disable-model-invocation: true
 ---
 
-# Re-Stow OpenClaw Config
+# Emergency Manual Stow
 
-Re-deploy configuration files from the openclaw-home repo to $HOME via GNU Stow.
+**This is an emergency-only skill.** Normal deployments go through `deploy.sh` which handles `stow --adopt` then `stow` automatically. Only use this when deploy.sh fails or symlinks are visibly broken.
 
-## Setup Detection
+## Critical Warning
 
-Detect the openclaw-home repo location and deployment mode:
-```bash
-OPENCLAW_REPO=$(readlink ~/.openclaw/openclaw.json 2>/dev/null | sed 's|/.openclaw/openclaw.json||')
-TIER_CONFIGS=(~/.openclaw/configs/openclaw-*.json)
-[[ -f "${TIER_CONFIGS[0]}" ]] && MULTI_GATEWAY=true || MULTI_GATEWAY=false
-```
+`stow --adopt` MUST run before regular `stow`, or per-agent runtime files (IDENTITY.md, USER.md, work-schedule.json) get overwritten with templates. This destroyed agent data on 2026-03-30. Never skip the adopt step.
 
 ## Steps
 
-1. **Check for known conflicts:**
-```bash
-ls -la ~/.openclaw/cron/jobs.json 2>/dev/null
-```
-If it's a regular file (not a symlink), remove it — the gateway recreates it on every startup:
+1. **Remove the known `jobs.json` conflict:**
 ```bash
 rm -f ~/.openclaw/cron/jobs.json
 ```
+The gateway overwrites `jobs.json` as a real file on every startup, breaking the stow symlink. This is expected.
 
-2. **Run stow:**
+2. **Adopt first (captures any host-side changes):**
 ```bash
-cd "$OPENCLAW_REPO" && stow --no-folding -t ~ .
+cd ~/Projects/<your-org>/openclaw-agents && stow --adopt --no-folding -t ~ .
 ```
 
-3. **If stow reports other conflicts**, check what they are:
-   - If it's a file the gateway created (session files, auth tokens), it's safe to remove and re-stow
-   - If it's user-created content, back it up first
+3. **Then push symlinks:**
+```bash
+cd ~/Projects/<your-org>/openclaw-agents && stow --no-folding -t ~ .
+```
 
 4. **Verify key symlinks:**
-
-### Single-gateway
 ```bash
-ls -la ~/.openclaw/openclaw.json
-ls -la ~/.openclaw/cron/jobs.json
+ls -la ~/.openclaw/cron/jobs-config.json    # Should be symlink → repo
+ls -la ~/.openclaw/openclaw.json            # Should be REAL FILE (Category 3, not symlinked)
+ls -la ~/.openclaw/agents/dev1/SOUL.md  # Should be symlink → repo
 ```
-Each should point to the openclaw-home repo.
 
-### Multi-gateway
-```bash
-ls -la ~/.openclaw/openclaw.json
-ls -la ~/.openclaw/cron/jobs.json
-ls -la ~/.openclaw/configs/openclaw-*.json
-ls -la ~/.openclaw/scripts/start-*.sh
-```
-All should be symlinks pointing to the openclaw-home repo.
+`openclaw.json` is Category 3 (host-only runtime) — it must NOT be a symlink. If it is, something went wrong.
 
-5. **Report result:** Confirm stow succeeded and list any warnings.
+5. **If stow reports other conflicts:**
+   - Gateway-created files (sessions, auth tokens): safe to remove, then re-stow
+   - User-created content (memory/, reports/): back up first, then investigate
+
+6. **Restart gateway after fixing stow:**
+   Follow the `openclaw-restart` skill (validate config first).
+
+## Files that should be symlinks (Category 2)
+
+These point from `~/.openclaw/` into the repo:
+- `agents/*/SOUL.md`, `AGENTS.md`, `TOOLS.md`, `HEARTBEAT.md`, `BOOTSTRAP.md`
+- `agents/*/scripts/` (entire directory)
+- `cron/jobs-config.json`
+- `agents/*/DAILY-SUMMARY.template.md`, `poll-config.json`
+
+## Files that must NOT be symlinks (Category 3/4)
+
+- `openclaw.json` — host-only runtime config
+- `agents/*/IDENTITY.md`, `USER.md`, `work-schedule.json` — per-agent runtime
+- `agents/*/memory/`, `reports/`, `outbox/` — agent-owned data
+- `cron/jobs.json` — gateway runtime (recreated on startup)

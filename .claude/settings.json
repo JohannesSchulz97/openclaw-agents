@@ -140,6 +140,76 @@
             "command": ".claude/hooks/dev/claude-md-guard.sh"
           }
         ]
+      },
+      {
+        "matcher": "Edit",
+        "inputPatterns": [".*\\.openclaw/openclaw\\.json.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/host/block-direct-openclaw-json.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "inputPatterns": [".*\\.openclaw/openclaw\\.json.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/host/block-direct-openclaw-json.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "inputPatterns": [".*/\\.openclaw/agents/.*/(?:SOUL|AGENTS|TOOLS|HEARTBEAT|BOOTSTRAP)\\.md.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/host/block-shared-file-edit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "inputPatterns": [".*/\\.openclaw/agents/.*/(?:SOUL|AGENTS|TOOLS|HEARTBEAT|BOOTSTRAP)\\.md.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/host/block-shared-file-edit.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "inputPatterns": [".*stow.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/host/block-stow.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "inputPatterns": [".*git\\s+(commit|checkout|switch|rebase|merge|cherry-pick|push|reset|branch\\s+-[dD]).*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/host/block-git-write.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "inputPatterns": [".*openclaw\\s+gateway\\s+restart.*"],
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/host/remind-validate-before-restart.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [

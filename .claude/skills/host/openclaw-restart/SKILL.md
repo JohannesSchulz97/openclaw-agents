@@ -1,80 +1,50 @@
 ---
 name: openclaw-restart
-description: Restart OpenClaw gateway(s) — handles stow conflicts and verifies channels reconnect. Supports single-gateway and multi-gateway (per-tier) deployments.
-argument-hint: "[tier-name | all]"
+description: Restart the OpenClaw gateway after config changes — validates config first, then restarts and verifies health
 disable-model-invocation: true
 ---
 
 # Restart OpenClaw Gateway
 
-Restart the gateway with automatic stow conflict resolution. Argument `$ARGUMENTS` is the tier name to restart, or "all" to restart every tier. If empty, auto-detect deployment mode.
-
-## Setup Detection
-
-```bash
-OPENCLAW_REPO=$(readlink ~/.openclaw/openclaw.json 2>/dev/null | sed 's|/.openclaw/openclaw.json||')
-TIER_CONFIGS=(~/.openclaw/configs/openclaw-*.json)
-[[ -f "${TIER_CONFIGS[0]}" ]] && MULTI_GATEWAY=true || MULTI_GATEWAY=false
-```
+Restart the single gateway after manual config changes. Normal deploys already handle restarts via `deploy.sh` — this skill is for manual `openclaw.json` edits on the host.
 
 ## Steps
 
-1. **Resolve stow conflicts:**
+1. **Validate config first (hard gate — never skip):**
 ```bash
-rm -f ~/.openclaw/cron/jobs.json
+openclaw config validate
 ```
-The gateway overwrites `jobs.json` as a real file on every startup, breaking the stow symlink.
+If validation fails, fix the config before restarting. Do NOT proceed.
 
-2. **Re-stow config:**
+2. **Restart the gateway:**
 ```bash
-cd "$OPENCLAW_REPO" && stow --no-folding -t ~ .
-```
-
-3. **Restart gateway(s):**
-
-### Multi-gateway mode (`MULTI_GATEWAY=true`)
-
-If `$ARGUMENTS` is a specific tier name:
-```bash
-launchctl kickstart -k gui/$(id -u)/ai.openclaw.gateway.$ARGUMENTS
+openclaw gateway restart
 ```
 
-If `$ARGUMENTS` is "all" or empty:
+3. **Verify it came back up:**
 ```bash
-for cfg in ~/.openclaw/configs/openclaw-*.json; do
-  TIER=$(basename "$cfg" | sed 's/openclaw-//;s/.json//')
-  launchctl kickstart -k gui/$(id -u)/ai.openclaw.gateway.$TIER
-done
+openclaw gateway status
 ```
+Confirm the gateway is running and the PID changed.
 
-### Single-gateway mode (`MULTI_GATEWAY=false`)
+4. **Check logs for errors:**
 ```bash
-launchctl kickstart -k gui/$(id -u)/ai.openclaw.gateway
+tail -30 ~/.openclaw/logs/gateway.log
 ```
+Look for `[slack] socket mode connected` and any error lines.
 
-4. **Wait for startup** (5 seconds), then check logs:
-
-### Multi-gateway
-```bash
-sleep 5
-for each restarted tier:
-  tail -30 ~/.openclaw-$TIER/gateway.log
-```
-
-### Single-gateway
-```bash
-sleep 5 && tail -30 ~/.openclaw/logs/gateway.log
-```
-
-5. **Verify channels connected:**
-   - Look for `[telegram] [<agent>] starting provider` lines (one per Telegram bot)
-   - Look for `[slack] socket mode connected` lines
-   - Check if WhatsApp is starting or in restart loop
-   - Note the PID and port number
-
-6. **Report status** to the user:
-   - Per tier (multi) or overall (single): PID, port, channel status
-   - Which Telegram bots started
+5. **Report to user:**
+   - Gateway PID, port (18789)
    - Slack connection status
-   - WhatsApp status (connected / restart loop / not configured)
-   - Any errors in the log
+   - Any errors from the log
+
+## When to use
+
+- After editing `~/.openclaw/openclaw.json` on the host
+- After `openclaw doctor --fix` (updates LaunchAgent plist)
+- After manual plugin updates
+
+## When NOT to use
+
+- After a normal PR merge — `deploy.sh` handles the full restart sequence
+- For stow conflicts — use `openclaw-stow` first
