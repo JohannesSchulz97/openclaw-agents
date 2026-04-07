@@ -167,18 +167,7 @@ fi
 log_action "Copying USER.md from template"
 run_cmd cp "$TYPE_DIR/USER.md.template" "$AGENT_DIR/USER.md"
 
-# Copy or create poll-state.json
-if [ -f "$TYPE_DIR/memory/poll-state.json" ]; then
-  log_action "Copying memory/poll-state.json from type template"
-  run_cmd cp "$TYPE_DIR/memory/poll-state.json" "$AGENT_DIR/memory/poll-state.json"
-else
-  log_action "Creating memory/poll-state.json with defaults"
-  if [ "$DRY_RUN" = false ]; then
-    echo '{"last_morning_epoch":0,"last_midday_epoch":0,"last_evening_epoch":0,"morning_responded":true,"midday_responded":true,"evening_responded":true,"missed_checkins":0}' > "$AGENT_DIR/memory/poll-state.json"
-  else
-    echo '[DRY RUN] Write new poll-state.json schema to memory/poll-state.json'
-  fi
-fi
+# Note: poll-state.json is no longer used. checkin-guard.sh reads sessions.json directly.
 
 # ------------------------------------------------------------------------------
 # Step 3: Sync shared files from type
@@ -310,7 +299,7 @@ echo "Files created:"
 echo "  .openclaw/agents/$NAME/IDENTITY.md           (from template)"
 echo "  .openclaw/agents/$NAME/USER.md               (from template)"
 echo "  .openclaw/agents/$NAME/bootstrap-state.json  (auto-detected fields pre-filled)"
-echo "  .openclaw/agents/$NAME/memory/poll-state.json"
+echo "  .openclaw/agents/$NAME/memory/              (runtime memory)"
 echo ""
 echo "Cron jobs:"
 echo "  Default CET schedule (09:00/13:00/16:30 Europe/Berlin)"

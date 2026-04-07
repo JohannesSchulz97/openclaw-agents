@@ -1,17 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# test-checkin-guard.sh — Test harness for checkin-guard.sh bug fixes
+# test-checkin-guard.sh — Test harness for checkin-guard.sh
 #
-# Tests 3 bugs:
-#   Bug 1: State consistency validation (responded=true but epoch=0)
-#   Bug 2: Renamed awaiting_response to checkin_dispatched
-#   Bug 3: Inter-day state hygiene (date change resets stale state)
+# Tests the stateless checkin-guard that reads sessions.json
+# and outputs last_interaction + hours_since_interaction.
 #
 # Strategy:
-#   We create a fake agent directory structure that mimics what
-#   checkin-guard.sh expects, then run the real script and inspect
-#   the resulting poll-state.json.
+#   Create a fake agent directory with sessions/sessions.json,
+#   run the guard, and verify the JSON output.
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
@@ -40,65 +37,17 @@ fail() {
     fi
 }
 
-assert_json_value() {
-    local file="$1"
-    local key="$2"
-    local expected="$3"
-    local label="$4"
-    local actual
-    actual=$(jq -r ".$key" "$file" 2>/dev/null)
-    if [[ "$actual" == "$expected" ]]; then
-        pass "$label"
-    else
-        fail "$label" "$expected" "$actual"
-    fi
-}
-
-assert_json_key_exists() {
-    local file="$1"
-    local key="$2"
-    local label="$3"
-    local exists
-    exists=$(jq "has(\"$key\")" "$file" 2>/dev/null)
-    if [[ "$exists" == "true" ]]; then
-        pass "$label"
-    else
-        fail "$label" "key '$key' to exist" "key not found"
-    fi
-}
-
-assert_json_key_missing() {
-    local file="$1"
-    local key="$2"
-    local label="$3"
-    local exists
-    exists=$(jq "has(\"$key\")" "$file" 2>/dev/null)
-    if [[ "$exists" == "false" ]]; then
-        pass "$label"
-    else
-        fail "$label" "key '$key' to NOT exist" "key exists"
-    fi
-}
-
 # ── Setup fake agent directory ───────────────────
-# The script derives AGENT_DIR from SCRIPT_DIR (parent of scripts/).
-# So we need: <AGENT_DIR>/scripts/checkin-guard.sh
-#              <AGENT_DIR>/scripts/lib/json-response.sh
-#              <AGENT_DIR>/memory/poll-state.json
-
 setup_test_agent() {
     local test_name="$1"
     TEST_TMPDIR=$(mktemp -d /tmp/checkin-guard-test-XXXXXX)
     AGENT_DIR="$TEST_TMPDIR/test-agent"
     SCRIPTS_DIR="$AGENT_DIR/scripts"
     LIB_DIR="$SCRIPTS_DIR/lib"
-    MEMORY_DIR="$AGENT_DIR/memory"
     SESSIONS_DIR="$AGENT_DIR/sessions"
-    POLL_STATE="$MEMORY_DIR/poll-state.json"
 
-    mkdir -p "$LIB_DIR" "$MEMORY_DIR" "$SESSIONS_DIR"
+    mkdir -p "$LIB_DIR" "$SESSIONS_DIR"
 
-    # Copy the real scripts into our fake agent structure
     cp "$GUARD_SCRIPT" "$SCRIPTS_DIR/checkin-guard.sh"
     cp "$REPO_DIR/types/dev-pa/scripts/lib/json-response.sh" "$LIB_DIR/json-response.sh"
     chmod +x "$SCRIPTS_DIR/checkin-guard.sh"
@@ -112,218 +61,235 @@ teardown_test_agent() {
 
 run_guard() {
     local checkin_type="$1"
-    # Run the guard, suppress stdout (JSON output) and stderr
-    "$SCRIPTS_DIR/checkin-guard.sh" "$checkin_type" --quiet >/dev/null 2>/dev/null || true
+    "$SCRIPTS_DIR/checkin-guard.sh" "$checkin_type" --quiet 2>/dev/null
 }
 
 # ══════════════════════════════════════════════════
 echo "============================================"
-echo "checkin-guard.sh Bug Fix Tests"
+echo "checkin-guard.sh Tests"
 echo "============================================"
 echo ""
 
-# ── Bug 1: State consistency validation ──────────
-echo "--- Bug 1: State consistency validation ---"
-echo "  (responded=true but epoch=0 should be reset to responded=false)"
+# ── Test 1: DM sessions are detected correctly ───
+echo "--- Test 1: DM session filter ---"
 echo ""
 
-# Test 1a: morning_responded=true, last_morning_epoch=0
-echo "  Test 1a: morning_responded inconsistency"
-setup_test_agent "bug1-morning"
-cat > "$POLL_STATE" <<'EOF'
+setup_test_agent "dm-filter"
+NOW_MS=$(( $(date -u +%s) * 1000 ))
+RECENT_MS=$(( NOW_MS - 3600000 ))  # 1 hour ago
+
+cat > "$SESSIONS_DIR/sessions.json" <<EOF
 {
-  "morning_responded": true,
-  "midday_responded": false,
-  "evening_responded": false,
-  "last_morning_epoch": 0,
-  "last_midday_epoch": 0,
-  "last_evening_epoch": 0,
-  "missed_checkins": 0,
-  "awaiting_response": false
+  "agent:test-agent:slack:direct:u1234": {
+    "updatedAt": $RECENT_MS,
+    "chatType": "direct"
+  },
+  "agent:test-agent:cron:abc123": {
+    "updatedAt": $NOW_MS,
+    "chatType": "cron"
+  },
+  "agent:test-agent:main": {
+    "updatedAt": $NOW_MS,
+    "chatType": "main"
+  }
 }
 EOF
 
-# Create empty sessions file so script has no human activity
-echo '{}' > "$SESSIONS_DIR/sessions.json"
+OUTPUT=$(run_guard "morning")
+HOURS=$(echo "$OUTPUT" | jq -r '.data.hours_since_interaction')
+LAST=$(echo "$OUTPUT" | jq -r '.data.last_interaction')
 
-# Run a midday check-in (not morning, so we don't overwrite morning state)
-run_guard "midday"
-
-# After the guard runs, morning_responded should be false because
-# last_morning_epoch is 0 (inconsistent state should be corrected)
-MORNING_RESPONDED=$(jq -r '.morning_responded' "$POLL_STATE")
-if [[ "$MORNING_RESPONDED" == "false" ]]; then
-    pass "morning_responded reset to false when last_morning_epoch=0"
+if [[ "$HOURS" -le 1 ]]; then
+    pass "hours_since_interaction reflects DM session (${HOURS}h, expected ~1h)"
 else
-    fail "morning_responded should be false when last_morning_epoch=0 (BUG EXISTS: not reset)" "false" "$MORNING_RESPONDED"
+    fail "hours_since_interaction should be ~1 from DM session" "0-1" "$HOURS"
+fi
+
+if [[ "$LAST" != "null" && "$LAST" != "" ]]; then
+    pass "last_interaction is set from DM session"
+else
+    fail "last_interaction should be set" "ISO timestamp" "$LAST"
 fi
 teardown_test_agent
 
-# Test 1b: midday_responded=true, last_midday_epoch=0
-echo "  Test 1b: midday_responded inconsistency"
-setup_test_agent "bug1-midday"
-cat > "$POLL_STATE" <<'EOF'
+# ── Test 2: Cron/main sessions are excluded ──────
+echo ""
+echo "--- Test 2: Non-DM sessions excluded ---"
+echo ""
+
+setup_test_agent "cron-excluded"
+NOW_MS=$(( $(date -u +%s) * 1000 ))
+
+cat > "$SESSIONS_DIR/sessions.json" <<EOF
 {
-  "morning_responded": false,
-  "midday_responded": true,
-  "evening_responded": false,
-  "last_morning_epoch": 0,
-  "last_midday_epoch": 0,
-  "last_evening_epoch": 0,
-  "missed_checkins": 0,
-  "awaiting_response": false
+  "agent:test-agent:cron:abc123": {
+    "updatedAt": $NOW_MS,
+    "chatType": "cron"
+  },
+  "agent:test-agent:main": {
+    "updatedAt": $NOW_MS,
+    "chatType": "main"
+  },
+  "agent:test-agent:slack:channel:c123": {
+    "updatedAt": $NOW_MS,
+    "chatType": "channel"
+  }
 }
 EOF
-echo '{}' > "$SESSIONS_DIR/sessions.json"
-run_guard "morning"
 
-MIDDAY_RESPONDED=$(jq -r '.midday_responded' "$POLL_STATE")
-if [[ "$MIDDAY_RESPONDED" == "false" ]]; then
-    pass "midday_responded reset to false when last_midday_epoch=0"
+OUTPUT=$(run_guard "morning")
+LAST=$(echo "$OUTPUT" | jq -r '.data.last_interaction')
+HOURS=$(echo "$OUTPUT" | jq -r '.data.hours_since_interaction')
+
+if [[ "$LAST" == "null" ]]; then
+    pass "last_interaction is null when no DM sessions exist"
 else
-    fail "midday_responded should be false when last_midday_epoch=0 (BUG EXISTS: not reset)" "false" "$MIDDAY_RESPONDED"
+    fail "last_interaction should be null (only cron/main/channel sessions)" "null" "$LAST"
+fi
+
+if [[ "$HOURS" -eq 0 ]]; then
+    pass "hours_since_interaction is 0 when no DM sessions"
+else
+    fail "hours_since_interaction should be 0" "0" "$HOURS"
 fi
 teardown_test_agent
 
-# Test 1c: evening_responded=true, last_evening_epoch=0
-echo "  Test 1c: evening_responded inconsistency"
-setup_test_agent "bug1-evening"
-cat > "$POLL_STATE" <<'EOF'
+# ── Test 3: Skip when recently active ────────────
+echo ""
+echo "--- Test 3: Skip when recently active ---"
+echo ""
+
+setup_test_agent "skip-active"
+VERY_RECENT_MS=$(( $(date -u +%s) * 1000 - 300000 ))  # 5 min ago
+
+cat > "$SESSIONS_DIR/sessions.json" <<EOF
 {
-  "morning_responded": false,
-  "midday_responded": false,
-  "evening_responded": true,
-  "last_morning_epoch": 0,
-  "last_midday_epoch": 0,
-  "last_evening_epoch": 0,
-  "missed_checkins": 0,
-  "awaiting_response": false
+  "agent:test-agent:slack:direct:u1234": {
+    "updatedAt": $VERY_RECENT_MS,
+    "chatType": "direct"
+  }
 }
 EOF
-echo '{}' > "$SESSIONS_DIR/sessions.json"
-run_guard "morning"
 
-EVENING_RESPONDED=$(jq -r '.evening_responded' "$POLL_STATE")
-if [[ "$EVENING_RESPONDED" == "false" ]]; then
-    pass "evening_responded reset to false when last_evening_epoch=0"
+OUTPUT=$(run_guard "morning")
+SKIP=$(echo "$OUTPUT" | jq -r '.data.skip')
+
+if [[ "$SKIP" == "true" ]]; then
+    pass "skip=true when developer active 5 min ago"
 else
-    fail "evening_responded should be false when last_evening_epoch=0 (BUG EXISTS: not reset)" "false" "$EVENING_RESPONDED"
+    fail "should skip when developer was active recently" "true" "$SKIP"
 fi
 teardown_test_agent
 
+# ── Test 4: Don't skip when not recently active ──
+echo ""
+echo "--- Test 4: Don't skip when not recently active ---"
 echo ""
 
-# ── Bug 2: awaiting_response renamed to checkin_dispatched ──
-echo "--- Bug 2: awaiting_response -> checkin_dispatched rename ---"
-echo "  (output should use checkin_dispatched, NOT awaiting_response)"
-echo ""
+setup_test_agent "no-skip"
+OLD_MS=$(( $(date -u +%s) * 1000 - 7200000 ))  # 2 hours ago
 
-setup_test_agent "bug2"
-cat > "$POLL_STATE" <<'EOF'
+cat > "$SESSIONS_DIR/sessions.json" <<EOF
 {
-  "morning_responded": false,
-  "midday_responded": false,
-  "evening_responded": false,
-  "last_morning_epoch": 0,
-  "last_midday_epoch": 0,
-  "last_evening_epoch": 0,
-  "missed_checkins": 0,
-  "awaiting_response": false
+  "agent:test-agent:slack:direct:u1234": {
+    "updatedAt": $OLD_MS,
+    "chatType": "direct"
+  }
 }
 EOF
-echo '{}' > "$SESSIONS_DIR/sessions.json"
-run_guard "morning"
 
-# Test 2a: checkin_dispatched key should exist
-assert_json_key_exists "$POLL_STATE" "checkin_dispatched" "poll-state.json contains 'checkin_dispatched' key"
+OUTPUT=$(run_guard "midday")
+SKIP=$(echo "$OUTPUT" | jq -r '.data.skip')
+TYPE=$(echo "$OUTPUT" | jq -r '.data.checkin_type')
 
-# Test 2b: awaiting_response key should NOT exist
-assert_json_key_missing "$POLL_STATE" "awaiting_response" "poll-state.json does NOT contain 'awaiting_response' key"
+if [[ "$SKIP" == "false" ]]; then
+    pass "skip=false when developer inactive for 2h"
+else
+    fail "should not skip when developer inactive for 2h" "false" "$SKIP"
+fi
 
+if [[ "$TYPE" == "midday" ]]; then
+    pass "checkin_type=midday passed through correctly"
+else
+    fail "checkin_type should be midday" "midday" "$TYPE"
+fi
 teardown_test_agent
 
+# ── Test 5: Missing sessions.json ────────────────
+echo ""
+echo "--- Test 5: Missing sessions.json ---"
 echo ""
 
-# ── Bug 3: Inter-day state hygiene ───────────────
-echo "--- Bug 3: Inter-day state hygiene ---"
-echo "  (when date changes, stale responded flags and epochs should reset)"
+setup_test_agent "no-sessions"
+rm -f "$SESSIONS_DIR/sessions.json"
+
+OUTPUT=$(run_guard "evening")
+SKIP=$(echo "$OUTPUT" | jq -r '.data.skip')
+LAST=$(echo "$OUTPUT" | jq -r '.data.last_interaction')
+SUCCESS=$(echo "$OUTPUT" | jq -r '.success')
+
+if [[ "$SUCCESS" == "true" ]]; then
+    pass "guard succeeds even without sessions.json"
+else
+    fail "guard should succeed without sessions.json" "true" "$SUCCESS"
+fi
+
+if [[ "$LAST" == "null" ]]; then
+    pass "last_interaction is null when sessions.json missing"
+else
+    fail "last_interaction should be null" "null" "$LAST"
+fi
+
+if [[ "$SKIP" == "false" ]]; then
+    pass "skip=false when no session data (proceed with check-in)"
+else
+    fail "should not skip when no session data" "false" "$SKIP"
+fi
+teardown_test_agent
+
+# ── Test 6: Hours calculation for stale sessions ─
+echo ""
+echo "--- Test 6: Stale session hours calculation ---"
 echo ""
 
-# Test 3a: last_state_date is yesterday, stale morning data
-echo "  Test 3a: Date change resets stale state"
-setup_test_agent "bug3"
+setup_test_agent "stale"
+TWO_DAYS_AGO_MS=$(( $(date -u +%s) * 1000 - 172800000 ))  # 48h ago
 
-YESTERDAY=$(date -v-1d '+%Y-%m-%d' 2>/dev/null || date -d 'yesterday' '+%Y-%m-%d' 2>/dev/null || echo "2026-03-29")
-
-cat > "$POLL_STATE" <<EOF
+cat > "$SESSIONS_DIR/sessions.json" <<EOF
 {
-  "morning_responded": true,
-  "midday_responded": true,
-  "evening_responded": true,
-  "last_morning_epoch": 1234567,
-  "last_midday_epoch": 1234567,
-  "last_evening_epoch": 1234567,
-  "missed_checkins": 3,
-  "awaiting_response": false,
-  "last_state_date": "$YESTERDAY"
+  "agent:test-agent:slack:direct:u1234": {
+    "updatedAt": $TWO_DAYS_AGO_MS,
+    "chatType": "direct"
+  }
 }
 EOF
+
+OUTPUT=$(run_guard "morning")
+HOURS=$(echo "$OUTPUT" | jq -r '.data.hours_since_interaction')
+
+if [[ "$HOURS" -ge 47 && "$HOURS" -le 49 ]]; then
+    pass "hours_since_interaction is ~48 for 2-day-old session (got ${HOURS}h)"
+else
+    fail "hours_since_interaction should be ~48" "47-49" "$HOURS"
+fi
+teardown_test_agent
+
+# ── Test 7: No poll-state.json created ───────────
+echo ""
+echo "--- Test 7: No poll-state.json side effects ---"
+echo ""
+
+setup_test_agent "no-side-effects"
 echo '{}' > "$SESSIONS_DIR/sessions.json"
-run_guard "morning"
 
-# After running on a new day, all responded flags should be reset
-MORNING_R=$(jq -r '.morning_responded' "$POLL_STATE")
-MIDDAY_R=$(jq -r '.midday_responded' "$POLL_STATE")
-EVENING_R=$(jq -r '.evening_responded' "$POLL_STATE")
-MORNING_E=$(jq -r '.last_morning_epoch' "$POLL_STATE")
-MIDDAY_E=$(jq -r '.last_midday_epoch' "$POLL_STATE")
-EVENING_E=$(jq -r '.last_evening_epoch' "$POLL_STATE")
+run_guard "morning" >/dev/null
 
-# morning_responded should be false (it was just dispatched in this run)
-if [[ "$MORNING_R" == "false" ]]; then
-    pass "morning_responded is false after date change (expected: dispatched this run)"
+MEMORY_DIR="$AGENT_DIR/memory"
+if [[ ! -d "$MEMORY_DIR" ]] || [[ -z "$(ls -A "$MEMORY_DIR" 2>/dev/null)" ]]; then
+    pass "no poll-state.json or memory files created"
 else
-    fail "morning_responded should be false after date change" "false" "$MORNING_R"
+    fail "guard should not create any files" "empty memory dir" "$(ls "$MEMORY_DIR" 2>/dev/null)"
 fi
-
-# midday_responded should be reset to false (stale from yesterday)
-if [[ "$MIDDAY_R" == "false" ]]; then
-    pass "midday_responded reset to false after date change"
-else
-    fail "midday_responded should be false after date change (BUG EXISTS: stale state preserved)" "false" "$MIDDAY_R"
-fi
-
-# evening_responded should be reset to false (stale from yesterday)
-if [[ "$EVENING_R" == "false" ]]; then
-    pass "evening_responded reset to false after date change"
-else
-    fail "evening_responded should be false after date change (BUG EXISTS: stale state preserved)" "false" "$EVENING_R"
-fi
-
-# Stale epochs from yesterday should be reset to 0
-# (morning epoch will be set to NOW because we just ran morning, but midday/evening should be 0)
-if [[ "$MIDDAY_E" == "0" ]]; then
-    pass "last_midday_epoch reset to 0 after date change"
-else
-    fail "last_midday_epoch should be 0 after date change (BUG EXISTS: stale epoch preserved)" "0" "$MIDDAY_E"
-fi
-
-if [[ "$EVENING_E" == "0" ]]; then
-    pass "last_evening_epoch reset to 0 after date change"
-else
-    fail "last_evening_epoch should be 0 after date change (BUG EXISTS: stale epoch preserved)" "0" "$EVENING_E"
-fi
-
-# Test 3b: last_state_date should be updated to today
-echo "  Test 3b: last_state_date updated to today"
-TODAY=$(date '+%Y-%m-%d')
-STATE_DATE=$(jq -r '.last_state_date // "missing"' "$POLL_STATE")
-if [[ "$STATE_DATE" == "$TODAY" ]]; then
-    pass "last_state_date updated to today's date"
-else
-    fail "last_state_date should be today ($TODAY) (BUG EXISTS: no date tracking)" "$TODAY" "$STATE_DATE"
-fi
-
 teardown_test_agent
 
 echo ""
@@ -334,13 +300,9 @@ echo "RESULTS: $PASS_COUNT passed, $FAIL_COUNT failed, $TOTAL_COUNT total"
 echo "============================================"
 
 if [[ $FAIL_COUNT -gt 0 ]]; then
-    echo ""
-    echo "NOTE: FAILed tests indicate the bug fix is NOT yet applied."
-    echo "Tests marked (BUG EXISTS) confirm the bug is present in the"
-    echo "current version of checkin-guard.sh."
     exit 1
 else
     echo ""
-    echo "All bug fixes verified successfully."
+    echo "All tests passed."
     exit 0
 fi

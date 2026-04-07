@@ -92,12 +92,12 @@ for agent in "${AGENT_LIST[@]}"; do
         fi
     fi
 
-    # Fallback: check sessions.json in agent directory
+    # Fallback: check sessions.json in agent directory (DM sessions only)
     SESSIONS_FILE="$AGENT_DIR/sessions/sessions.json"
     if [[ -z "$LAST_SESSION_ACTIVITY" && -f "$SESSIONS_FILE" ]]; then
         LAST_EPOCH_MS=$(jq -r '
             to_entries
-            | map(select(.key | test("cron") | not))
+            | map(select(.key | test("slack:direct:")))
             | map(.value.updatedAt // 0)
             | max // 0
         ' "$SESSIONS_FILE" 2>/dev/null || echo "0")
@@ -106,13 +106,13 @@ for agent in "${AGENT_LIST[@]}"; do
             LAST_EPOCH_S=$(( LAST_EPOCH_MS / 1000 ))
             LAST_SESSION_ACTIVITY=$(epoch_to_iso "$LAST_EPOCH_S")
 
-            # Count today's sessions
+            # Count today's DM sessions
             TODAY_START_EPOCH=$(date -u -j -f '%Y-%m-%d' "$TODAY" '+%s' 2>/dev/null || date -u -d "$TODAY" '+%s' 2>/dev/null || echo "0")
             if [[ "$TODAY_START_EPOCH" != "0" ]]; then
                 TODAY_START_MS=$(( TODAY_START_EPOCH * 1000 ))
                 SESSIONS_TODAY=$(jq -r \
                     --argjson start "$TODAY_START_MS" \
-                    'to_entries | map(select(.key | test("cron") | not) | select((.value.updatedAt // 0) >= $start)) | length' \
+                    'to_entries | map(select(.key | test("slack:direct:")) | select((.value.updatedAt // 0) >= $start)) | length' \
                     "$SESSIONS_FILE" 2>/dev/null || echo "0")
             fi
         fi
@@ -122,50 +122,26 @@ for agent in "${AGENT_LIST[@]}"; do
         ACTIVE_TODAY=$((ACTIVE_TODAY + 1))
     fi
 
-    # ── Poll state (new + old schema) ──────
-    POLL_STATE_FILE="$AGENT_DIR/memory/poll-state.json"
-    AWAITING_RESPONSE="false"
-    LAST_CHECK_IN=""
-    POLL_STATE="{}"
-    MISSED_CHECKINS=0
+    # ── Hours since last DM interaction ────
+    HOURS_SINCE_INTERACTION=0
+    LAST_DM_INTERACTION=""
 
-    if [[ -f "$POLL_STATE_FILE" ]]; then
-        POLL_STATE=$(jq '.' "$POLL_STATE_FILE" 2>/dev/null || echo "{}")
-        MISSED_CHECKINS=$(echo "$POLL_STATE" | jq -r '.missed_checkins // 0')
+    if [[ -f "$SESSIONS_FILE" ]]; then
+        LAST_DM_EPOCH_MS=$(jq -r '
+            to_entries
+            | map(select(.key | test("slack:direct:")))
+            | map(.value.updatedAt // 0)
+            | max // 0
+        ' "$SESSIONS_FILE" 2>/dev/null || echo "0")
 
-        # Detect schema: new schema has last_morning_epoch
-        ST_HAS_NEW_SCHEMA=$(echo "$POLL_STATE" | jq 'has("last_morning_epoch")')
-
-        if [[ "$ST_HAS_NEW_SCHEMA" == "true" ]]; then
-            # New schema: awaiting if any *_responded is false
-            ANY_<slack-id>=$(echo "$POLL_STATE" | jq '
-                (if .morning_responded == false then 1 else 0 end) +
-                (if .midday_responded == false then 1 else 0 end) +
-                (if .evening_responded == false then 1 else 0 end)
-            ')
-            if [[ "$ANY_<slack-id>" -gt 0 ]]; then
-                AWAITING_RESPONSE="true"
-            fi
-            # Enrich poll_state with computed fields for output
-            POLL_STATE=$(echo "$POLL_STATE" | jq '{
-                missed_checkins: .missed_checkins,
-                morning_responded: .morning_responded,
-                midday_responded: .midday_responded,
-                evening_responded: .evening_responded,
-                last_morning_epoch: .last_morning_epoch,
-                last_midday_epoch: .last_midday_epoch,
-                last_evening_epoch: .last_evening_epoch
-            }')
-        else
-            # Old schema
-            AWAITING_RESPONSE=$(echo "$POLL_STATE" | jq -r '.awaiting_response // false')
-            LAST_CHECK_IN=$(echo "$POLL_STATE" | jq -r '.last_check_in // ""')
+        if [[ "$LAST_DM_EPOCH_MS" != "0" && "$LAST_DM_EPOCH_MS" != "null" ]]; then
+            LAST_DM_EPOCH_S=$(( LAST_DM_EPOCH_MS / 1000 ))
+            HOURS_SINCE_INTERACTION=$(( (NOW_EPOCH - LAST_DM_EPOCH_S) / 3600 ))
+            LAST_DM_INTERACTION=$(epoch_to_iso "$LAST_DM_EPOCH_S")
         fi
-    else
-        log "  WARNING: poll-state.json not found for $agent, skipping poll state"
     fi
 
-    if [[ "$AWAITING_RESPONSE" == "true" ]]; then
+    if [[ "$HOURS_SINCE_INTERACTION" -ge 12 ]]; then
         AWAITING_COUNT=$((AWAITING_COUNT + 1))
     fi
 
@@ -240,8 +216,8 @@ for agent in "${AGENT_LIST[@]}"; do
         --arg name "$agent" \
         --arg last_activity "${LAST_SESSION_ACTIVITY:-}" \
         --argjson sessions_today "$SESSIONS_TODAY" \
-        --argjson awaiting "$AWAITING_RESPONSE" \
-        --argjson poll_state "$POLL_STATE" \
+        --arg last_dm "${LAST_DM_INTERACTION:-}" \
+        --argjson hours_since "$HOURS_SINCE_INTERACTION" \
         --argjson has_notes "$HAS_RECENT_NOTES" \
         --arg note_date "${LATEST_NOTE_DATE:-}" \
         --argjson work_schedule "$WORK_SCHEDULE" \
@@ -251,8 +227,8 @@ for agent in "${AGENT_LIST[@]}"; do
             name: $name,
             last_session_activity: (if $last_activity == "" then null else $last_activity end),
             sessions_today: $sessions_today,
-            awaiting_response: $awaiting,
-            poll_state: $poll_state,
+            last_dm_interaction: (if $last_dm == "" then null else $last_dm end),
+            hours_since_interaction: $hours_since,
             has_recent_notes: $has_notes,
             latest_note_date: (if $note_date == "" then null else $note_date end),
             work_schedule: $work_schedule,
@@ -277,13 +253,13 @@ DATA=$(jq -n \
         summary: {
             total_agents: $total,
             active_today: $active,
-            awaiting_response: $awaiting,
+            silent_12h_plus: $awaiting,
             inactive: $inactive,
             bootstrapped: $bootstrapped,
             currently_working: $currently_working
         }
     }')
 
-log "Status check complete: $TOTAL agents, $ACTIVE_TODAY active today, $AWAITING_COUNT awaiting response, $BOOTSTRAPPED_COUNT bootstrapped, $CURRENTLY_WORKING currently working"
+log "Status check complete: $TOTAL agents, $ACTIVE_TODAY active today, $AWAITING_COUNT silent 12h+, $BOOTSTRAPPED_COUNT bootstrapped, $CURRENTLY_WORKING currently working"
 
 json_success "check-status" "$DATA"
