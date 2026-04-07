@@ -64,6 +64,7 @@ AWAITING_COUNT=0
 INACTIVE=0
 BOOTSTRAPPED_COUNT=0
 CURRENTLY_WORKING=0
+SCHEDULED_TODAY=0
 
 for agent in "${AGENT_LIST[@]}"; do
     agent=$(echo "$agent" | xargs)  # trim whitespace
@@ -166,6 +167,7 @@ for agent in "${AGENT_LIST[@]}"; do
     WORK_SCHEDULE="null"
     IS_BOOTSTRAPPED="false"
     IS_WORKING_HOURS="false"
+    WAS_SCHEDULED_TODAY="false"
 
     if [[ -f "$WORK_SCHEDULE_FILE" ]]; then
         WORK_SCHEDULE=$(jq '.' "$WORK_SCHEDULE_FILE" 2>/dev/null || echo "null")
@@ -179,9 +181,14 @@ for agent in "${AGENT_LIST[@]}"; do
 
             if [[ -n "$TZ_NAME" && -n "$WH_START" && -n "$WH_END" ]]; then
                 DOW=$(TZ="$TZ_NAME" date +%u)   # 1=Mon … 7=Sun
+
+                # was_scheduled_today: is today a working day?
                 if [[ "$WORKS_WEEKENDS" == "false" && ( "$DOW" -eq 6 || "$DOW" -eq 7 ) ]]; then
+                    WAS_SCHEDULED_TODAY="false"
                     IS_WORKING_HOURS="false"
                 else
+                    WAS_SCHEDULED_TODAY="true"
+
                     CUR_H=$(TZ="$TZ_NAME" date +%-H)
                     CUR_M=$(TZ="$TZ_NAME" date +%-M)
                     CUR_MINS=$(( 10#$CUR_H * 60 + 10#$CUR_M ))
@@ -197,6 +204,12 @@ for agent in "${AGENT_LIST[@]}"; do
                 fi
             fi
         fi
+    else
+        # Not bootstrapped: assume scheduled on weekdays (Mon-Fri)
+        DOW=$(date +%u)
+        if [[ "$DOW" -ge 1 && "$DOW" -le 5 ]]; then
+            WAS_SCHEDULED_TODAY="true"
+        fi
     fi
 
     if [[ "$IS_BOOTSTRAPPED" == "true" ]]; then
@@ -204,6 +217,9 @@ for agent in "${AGENT_LIST[@]}"; do
     fi
     if [[ "$IS_WORKING_HOURS" == "true" ]]; then
         CURRENTLY_WORKING=$((CURRENTLY_WORKING + 1))
+    fi
+    if [[ "$WAS_SCHEDULED_TODAY" == "true" ]]; then
+        SCHEDULED_TODAY=$((SCHEDULED_TODAY + 1))
     fi
 
     # ── Track inactive ──────────────────────
@@ -223,6 +239,7 @@ for agent in "${AGENT_LIST[@]}"; do
         --argjson work_schedule "$WORK_SCHEDULE" \
         --argjson is_bootstrapped "$IS_BOOTSTRAPPED" \
         --argjson is_working_hours "$IS_WORKING_HOURS" \
+        --argjson was_scheduled_today "$WAS_SCHEDULED_TODAY" \
         '{
             name: $name,
             last_session_activity: (if $last_activity == "" then null else $last_activity end),
@@ -233,7 +250,8 @@ for agent in "${AGENT_LIST[@]}"; do
             latest_note_date: (if $note_date == "" then null else $note_date end),
             work_schedule: $work_schedule,
             is_bootstrapped: $is_bootstrapped,
-            is_working_hours: $is_working_hours
+            is_working_hours: $is_working_hours,
+            was_scheduled_today: $was_scheduled_today
         }')
 
     AGENT_RESULTS=$(echo "$AGENT_RESULTS" | jq --argjson entry "$AGENT_ENTRY" '. + [$entry]')
@@ -248,6 +266,7 @@ DATA=$(jq -n \
     --argjson inactive "$INACTIVE" \
     --argjson bootstrapped "$BOOTSTRAPPED_COUNT" \
     --argjson currently_working "$CURRENTLY_WORKING" \
+    --argjson scheduled_today "$SCHEDULED_TODAY" \
     '{
         agents: $agents,
         summary: {
@@ -256,10 +275,11 @@ DATA=$(jq -n \
             silent_12h_plus: $awaiting,
             inactive: $inactive,
             bootstrapped: $bootstrapped,
-            currently_working: $currently_working
+            currently_working: $currently_working,
+            scheduled_today: $scheduled_today
         }
     }')
 
-log "Status check complete: $TOTAL agents, $ACTIVE_TODAY active today, $AWAITING_COUNT silent 12h+, $BOOTSTRAPPED_COUNT bootstrapped, $CURRENTLY_WORKING currently working"
+log "Status check complete: $TOTAL agents, $ACTIVE_TODAY active today, $AWAITING_COUNT silent 12h+, $BOOTSTRAPPED_COUNT bootstrapped, $CURRENTLY_WORKING currently working, $SCHEDULED_TODAY scheduled today"
 
 json_success "check-status" "$DATA"

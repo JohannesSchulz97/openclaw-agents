@@ -62,12 +62,8 @@ for agent in "${AGENT_LIST[@]}"; do
 
     log "Checking missed check-ins for: $agent"
 
-    # ── Skip agents not yet bootstrapped ────
-    WORK_SCHEDULE_FILE="$AGENT_DIR/work-schedule.json"
-    if [[ ! -f "$WORK_SCHEDULE_FILE" ]]; then
-        log "  SKIP: $agent not yet bootstrapped"
-        continue
-    fi
+    # ── Work schedule (optional — unbootstrapped agents still get checked) ──
+    WORK_SCHEDULE_FILE="$AGENT_DIR/memory/work-schedule.json"
 
     # ── Get last human DM interaction ──────
     SESSIONS_FILE="$AGENT_DIR/sessions/sessions.json"
