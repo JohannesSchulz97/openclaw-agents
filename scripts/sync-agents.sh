@@ -42,11 +42,16 @@ sync_dir() {
 for agent_dir in "$AGENTS_DIR"/*/; do
   agent_dir="${agent_dir%/}"
   agent_name="$(basename "$agent_dir")"
-  # Read type from .agent-type file, fall back to dev-pa for backward compatibility
-  if [[ -f "$agent_dir/.agent-type" ]]; then
+  # Read type from .agent-type file.
+  # .agent-type is Category 3 (host-only, not in repo), so check the live
+  # directory first (~/.openclaw/agents/), then fall back to the repo copy.
+  live_agent_type="${HOME}/.openclaw/agents/${agent_name}/.agent-type"
+  if [[ -f "$live_agent_type" ]]; then
+    type="$(cat "$live_agent_type")"
+  elif [[ -f "$agent_dir/.agent-type" ]]; then
     type="$(cat "$agent_dir/.agent-type")"
   else
-    log "WARNING: $agent_dir.agent-type not found, falling back to 'dev-pa'"
+    log "WARNING: .agent-type not found for $agent_name, falling back to 'dev-pa'"
     type="dev-pa"
   fi
   type_dir="$TYPES_DIR/$type"
