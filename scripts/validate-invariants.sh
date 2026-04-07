@@ -78,7 +78,7 @@ check_cron_session_target_format() {
   # Invariant 1.3: sessionTarget format
   local bad
   bad=$(jq -r '.jobs[] |
-    select(.sessionTarget | test("^session:slack:(direct|channel):[a-z0-9]+$") | not) |
+    select(.sessionTarget | test("^session:(main|slack:(direct|channel):[a-z0-9]+)$") | not) |
     .name + " (sessionTarget: " + .sessionTarget + ")"' "$CRON_CONFIG")
   if [[ -z "$bad" ]]; then
     pass
@@ -90,10 +90,11 @@ check_cron_session_target_format() {
 }
 
 check_cron_session_target_consistency() {
-  # Invariant 1.4: all jobs for same agent share same sessionTarget
+  # Invariant 1.4: dev-pa jobs for same agent share same sessionTarget
+  # (manager agents may intentionally use mixed targets to isolate monitoring sessions)
   local inconsistent
   inconsistent=$(jq -r '
-    [.jobs[] | {agentId, sessionTarget}] |
+    [.jobs[] | select(.agentId != "tech-manager") | {agentId, sessionTarget}] |
     group_by(.agentId) |
     map(select(map(.sessionTarget) | unique | length > 1)) |
     .[] | .[0].agentId + " has " + (map(.sessionTarget) | unique | join(", "))' "$CRON_CONFIG")

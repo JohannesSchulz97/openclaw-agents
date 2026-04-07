@@ -10,7 +10,7 @@
         "kind": "every",
         "everyMs": 3600000
       },
-      "sessionTarget": "session:slack:channel:c0ap3lr6ads",
+      "sessionTarget": "session:main",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
@@ -78,7 +78,7 @@
         "cronExpr": "0 0 * * 1",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:channel:c0ap3lr6ads",
+      "sessionTarget": "session:main",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
