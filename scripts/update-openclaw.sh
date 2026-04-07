@@ -171,6 +171,20 @@ if should_update "openclaw"; then
     else
       log "  WARN: openclaw doctor --fix returned non-zero (continuing)"
     fi
+
+    # Step 4b: Re-inject NODE_OPTIONS into gateway plist if missing
+    # Workaround for openclaw/openclaw#62342 — doctor --fix overwrites the
+    # plist, losing custom env vars. Remove once #62342 is fixed upstream.
+    PLIST="$HOME/Library/LaunchAgents/ai.openclaw.gateway.plist"
+    if [ -f "$PLIST" ] && ! grep -q 'NODE_OPTIONS' "$PLIST"; then
+      log "Re-injecting NODE_OPTIONS into gateway plist (openclaw/openclaw#62342 workaround)..."
+      sed -i '' '/<key>LCM_IGNORE_SESSION_PATTERNS<\/key>/,/<\/string>/{
+        /<\/string>/a\
+\    <key>NODE_OPTIONS</key>\
+\    <string>--unhandled-rejections=warn</string>
+      }' "$PLIST"
+      log "  OK"
+    fi
   else
     failed_step="npm i -g openclaw"
   fi

@@ -44,17 +44,18 @@ No two jobs may share the same `sessionKey`. Each job runs in its own session.
 
 `sessionTarget` must be one of:
 - `session:slack:direct:<slack-user-id-lowercase>` — for dev-pa agents (DM sessions)
-- `session:slack:channel:<channel-id-lowercase>` — for tech-manager (channel sessions)
+- `session:slack:channel:<channel-id-lowercase>` — for channel-bound sessions (e.g. tech-manager reports)
+- `session:main` — for isolated non-interactive jobs (e.g. tech-manager monitoring/update-check)
 
 The Slack ID / channel ID **must be lowercase**.
 
-**Rationale:** Using `session:main` disconnects cron from the DM conversation — agent can't see prior context, hallucinates responses. Fixed 4 separate times: `cd45db7`, `7d59255`, `829c495`, `ecb2957`.
+**Rationale:** For dev-pa check-in jobs, `session:main` disconnects cron from the DM conversation — agent can't see prior context, hallucinates responses. Fixed 4 separate times: `cd45db7`, `7d59255`, `829c495`, `ecb2957`. For non-interactive monitoring jobs that only run scripts and optionally send Slack messages via `openclaw message send`, `session:main` is preferred to avoid bloating the channel session (#206).
 
 ### 1.4 Session Target Consistency [ENFORCED]
 
-All jobs for the same dev-pa agent must share the same `sessionTarget` (same Slack user ID).
+All jobs for the same dev-pa agent must share the same `sessionTarget` (same Slack user ID). Manager agents may intentionally use mixed targets to isolate high-volume monitoring sessions from report sessions.
 
-**Rationale:** Inconsistent targets would split an agent's cron jobs across different sessions, breaking context continuity between morning/midday/evening check-ins.
+**Rationale:** For dev-pa agents, inconsistent targets would split check-in jobs across different sessions, breaking context continuity between morning/midday/evening check-ins. Manager agents are exempt because monitoring jobs (hourly scripts) and report jobs (morning/evening summaries) have independent context needs (#206).
 
 ### 1.5 Delivery Mode [ENFORCED]
 

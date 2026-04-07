@@ -56,7 +56,7 @@ if [[ -z "$AGENTS" ]]; then
 fi
 
 # ── Get current cron jobs from gateway ───────
-GATEWAY_JOBS=$(openclaw cron list --json 2>/dev/null || echo '{"jobs":[]}')
+GATEWAY_JOBS=$(openclaw cron list --json 2>/dev/null | jq '{jobs: [.jobs[] | {id, sessionKey, schedule}]}' 2>/dev/null || echo '{"jobs":[]}')
 
 # ── Process each agent ───────────────────────
 IFS=',' read -ra AGENT_LIST <<< "$AGENTS"
