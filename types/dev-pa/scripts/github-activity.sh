@@ -110,11 +110,10 @@ done
 
 # ── Transform and deduplicate ────────────────
 RESULT=$(jq -n \
-    --argjson issues "$ISSUES_RAW" \
-    --argjson commits "$COMMITS_RAW" \
-    --argjson comments "$COMMENTS_RAW" \
     --arg since "$SINCE_ISO" \
 '
+input as $issues | input as $commits | input as $comments |
+
 # Deduplicate issues/PRs by html_url
 ($issues | [group_by(.html_url)[] | .[0]]) as $uniq_issues |
 
@@ -202,7 +201,7 @@ RESULT=$(jq -n \
     },
     activity: $activity
 }
-')
+' <(printf '%s' "$ISSUES_RAW") <(printf '%s' "$COMMITS_RAW") <(printf '%s' "$COMMENTS_RAW"))
 
 # ── Build final output ───────────────────────
 DATA=$(echo "$RESULT" | jq \
