@@ -247,7 +247,7 @@ Rules:
     job_output=$(openclaw cron add \
         --agent "$agent" \
         --name "${agent} Evening Narrative ${TODAY}" \
-        --at "+1m" \
+        --at "$(date -u -v+2M '+%Y-%m-%dT%H:%M:%SZ')" \
         --delete-after-run \
         --session-key "$session_key" \
         --session "session:slack:direct:$(echo "$slack_id" | tr '[:upper:]' '[:lower:]')" \
@@ -383,7 +383,7 @@ summary_session_key="agent:tech-manager:cron:evening-summary:${TODAY}"
 summary_job_output=$(openclaw cron add \
     --agent tech-manager \
     --name "Evening Report Summary ${TODAY}" \
-    --at "+1m" \
+    --at "$(date -u -v+2M '+%Y-%m-%dT%H:%M:%SZ')" \
     --delete-after-run \
     --session-key "$summary_session_key" \
     --session "session:slack:channel:$(echo "$CHANNEL_ID" | tr '[:upper:]' '[:lower:]')" \
