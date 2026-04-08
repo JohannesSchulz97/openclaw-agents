@@ -185,6 +185,22 @@ if should_update "openclaw"; then
       }' "$PLIST"
       log "  OK"
     fi
+
+    # Step 4c: Re-apply jiti patches and fix streaming config
+    # Workaround for openclaw/openclaw#63080 — npm install overwrites the
+    # patched dist files, and doctor --fix converts streaming config to
+    # object format. Remove once #63080 is fixed upstream.
+    PATCH_SCRIPT="$HOME/.openclaw/patch-openclaw.sh"
+    if [ -f "$PATCH_SCRIPT" ]; then
+      log "Running patch-openclaw.sh (jiti + streaming config fixes)..."
+      if bash "$PATCH_SCRIPT"; then
+        log "  OK"
+      else
+        failed_step="patch-openclaw.sh"
+      fi
+    else
+      log "  WARN: $PATCH_SCRIPT not found, skipping patches"
+    fi
   else
     failed_step="npm i -g openclaw"
   fi
