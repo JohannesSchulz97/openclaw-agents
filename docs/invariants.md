@@ -97,13 +97,13 @@ All jobs for the same dev-pa agent must share the same `sessionTarget` (same Sla
 
 All daily summary jobs (sessionKey ending in `:summary`) must use `schedule.tz = "Europe/Berlin"` regardless of the developer's local timezone.
 
-**Rationale:** Summaries must run at a coordinated time (20:00 CET) so the tech-manager's evening report can collect them. The tech-manager evening report also runs at 20:00 CET.
+**Rationale:** Summaries must run at a coordinated time so the tech-manager's evening report (20:00 CET) completes before summaries begin.
 
 ### 1.12 Summary Schedule [ENFORCED]
 
-All daily summary jobs must use `cronExpr` of `"0 20 * * *"` (works weekends) or `"0 20 * * 1-5"` (weekdays only).
+All daily summary jobs must run at 22:00 (`cronExpr` starting with `"0 22 "`). Day-of-week pattern varies per developer's work schedule.
 
-**Rationale:** Summary must run after the evening check-in to capture the full day. Collision at 19:30 with evening check-ins broke 3 agents. Fixed in `559bb7b`.
+**Rationale:** Summaries are agent self-memory, not an evening report input (decoupled in #225/#226). Running at 22:00 avoids the race condition where summaries and the evening report both fired at 20:00. The 2-hour gap ensures the evening report completes first. Previous collision at 19:30 with evening check-ins broke 3 agents (`559bb7b`).
 
 ### 1.13 No Duplicate Agent+Type [ENFORCED]
 

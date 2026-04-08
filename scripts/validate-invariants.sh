@@ -214,17 +214,17 @@ check_cron_summary_timezone() {
 }
 
 check_cron_summary_schedule() {
-  # Invariant 1.12: summary jobs must be at 0 20 * * * or 0 20 * * 1-5
+  # Invariant 1.12: summary jobs must run at 22:00 (after evening report at 20:00)
   local bad
   bad=$(jq -r '.jobs[] |
     select(.sessionKey | test(":summary$")) |
-    select(.schedule.cronExpr != "0 20 * * *" and .schedule.cronExpr != "0 20 * * 1-5") |
+    select(.schedule.cronExpr | test("^0 22 ") | not) |
     .name + " (cronExpr: " + (.schedule.cronExpr // "null") + ")"' "$CRON_CONFIG")
   if [[ -z "$bad" ]]; then
     pass
   else
     while IFS= read -r line; do
-      fail "summary_schedule" "Summary job not at 20:00: $line"
+      fail "summary_schedule" "Summary job not at 22:00: $line"
     done <<< "$bad"
   fi
 }
