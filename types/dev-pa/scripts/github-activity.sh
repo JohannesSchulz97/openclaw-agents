@@ -108,11 +108,64 @@ for u in "${USERS[@]}"; do
     COMMENTS_RAW=$(echo "$COMMENTS_RAW"$'\n'"$USER_COMMENTS" | jq -s 'flatten')
 done
 
+# ── Fetch comment bodies (parallel) ─────────
+COMMENT_TMPDIR=$(mktemp -d)
+trap 'rm -rf "$COMMENT_TMPDIR"' EXIT
+
+# Build username list for filtering comment authors
+USERNAMES_JSON=$(for u in "${USERS[@]}"; do echo "$u" | xargs; done | jq -R . | jq -s .)
+
+# Extract unique (repo, number) pairs from comment search results
+COMMENT_TARGETS=$(printf '%s' "$COMMENTS_RAW" | jq -r \
+    '[.[] | {repo: (.repository_url | split("/")[-1]), number: .number}]
+     | unique_by("\(.repo)/\(.number)")[]
+     | "\(.repo) \(.number)"' 2>/dev/null || true)
+
+COMMENT_BODIES="{}"
+if [[ -n "$COMMENT_TARGETS" ]]; then
+    BODY_PIDS=()
+    MAX_BODY_CONCURRENT=5
+
+    while IFS=' ' read -r repo_name issue_number; do
+        [[ -z "$repo_name" ]] && continue
+
+        (
+            RAW=$(gh api "repos/${ORG}/${repo_name}/issues/${issue_number}/comments?per_page=100&since=${SINCE_ISO}" 2>/dev/null) || RAW="[]"
+            printf '%s' "$RAW" | jq --argjson users "$USERNAMES_JSON" \
+                '[.[] | select(.user.login as $l | $users | index($l)) | .body]' \
+                > "$COMMENT_TMPDIR/${repo_name}_${issue_number}.json"
+        ) &
+        BODY_PIDS+=($!)
+
+        if [[ ${#BODY_PIDS[@]} -ge $MAX_BODY_CONCURRENT ]]; then
+            for pid in "${BODY_PIDS[@]}"; do wait "$pid" 2>/dev/null || true; done
+            BODY_PIDS=()
+        fi
+    done <<< "$COMMENT_TARGETS"
+
+    for pid in "${BODY_PIDS[@]}"; do wait "$pid" 2>/dev/null || true; done
+
+    # Build lookup: { "repo/number": "joined body text" }
+    for f in "$COMMENT_TMPDIR"/*.json; do
+        [[ -f "$f" ]] || continue
+        basename_f=$(basename "$f" .json)
+        repo_name="${basename_f%_*}"
+        issue_number="${basename_f##*_}"
+        key="${repo_name}/${issue_number}"
+        body=$(jq -r 'if length > 0 then join("\n---\n") else "" end' "$f" 2>/dev/null || echo "")
+        if [[ -n "$body" ]]; then
+            COMMENT_BODIES=$(printf '%s' "$COMMENT_BODIES" | jq --arg key "$key" --arg body "$body" '. + {($key): $body}')
+        fi
+    done
+fi
+
+log "Fetched comment bodies for $(printf '%s' "$COMMENT_BODIES" | jq 'length') issues"
+
 # ── Transform and deduplicate ────────────────
 RESULT=$(jq -n \
     --arg since "$SINCE_ISO" \
 '
-input as $issues | input as $commits | input as $comments |
+input as $issues | input as $commits | input as $comments | input as $bodies |
 
 # Deduplicate issues/PRs by html_url
 ($issues | [group_by(.html_url)[] | .[0]]) as $uniq_issues |
@@ -170,15 +223,17 @@ input as $issues | input as $commits | input as $comments |
     }
 ] as $commit_activity |
 
-# Transform comment items into activity entries
+# Transform comment items into activity entries (with bodies from Phase 2)
 [
     $uniq_comments[] |
+    (.repository_url | split("/")[-1]) as $repo |
     {
         type: "comment",
-        repo: (.repository_url | split("/")[-1]),
+        repo: $repo,
         title: .title,
         number: .number,
-        at: .updated_at
+        at: .updated_at,
+        body: ($bodies["\($repo)/\(.number)"] // null)
     }
 ] as $comment_activity |
 
@@ -201,7 +256,7 @@ input as $issues | input as $commits | input as $comments |
     },
     activity: $activity
 }
-' <(printf '%s' "$ISSUES_RAW") <(printf '%s' "$COMMITS_RAW") <(printf '%s' "$COMMENTS_RAW"))
+' <(printf '%s' "$ISSUES_RAW") <(printf '%s' "$COMMITS_RAW") <(printf '%s' "$COMMENTS_RAW") <(printf '%s' "$COMMENT_BODIES"))
 
 # ── Build final output ───────────────────────
 DATA=$(echo "$RESULT" | jq \
