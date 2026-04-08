@@ -291,7 +291,11 @@ Literal `@Name` doesn't ping anyone in Slack.
 
 Multi-step tool operations must produce one message, not narrate each step separately.
 
-### 5.4 Alert Routing [DOCUMENTED]
+### 5.4 All Operational Changes Documented in Issues [DOCUMENTED]
+
+Every operational change (version upgrades/downgrades, config changes, host fixes, cron changes, agent creation/removal, incident resolution) must have a GitHub issue with rationale, observations, and outcome. Issues must be maintained with progress comments and closed with a resolution summary. See CLAUDE.md "Issue Hygiene" for the full workflow.
+
+### 5.5 Alert Routing [DOCUMENTED]
 
 - Operational alerts -> `#<manager-agent>-feedback` (<channel-id>)
 - Status reports -> `#tech-management` (<channel-id>)

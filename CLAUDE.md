@@ -33,6 +33,38 @@ This separation prevents the class of incidents where development operations (br
 
 **Issues and tasks must clearly distinguish work by machine.** When creating issues or planning tasks, always separate what needs to happen on the dev machine (code changes, PRs) from what needs to happen on the OpenClaw host (runtime config like `openclaw.json`, memory file operations, gateway restarts, cron triggers). Use clear labels like "Dev machine:" and "Host:" in task lists.
 
+## Issue Hygiene
+
+GitHub issues are the paper trail for everything that happens in this project. Nothing operational should go unlogged.
+
+### Every change gets an issue
+
+Before starting work — whether it's a bug fix, feature, config change, version upgrade/downgrade, or host-side fix — create or find the relevant issue. The issue documents:
+- **What** is being changed and **why**
+- **What we expect** to happen (and what could go wrong)
+- **What actually happened** — observations, side effects, verification results
+
+If the work is reactive (e.g. fixing a production incident), it's fine to create the issue during or right after — but it must exist before the work is considered done.
+
+### Issues stay maintained
+
+Issues are living documents, not fire-and-forget tickets:
+- **Add comments as work progresses.** Intermediate findings, decisions, and pivots go into comments so the full story is traceable.
+- **Link related issues.** If an investigation reveals a new problem, open a new issue and cross-reference both. Don't bury multiple root causes in one thread.
+- **Close with a resolution summary.** When closing, state what was done and what the outcome was. If a PR fixes it, the link alone is not enough — summarize what the PR actually changed and why.
+- **Don't let issues go stale.** If work is paused or deprioritized, say so in a comment. An issue with no activity and no explanation is a blind spot.
+
+### What counts as "operational"
+
+This isn't limited to code changes. All of the following need issue documentation:
+- Version changes (OpenClaw, LCM, QMD) — including what the new version changed in config
+- Config changes to `openclaw.json`
+- Gateway restarts with unusual circumstances
+- Fixes applied directly on the host
+- Agent creation or removal
+- Cron schedule changes
+- Incident investigation and resolution
+
 ## One-Way Sync Model
 
 Sync is **one-way: repo → host**. There is no reverse path.
@@ -289,6 +321,7 @@ The apply sequence: backup `openclaw.json` → update packages → `openclaw doc
 - `openclaw doctor --fix` is required after every OpenClaw update (LaunchAgent plist hardcodes binary path)
 - Never restart the gateway without running `openclaw config validate` first
 - `openclaw.json` is backed up to `~/.openclaw/backups/` before every update
+
 
 ## Useful Commands
 
