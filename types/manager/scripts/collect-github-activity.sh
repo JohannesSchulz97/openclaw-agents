@@ -13,6 +13,7 @@ fi
 # ── Args ─────────────────────────────────────
 SINCE_HOURS=12
 BASE_DIR="$HOME/.openclaw/agents"
+MAX_CONCURRENT=5
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -22,6 +23,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --base-dir)
             BASE_DIR="$2"
+            shift 2
+            ;;
+        --max-concurrent)
+            MAX_CONCURRENT="$2"
             shift 2
             ;;
         *)
@@ -50,18 +55,19 @@ extract_github_usernames() {
     fi
 }
 
-# ── Collect activity for all dev-pa agents ───
-AGENT_RESULTS="[]"
+# ── Phase 1: Pre-checks (sequential, fast) ──
 TOTAL=0
-COLLECTED=0
 SKIPPED_NO_USERNAME=0
 SKIPPED_NO_SCRIPT=0
-FAILED=0
+SKIP_RESULTS="[]"
+
+AGENT_NAMES=()
+AGENT_DIRS=()
+AGENT_GITHUB_USERS=()
 
 for agent_dir in "$BASE_DIR"/*/; do
     [[ -d "$agent_dir" ]] || continue
 
-    # Only process dev-pa agents
     agent_type_file="$agent_dir/.agent-type"
     [[ -f "$agent_type_file" ]] || continue
     agent_type=$(cat "$agent_type_file" 2>/dev/null | tr -d '[:space:]')
@@ -70,55 +76,96 @@ for agent_dir in "$BASE_DIR"/*/; do
     agent_name=$(basename "$agent_dir")
     TOTAL=$((TOTAL + 1))
 
-    log "Processing $agent_name"
-
-    # Check for github-activity.sh
     ACTIVITY_SCRIPT="$agent_dir/scripts/github-activity.sh"
     if [[ ! -f "$ACTIVITY_SCRIPT" ]]; then
-        log "  SKIP: no github-activity.sh script"
+        log "SKIP $agent_name: no github-activity.sh"
         SKIPPED_NO_SCRIPT=$((SKIPPED_NO_SCRIPT + 1))
-        AGENT_RESULTS=$(echo "$AGENT_RESULTS" | jq \
+        SKIP_RESULTS=$(printf '%s' "$SKIP_RESULTS" | jq \
             --arg name "$agent_name" \
             '. + [{"agent": $name, "status": "no_script", "activity": null}]')
         continue
     fi
 
-    # Extract GitHub username(s) from USER.md
     GITHUB_USERS=$(extract_github_usernames "$agent_dir/USER.md")
     if [[ -z "$GITHUB_USERS" ]]; then
-        log "  SKIP: no GitHub username in USER.md"
+        log "SKIP $agent_name: no GitHub username in USER.md"
         SKIPPED_NO_USERNAME=$((SKIPPED_NO_USERNAME + 1))
-        AGENT_RESULTS=$(echo "$AGENT_RESULTS" | jq \
+        SKIP_RESULTS=$(printf '%s' "$SKIP_RESULTS" | jq \
             --arg name "$agent_name" \
             '. + [{"agent": $name, "status": "no_github_username", "activity": null}]')
         continue
     fi
 
-    # Run github-activity.sh
-    log "  Fetching activity for $GITHUB_USERS (--since $SINCE_HOURS)"
-    ACTIVITY_OUTPUT=""
-    if ACTIVITY_OUTPUT=$(bash "$ACTIVITY_SCRIPT" --user "$GITHUB_USERS" --since "$SINCE_HOURS" 2>/dev/null); then
-        # Extract the data field from the script's json_success output
-        ACTIVITY_DATA=$(echo "$ACTIVITY_OUTPUT" | jq '.data // empty' 2>/dev/null || echo "null")
-        if [[ "$ACTIVITY_DATA" != "null" && -n "$ACTIVITY_DATA" ]]; then
-            COLLECTED=$((COLLECTED + 1))
-            AGENT_RESULTS=$(echo "$AGENT_RESULTS" | jq \
-                --arg name "$agent_name" \
-                --argjson activity "$ACTIVITY_DATA" \
-                '. + [{"agent": $name, "status": "ok", "activity": $activity}]')
-            log "  Collected $(echo "$ACTIVITY_DATA" | jq '.summary.total_events // 0') events"
+    AGENT_NAMES+=("$agent_name")
+    AGENT_DIRS+=("$agent_dir")
+    AGENT_GITHUB_USERS+=("$GITHUB_USERS")
+done
+
+log "Pre-check: ${#AGENT_NAMES[@]} agents to fetch, $SKIPPED_NO_USERNAME no username, $SKIPPED_NO_SCRIPT no script"
+
+# ── Phase 2: Parallel API calls ─────────────
+WORK_TMPDIR=$(mktemp -d)
+trap 'rm -rf "$WORK_TMPDIR"' EXIT
+
+BATCH_PIDS=()
+
+for i in "${!AGENT_NAMES[@]}"; do
+    agent_name="${AGENT_NAMES[$i]}"
+    agent_dir="${AGENT_DIRS[$i]}"
+    github_users="${AGENT_GITHUB_USERS[$i]}"
+
+    (
+        ACTIVITY_SCRIPT="$agent_dir/scripts/github-activity.sh"
+        log "Fetching $agent_name ($github_users, --since $SINCE_HOURS)"
+
+        ACTIVITY_OUTPUT=""
+        if ACTIVITY_OUTPUT=$(bash "$ACTIVITY_SCRIPT" --user "$github_users" --since "$SINCE_HOURS" 2>/dev/null); then
+            ACTIVITY_DATA=$(printf '%s' "$ACTIVITY_OUTPUT" | jq '.data // empty' 2>/dev/null || echo "null")
+            if [[ "$ACTIVITY_DATA" != "null" && -n "$ACTIVITY_DATA" ]]; then
+                jq -n --arg name "$agent_name" --argjson activity "$ACTIVITY_DATA" \
+                    '{"agent": $name, "status": "ok", "activity": $activity}' > "$WORK_TMPDIR/$agent_name.json"
+            else
+                jq -n --arg name "$agent_name" \
+                    '{"agent": $name, "status": "ok", "activity": null}' > "$WORK_TMPDIR/$agent_name.json"
+            fi
         else
-            COLLECTED=$((COLLECTED + 1))
-            AGENT_RESULTS=$(echo "$AGENT_RESULTS" | jq \
-                --arg name "$agent_name" \
-                '. + [{"agent": $name, "status": "ok", "activity": null}]')
-            log "  No activity data returned"
+            jq -n --arg name "$agent_name" \
+                '{"agent": $name, "status": "script_error", "activity": null}' > "$WORK_TMPDIR/$agent_name.json"
+            log "FAILED: $agent_name"
         fi
+    ) &
+    BATCH_PIDS+=($!)
+
+    if [[ ${#BATCH_PIDS[@]} -ge $MAX_CONCURRENT ]]; then
+        for pid in "${BATCH_PIDS[@]}"; do
+            wait "$pid" 2>/dev/null || true
+        done
+        BATCH_PIDS=()
+    fi
+done
+
+for pid in "${BATCH_PIDS[@]}"; do
+    wait "$pid" 2>/dev/null || true
+done
+
+# ── Phase 3: Merge results ──────────────────
+COLLECTED=0
+FAILED=0
+AGENT_RESULTS="$SKIP_RESULTS"
+
+for agent_name in "${AGENT_NAMES[@]}"; do
+    result_file="$WORK_TMPDIR/$agent_name.json"
+    if [[ -f "$result_file" ]]; then
+        status=$(jq -r '.status' "$result_file")
+        if [[ "$status" == "ok" ]]; then
+            COLLECTED=$((COLLECTED + 1))
+        else
+            FAILED=$((FAILED + 1))
+        fi
+        AGENT_RESULTS=$(printf '%s' "$AGENT_RESULTS" | jq --slurpfile r "$result_file" '. + $r')
     else
-        log "  FAILED: github-activity.sh returned error"
         FAILED=$((FAILED + 1))
-        AGENT_RESULTS=$(echo "$AGENT_RESULTS" | jq \
-            --arg name "$agent_name" \
+        AGENT_RESULTS=$(printf '%s' "$AGENT_RESULTS" | jq --arg name "$agent_name" \
             '. + [{"agent": $name, "status": "script_error", "activity": null}]')
     fi
 done
@@ -144,6 +191,6 @@ DATA=$(jq -n \
         }
     }')
 
-log "GitHub activity collection complete: $TOTAL agents, $COLLECTED collected, $SKIPPED_NO_USERNAME no username, $SKIPPED_NO_SCRIPT no script, $FAILED failed"
+log "Collection complete: $TOTAL agents, $COLLECTED collected, $SKIPPED_NO_USERNAME no username, $SKIPPED_NO_SCRIPT no script, $FAILED failed"
 
 json_success "collect-github-activity" "$DATA"
