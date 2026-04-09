@@ -22,10 +22,11 @@ ORG="<your-org>"
 REPO=""
 ISSUE_NUMBER=""
 BODY=""
+AUTHOR=""
 
 usage() {
     cat >&2 <<EOF
-Usage: $(basename "$0") --repo <repo-name> --issue <number> --body <comment>
+Usage: $(basename "$0") --repo <repo-name> --issue <number> --body <comment> [--author <github-username>]
 
 Add a comment to a GitHub issue in the $ORG organization.
 
@@ -33,6 +34,7 @@ Options:
   --repo   REPO    Repository name (without org prefix, e.g. "tob-app")
   --issue  NUMBER  Issue number (required)
   --body   BODY    Comment text (required)
+  --author USER    GitHub username of the person on whose behalf this comment is made
 EOF
     exit 1
 }
@@ -49,6 +51,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --body)
             BODY="$2"
+            shift 2
+            ;;
+        --author)
+            AUTHOR="$2"
             shift 2
             ;;
         -h|--help)
@@ -95,6 +101,15 @@ FULL_REPO="$ORG/$REPO"
 if ! gh repo view "$FULL_REPO" --json name &>/dev/null; then
     json_error "comment-on-issue" "REPO_NOT_FOUND" "Repository $FULL_REPO not found or not accessible"
     exit 1
+fi
+
+# ── Author attribution ──────────────────────────
+if [[ -n "$AUTHOR" ]]; then
+    BODY="🙋 **On behalf of @${AUTHOR}**
+
+---
+
+${BODY}"
 fi
 
 # ── Add comment ─────────────────────────────
