@@ -43,19 +43,19 @@ No two jobs may share the same `sessionKey`. Each job runs in its own session.
 ### 1.3 Session Target Format [ENFORCED]
 
 `sessionTarget` must be one of:
-- `session:slack:direct:<slack-user-id-lowercase>` — for dev-pa agents (DM sessions)
+- `isolated` — for dev-pa agents (fresh session per cron run, no DM pollution)
 - `session:slack:channel:<channel-id-lowercase>` — for channel-bound sessions (e.g. tech-manager reports)
-- `session:main` — for isolated non-interactive jobs (e.g. tech-manager monitoring/update-check)
+- `session:main` — for non-interactive jobs (e.g. tech-manager monitoring/update-check)
 
-The Slack ID / channel ID **must be lowercase**.
+The channel ID **must be lowercase**.
 
-**Rationale:** For dev-pa check-in jobs, `session:main` disconnects cron from the DM conversation — agent can't see prior context, hallucinates responses. Fixed 4 separate times: `cd45db7`, `7d59255`, `829c495`, `ecb2957`. For non-interactive monitoring jobs that only run scripts and optionally send Slack messages via `openclaw message send`, `session:main` is preferred to avoid bloating the channel session (#206).
+**Rationale:** Dev-pa cron jobs previously used `session:slack:direct:<id>` to share the DM session for context. This caused session bloat (43MB), LCM pollution (2.2M tokens of cron noise), and Slack DM replay loops (#276). Switched to `isolated` — cron jobs now get conversation context via `scripts/lib/dm-digest.sh` instead of sharing the DM session. For non-interactive monitoring jobs, `session:main` is preferred to avoid bloating the channel session (#206).
 
 ### 1.4 Session Target Consistency [ENFORCED]
 
-All jobs for the same dev-pa agent must share the same `sessionTarget` (same Slack user ID). Manager agents may intentionally use mixed targets to isolate high-volume monitoring sessions from report sessions.
+All jobs for the same dev-pa agent must share the same `sessionTarget`. Manager agents may intentionally use mixed targets to isolate high-volume monitoring sessions from report sessions.
 
-**Rationale:** For dev-pa agents, inconsistent targets would split check-in jobs across different sessions, breaking context continuity between morning/midday/evening check-ins. Manager agents are exempt because monitoring jobs (hourly scripts) and report jobs (morning/evening summaries) have independent context needs (#206).
+**Rationale:** For dev-pa agents, all cron jobs use `isolated` so each run gets a clean session. Manager agents are exempt because monitoring jobs (hourly scripts) and report jobs (morning/evening summaries) have independent context needs (#206).
 
 ### 1.5 Delivery Mode [ENFORCED]
 

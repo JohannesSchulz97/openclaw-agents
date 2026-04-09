@@ -12,6 +12,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib/json-response.sh"
+source "$SCRIPT_DIR/lib/dm-digest.sh"
 
 # ── Dependency check ─────────────────────────
 if ! command -v jq &>/dev/null; then
@@ -87,6 +88,9 @@ if [[ "$PHASE" == "prepare" ]]; then
         log "No GitHub usernames configured, skipping activity fetch"
     fi
 
+    # ── Fetch DM conversation digest ───────────
+    <channel-id>N_DIGEST=$(get_dm_digest "$AGENT_NAME")
+
     log "Agent: $AGENT_NAME, date: $TODAY_DATE, last_report_epoch: $LAST_REPORT_EPOCH, file_exists: $FILE_EXISTS"
 
     json_success "work-report:prepare" "$(jq -n \
@@ -97,6 +101,7 @@ if [[ "$PHASE" == "prepare" ]]; then
         --arg agent "$AGENT_NAME" \
         --arg slack_user_id "$SLACK_USER_ID" \
         --argjson github_activity "$GITHUB_ACTIVITY" \
+        --argjson conversation_digest "$<channel-id>N_DIGEST" \
         '{
             date: $date,
             output_file: $output_file,
@@ -104,7 +109,8 @@ if [[ "$PHASE" == "prepare" ]]; then
             file_exists: $file_exists,
             agent_name: $agent,
             slack_user_id: $slack_user_id,
-            github_activity: $github_activity
+            github_activity: $github_activity,
+            conversation_digest: $conversation_digest
         }')"
     exit 0
 fi
@@ -131,8 +137,8 @@ if [[ "$PHASE" == "finalize" ]]; then
 
     # ── Validate expected sections exist ──────
     # Match with or without emoji prefixes (e.g. "### ✅ What was accomplished")
-    if ! grep -q '^### .*What was accomplished' "$OUTPUT_FILE" && \
-       ! grep -q '^### .*Challenges' "$OUTPUT_FILE" && \
+    if ! grep -q '^### .*What was accomplished' "$OUTPUT_FILE" || \
+       ! grep -q '^### .*Challenges' "$OUTPUT_FILE" || \
        ! grep -q '^### .*Next steps' "$OUTPUT_FILE"; then
         json_error "work-report" "MISSING_SECTION" "Output file missing expected report sections (What was accomplished / Challenges / Next steps): $OUTPUT_FILE"
         exit 1

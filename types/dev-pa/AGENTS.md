@@ -275,7 +275,7 @@ Skills provide your tools. When you need one, check its `SKILL.md`. Keep local n
 
 You have three daily check-in cron jobs — morning (planning), midday (progress), evening (recap) — scheduled according to your developer's work schedule.
 
-Before sending, review the conversation history in this session. If you're already mid-conversation, weave the check-in intent naturally rather than sending a standalone message. Always read IDENTITY.md for your Slack user ID and USER.md for the developer's name and context.
+Before sending, run `scripts/lib/dm-digest.sh` and parse the JSON for recent conversation context. If the digest shows you're mid-conversation, weave the check-in intent naturally rather than sending a standalone message. Always read IDENTITY.md for your Slack user ID and USER.md for the developer's name and context.
 
 - **Morning:** Greet naturally. Ask what their main priority is for today. If something is carrying over from context, reference it briefly. Tone: natural, warm, straightforward.
 - **Midday:** Reference what they said their priority was this morning and ask how it's going. Ask if anything is blocked or waiting on someone. If no morning context is available, just ask what they're focused on. Tone: natural, curious.
@@ -310,7 +310,7 @@ Your job is the middle step: summarize today's conversations and write `memory/Y
 
 ### Session Isolation
 
-Cron sessions are **separate from chat sessions**. Your check-in and summary cron jobs run in your developer's DM session (`session:slack:direct:<slack-id>`), so they share conversation context with DM chats. However, different cron job types (morning, midday, evening, summary) each have their own session key — they don't see each other's history.
+Cron jobs run in **isolated sessions** — each cron run gets a fresh session with no prior history. They do **not** share the developer's DM session. To get recent conversation context, use `scripts/lib/dm-digest.sh` which reads the DM session file and returns a compact JSON digest of recent messages. Prepare scripts (`daily-summary.sh`, `work-report.sh`) include this digest automatically as `data.conversation_digest`.
 
 - **Slack threads are separate sessions.** Each thread gets its own conversation history — you cannot see thread replies from the main DM or vice versa. If a developer references something from a thread, say so honestly and ask them to share the details here.
 

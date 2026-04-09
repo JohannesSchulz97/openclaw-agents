@@ -148,11 +148,8 @@ add_cron_jobs() {
     local start_hour="${5:-9}" end_hour="${6:-18}" timezone="${7:-UTC}" works_weekends="${8:-false}"
     local slack_id="${9:-}"
 
-    # Derive session target: use DM session if Slack ID provided, otherwise fall back to session:main
-    local session_target="session:main"
-    if [[ -n "$slack_id" ]]; then
-        session_target="session:slack:direct:$(echo "$slack_id" | tr '[:upper:]' '[:lower:]')"
-    fi
+    # Use isolated sessions to prevent cron output from polluting DM sessions (#276)
+    local session_target="isolated"
 
     if [[ ! -f "$cron_file" ]]; then
         echo "Error: Cron file not found: $cron_file" >&2
@@ -188,17 +185,17 @@ add_cron_jobs() {
             morning)
                 cron_expr="$morning_cron"
                 name_suffix="Morning Check-in"
-                checkin_message="Read IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\""
+                checkin_message="Read IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\""
                 ;;
             midday)
                 cron_expr="$midday_cron"
                 name_suffix="Midday Check-in"
-                checkin_message="Read IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\""
+                checkin_message="Read IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\""
                 ;;
             evening)
                 cron_expr="$evening_cron"
                 name_suffix="Evening Check-in"
-                checkin_message="Read IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\""
+                checkin_message="Read IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\""
                 ;;
         esac
 
@@ -249,7 +246,7 @@ add_cron_jobs() {
     # Add daily summary job — runs at 20:00 CET (after evening check-in, before tech-manager report)
     local summary_id summary_message
     summary_id=$(generate_uuid)
-    summary_message="Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself."
+    summary_message="Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself."
 
     local summary_cron_expr
     if [[ "$works_weekends" == "true" ]]; then

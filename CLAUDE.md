@@ -180,7 +180,7 @@ The tech-manager agent has 3 jobs: `monitoring` (hourly), `morning-report`, `eve
     "cronExpr": "0 9 * * *",
     "tz": "Europe/Vienna"
   },
-  "sessionTarget": "session:slack:direct:<slack-user-id-lowercase>",
+  "sessionTarget": "isolated",
   "wakeMode": "now",
   "payload": {
     "kind": "agentTurn",
@@ -198,10 +198,9 @@ The tech-manager agent has 3 jobs: `monitoring` (hourly), `morning-report`, `eve
 - **`sessionTarget`** is the primary control for which conversation a cron job runs in. It supports three modes:
   - `"main"` -- injects system events into the default agent's main session (requires `payload.kind: "systemEvent"`)
   - `"isolated"` -- creates a brand-new session every run (no conversation history)
-  - `"session:<id>"` -- the `<id>` portion **overrides** the `sessionKey` for session lookup. `"session:main"` maps to the agent's main DM session (`agent:<name>:main`).
-- **`sessionKey`** has two roles: (1) cron scheduler matching in `apply-cron.sh`, and (2) fallback session identity only when `sessionTarget` does **not** start with `session:`. When `sessionTarget` starts with `session:`, the sessionKey is overridden.
-- **With `sessionTarget: "session:main"`** (current config), all cron jobs for an agent share the **same conversation history** as the agent's Slack DM session. The different `sessionKey` values (`agent:X:cron:morning`, `:midday`, etc.) do not create separate sessions -- they only serve as identifiers for `apply-cron.sh` reconciliation.
-- To get **isolated cron sessions** with their own history, use `sessionTarget: "session:agent:<name>:cron:<type>"`. To get no-history one-shot runs, use `sessionTarget: "isolated"`.
+  - `"session:<id>"` -- the `<id>` portion **overrides** the `sessionKey` for session lookup.
+- **`sessionKey`** serves as the cron scheduler matching key in `apply-cron.sh`. When `sessionTarget` is `"isolated"`, sessionKey is only used for reconciliation, not session identity.
+- **Dev-pa cron jobs use `sessionTarget: "isolated"`** (current config). Each cron run gets a fresh session with no prior history. Conversation context is provided via `scripts/lib/dm-digest.sh` which reads the DM session file and returns a compact digest. This prevents cron output from polluting the DM session (#276).
 - **`delivery.mode: "none"`** means the agent's response stays in the cron session only and is not delivered to the user as a notification. The agent itself decides whether to send a Slack message using `openclaw message send`.
 - See `docs/research/openclaw-session-key-vs-target-2026-04-09.md` for the full source-code analysis.
 

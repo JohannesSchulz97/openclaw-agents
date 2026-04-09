@@ -12,6 +12,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "$SCRIPT_DIR/lib/json-response.sh"
+source "$SCRIPT_DIR/lib/dm-digest.sh"
 
 # ── Dependency check ─────────────────────────
 if ! command -v jq &>/dev/null; then
@@ -66,6 +67,9 @@ if [[ "$PHASE" == "prepare" ]]; then
         FILE_EXISTS=true
     fi
 
+    # ── Fetch DM conversation digest ───────────
+    <channel-id>N_DIGEST=$(get_dm_digest "$AGENT_NAME")
+
     log "Agent: $AGENT_NAME, date: $TODAY_DATE, last_summary_epoch: $LAST_SUMMARY_EPOCH, file_exists: $FILE_EXISTS"
 
     json_success "daily-summary:prepare" "$(jq -n \
@@ -76,6 +80,7 @@ if [[ "$PHASE" == "prepare" ]]; then
         --argjson file_exists "$FILE_EXISTS" \
         --arg agent "$AGENT_NAME" \
         --arg memory_dir "$MEMORY_DIR" \
+        --argjson conversation_digest "$<channel-id>N_DIGEST" \
         '{
             date: $date,
             output_file: $output_file,
@@ -83,7 +88,8 @@ if [[ "$PHASE" == "prepare" ]]; then
             last_summary_epoch: $last_summary_epoch,
             file_exists: $file_exists,
             agent_name: $agent,
-            memory_dir: $memory_dir
+            memory_dir: $memory_dir,
+            conversation_digest: $conversation_digest
         }')"
     exit 0
 fi
