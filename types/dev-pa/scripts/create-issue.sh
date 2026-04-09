@@ -23,18 +23,24 @@ REPO=""
 TITLE=""
 BODY=""
 LABELS=""
+FORCE=false
 
 usage() {
     cat >&2 <<EOF
-Usage: $(basename "$0") --repo <repo-name> --title <title> [--body <body>] [--label <label>]
+Usage: $(basename "$0") --repo <repo-name> --title <title> [--body <body>] [--label <label>] [--force]
 
 Create a GitHub issue in the $ORG organization.
+
+Before creating, searches for existing open issues with similar titles.
+If potential duplicates are found, returns them and refuses to create
+unless --force is passed.
 
 Options:
   --repo   REPO    Repository name (without org prefix, e.g. "tob-app")
   --title  TITLE   Issue title (required)
   --body   BODY    Issue body/description (optional)
   --label  LABEL   Label to add (can be repeated)
+  --force          Create even if potential duplicates are found
 EOF
     exit 1
 }
@@ -56,6 +62,10 @@ while [[ $# -gt 0 ]]; do
         --label)
             LABELS="${LABELS:+$LABELS,}$2"
             shift 2
+            ;;
+        --force)
+            FORCE=true
+            shift
             ;;
         -h|--help)
             usage
@@ -92,6 +102,32 @@ if ! gh repo view "$FULL_REPO" --json name &>/dev/null; then
     exit 1
 fi
 
+# ── Duplicate detection ─────────────────────────
+if [[ "$FORCE" != true ]]; then
+    # Search open issues using the title as the query
+    SEARCH_RESULTS=$(gh issue list --repo "$FULL_REPO" --state open --search "$TITLE" --json number,title,url,body --limit 5 2>&1) || {
+        log "Warning: duplicate search failed, proceeding with creation: $SEARCH_RESULTS"
+        SEARCH_RESULTS="[]"
+    }
+
+    MATCH_COUNT=$(echo "$SEARCH_RESULTS" | jq 'length')
+
+    if [[ "$MATCH_COUNT" -gt 0 ]]; then
+        json_success "create-issue" "$(jq -n \
+            --argjson duplicates "$SEARCH_RESULTS" \
+            --arg repo "$FULL_REPO" \
+            --arg title "$TITLE" \
+            '{
+                created: false,
+                repo: $repo,
+                title: $title,
+                potential_duplicates: $duplicates,
+                message: "Potential duplicate issues found. Review the list and re-run with --force to create anyway."
+            }')"
+        exit 0
+    fi
+fi
+
 # ── Create issue ─────────────────────────────
 GH_ARGS=(issue create --repo "$FULL_REPO" --title "$TITLE")
 
@@ -117,4 +153,4 @@ json_success "create-issue" "$(jq -n \
     --arg number "$ISSUE_NUMBER" \
     --arg repo "$FULL_REPO" \
     --arg title "$TITLE" \
-    '{url: $url, number: ($number | tonumber), repo: $repo, title: $title}')"
+    '{created: true, url: $url, number: ($number | tonumber), repo: $repo, title: $title}')"
