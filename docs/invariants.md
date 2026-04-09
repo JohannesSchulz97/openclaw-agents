@@ -301,3 +301,21 @@ Every operational change (version upgrades/downgrades, config changes, host fixe
 - Status reports -> `#tech-management` (<channel-id>)
 
 **Rationale:** Operational alerts polluted the team-facing channel. Fixed in `ecb2957`.
+
+---
+
+## Area 6: Plugin Configuration
+
+### 6.1 LCM summaryModel Must Be Set [DOCUMENTED]
+
+The LCM (lossless-claw) plugin config in `openclaw.json` must always have a non-empty `summaryModel` field at `plugins.entries.lossless-claw.config.summaryModel`. Without it, LCM cannot compact sessions and they grow unbounded.
+
+**Rationale:** `openclaw plugins install --force` resets the plugin config entry, wiping `summaryModel`, `summaryProvider`, `ignoreSessionPatterns`, and other custom settings. This happened 4 times (Mar 27, ~Apr 2, ~Apr 3, Apr 6), each requiring manual config restoration. The CLI shows "(unconfigured)" even when the gateway has the model — the CLI uses a different config resolution path (`resolveMemoryPluginConfig` reads from `memory-core`, not `lossless-claw`). Always check the gateway log for the authoritative state: `grep 'Compaction summarization model' ~/.openclaw/logs/gateway.log | tail -1`.
+
+**Enforcement:** `update-openclaw.sh` saves/restores LCM config around `plugins install --force`. Post-update verification checks `summaryModel` survives. Manual `openclaw plugins install` on the host remains a risk — document in CLAUDE.md.
+
+### 6.2 Never Run openclaw plugins install Without Config Preservation [DOCUMENTED]
+
+Running `openclaw plugins install --force` directly (outside of `update-openclaw.sh`) will wipe the LCM plugin config. Always use `update-openclaw.sh --apply --component lossless-claw` instead, which handles config preservation automatically.
+
+**Rationale:** Direct `plugins install` on Apr 6 caused the compaction model to silently fall back to the default agent model. The gateway kept running but sessions grew without compaction until the next manual fix. Fixed in `update-openclaw.sh` config preservation (issue #253).
