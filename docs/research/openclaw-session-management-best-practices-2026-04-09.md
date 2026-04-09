@@ -148,18 +148,12 @@ With `sessionTarget: "session:main"`, all cron jobs (morning/midday/evening/summ
 
 **Impact:** Session grows unboundedly. LCM compaction helps but adds overhead. Agent context becomes polluted with cron messages mixed with user conversations.
 
-**Problem 2: `isolated` mode not honored (openclaw#61426 -- REGRESSION BUG)**
+**Problem 2: `isolated` mode not honored (openclaw#61426 -- REGRESSION BUG, FIXED)**
 
-As of OpenClaw 2026.4.1, cron jobs configured with `sessionTarget: "isolated"` still accumulate messages in the main session. This has caused:
-- Context overflow crashes
-- Agent resets with loss of in-progress work
-- Silent accumulation with no warnings in logs
-- Affects all cron jobs using `isolated` mode
-
-**Workaround:** Manual LCM database cleanup:
-```bash
-sqlite3 ~/.openclaw/lcm.db "DELETE FROM messages WHERE conversation_id = <ID>;"
-```
+Reported in OpenClaw 2026.4.1: cron jobs configured with `sessionTarget: "isolated"` accumulated messages in the main session. **Verified fixed in OpenClaw 2026.4.8** — tested 2026-04-09 with a one-shot isolated cron job for dev1:
+- DM session `updatedAt` unchanged after job ran
+- Isolated job created its own session file
+- Job completed and auto-deleted cleanly
 
 **Problem 3: Session store bloat from skillsSnapshot (openclaw#45717)**
 
@@ -189,7 +183,7 @@ This creates a dedicated session per cron job type that:
 }
 ```
 
-Good for daily summaries or one-shot tasks where history is not needed. BUT: **currently broken by openclaw#61426** -- verify the fix is deployed before relying on this.
+Good for daily summaries or one-shot tasks where history is not needed. Verified working on OpenClaw 2026.4.8 (openclaw#61426 fix confirmed).
 
 **Anti-pattern: Sharing the main DM session**
 ```json
