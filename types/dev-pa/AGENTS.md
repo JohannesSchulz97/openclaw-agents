@@ -126,12 +126,13 @@ Options:
 - `--force` (optional) — skip duplicate check and create the issue
 
 **Duplicate detection:** When potential duplicates are found, the response has `data.created: false` and `data.potential_duplicates` listing matching issues (including their body text). Before deciding to `--force`:
-1. Compare your intended issue's title **and body** against each potential duplicate's title and body.
-2. If an existing issue describes the same underlying problem — even with different wording — it is a duplicate. Do not create a new one. Instead, add your context to the existing issue using `comment-on-issue.sh`:
+1. Compare the **specific problem being solved** — not just keywords. Two issues that share words like "deduplication" or "check-in" are NOT duplicates if they describe different problems. Read the body of each potential duplicate carefully.
+2. An issue is only a true duplicate if it would be **closed by the same fix**. If the solutions would be different, they are different issues — create yours with `--force`.
+3. If an existing issue truly describes the same problem, **tell your developer** — don't silently skip the creation. Share the existing issue link and ask whether they want you to add context to it or create a new one anyway. Only comment on the existing issue using `comment-on-issue.sh` if your developer confirms and you have genuinely new information that changes or expands the issue's scope.
    ```bash
    bash scripts/comment-on-issue.sh --repo tob-app --issue 146 --body "Additional context: ..."
    ```
-3. Only use `--force` if you've confirmed that none of the returned issues cover the same problem you're reporting.
+4. **When in doubt, create the issue.** A duplicate issue is easy to close; a missing issue is invisible work. Use `--force` and let a human deduplicate later if needed.
 
 Output: JSON with `success`, `data.url`, `data.number`, `data.repo`, `data.title`. Only works for `<your-org>` org repos.
 
@@ -156,12 +157,19 @@ Query GitHub activity for a user within <your-org> org.
 bash scripts/github-activity.sh --user <github-username> [--since <hours>]
 ```
 
+### `scripts/work-report.sh`
+Deterministic wrapper for the evening work report cron job. Two phases:
+- `prepare` — returns JSON with date, github usernames, output path (`memory/reports/YYYY-MM-DD.md`), Slack user ID, and last report epoch
+- `finalize` — validates the output file exists, has expected sections, and updates `report-state.json`
+
+Called by the evening work report cron payload. You don't call this directly — the cron prompt tells you when to run each phase.
+
 ### `scripts/daily-summary.sh`
 Deterministic wrapper for the daily summary cron job. Two phases:
 - `prepare` — returns JSON with date, paths, template, and epoch info
 - `finalize` — validates the output file exists and updates `summary-state.json`
 
-Called by the daily summary cron payload. You don't call this directly — the cron prompt tells you when to run each phase.
+**Note:** Daily summary cron is disabled — superseded by evening work report. Kept for reference.
 
 ### `scripts/bootstrap-check.sh`
 Deterministic bootstrap state manager. Tracks which bootstrap fields have been collected.
