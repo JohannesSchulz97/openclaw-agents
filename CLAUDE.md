@@ -195,10 +195,15 @@ The tech-manager agent has 3 jobs: `monitoring` (hourly), `morning-report`, `eve
 
 ### Session keys and session sharing
 
-- **`sessionKey`** determines which session the cron job runs in. Jobs with different session keys get separate sessions.
-- **`sessionTarget`** determines which Slack conversation the session is tied to. Use `session:slack:direct:<slack-id-lowercase>` for DMs or `session:slack:channel:<channel-id-lowercase>` for channels.
-- Cron sessions are **separate from chat sessions**. A cron job with `sessionKey: "agent:dev10:cron:morning"` runs in its own session, not in the developer's DM chat session. This means cron jobs don't have access to the chat conversation context and vice versa.
+- **`sessionTarget`** is the primary control for which conversation a cron job runs in. It supports three modes:
+  - `"main"` -- injects system events into the default agent's main session (requires `payload.kind: "systemEvent"`)
+  - `"isolated"` -- creates a brand-new session every run (no conversation history)
+  - `"session:<id>"` -- the `<id>` portion **overrides** the `sessionKey` for session lookup. `"session:main"` maps to the agent's main DM session (`agent:<name>:main`).
+- **`sessionKey`** has two roles: (1) cron scheduler matching in `apply-cron.sh`, and (2) fallback session identity only when `sessionTarget` does **not** start with `session:`. When `sessionTarget` starts with `session:`, the sessionKey is overridden.
+- **With `sessionTarget: "session:main"`** (current config), all cron jobs for an agent share the **same conversation history** as the agent's Slack DM session. The different `sessionKey` values (`agent:X:cron:morning`, `:midday`, etc.) do not create separate sessions -- they only serve as identifiers for `apply-cron.sh` reconciliation.
+- To get **isolated cron sessions** with their own history, use `sessionTarget: "session:agent:<name>:cron:<type>"`. To get no-history one-shot runs, use `sessionTarget: "isolated"`.
 - **`delivery.mode: "none"`** means the agent's response stays in the cron session only and is not delivered to the user as a notification. The agent itself decides whether to send a Slack message using `openclaw message send`.
+- See `docs/research/openclaw-session-key-vs-target-2026-04-09.md` for the full source-code analysis.
 
 ### Adding a new cron job
 
