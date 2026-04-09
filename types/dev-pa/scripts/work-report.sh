@@ -130,9 +130,10 @@ if [[ "$PHASE" == "finalize" ]]; then
     fi
 
     # ── Validate expected sections exist ──────
-    if ! grep -q '^### What was accomplished' "$OUTPUT_FILE" && \
-       ! grep -q '^### Challenges' "$OUTPUT_FILE" && \
-       ! grep -q '^### Next steps' "$OUTPUT_FILE"; then
+    # Match with or without emoji prefixes (e.g. "### ✅ What was accomplished")
+    if ! grep -q '^### .*What was accomplished' "$OUTPUT_FILE" && \
+       ! grep -q '^### .*Challenges' "$OUTPUT_FILE" && \
+       ! grep -q '^### .*Next steps' "$OUTPUT_FILE"; then
         json_error "work-report" "MISSING_SECTION" "Output file missing expected report sections (What was accomplished / Challenges / Next steps): $OUTPUT_FILE"
         exit 1
     fi
