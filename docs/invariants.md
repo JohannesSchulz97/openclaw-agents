@@ -77,7 +77,7 @@ All jobs for the same dev-pa agent must share the same `sessionTarget` (same Sla
 
 ### 1.8 No Model Field [ENFORCED]
 
-`payload.model` must be absent or null. Agents inherit their model from the gateway default. **Exception:** jobs with sessionKey in the allowed list in `validate-invariants.sh` may override the model (currently: `agent:tech-manager:cron:update-check` uses `gemini-pro` for higher-quality risk analysis).
+`payload.model` must be absent or null. Agents inherit their model from the gateway default. **Exception:** jobs with sessionKey in the allowed list or matching allowed patterns in `validate-invariants.sh` may override the model (currently: `agent:tech-manager:cron:update-check` and all `:report` jobs use `gemini-pro` for higher-quality analysis).
 
 **Rationale:** Leftover model fields caused 9 unnecessary gateway restarts in one day when `apply-cron.sh` tried to clear them non-idempotently. Fixed in `a70e779`, `593ccaa`, `3c64a1e`.
 

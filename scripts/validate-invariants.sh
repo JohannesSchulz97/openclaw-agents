@@ -151,13 +151,18 @@ check_cron_payload_kind() {
 
 check_cron_no_model() {
   # Invariant 1.8: payload.model must be absent or null (inherit from defaults)
-  # Exception: jobs with sessionKey in the allowed list may override the model
-  # (e.g., weekly update-check uses gemini-pro for higher-quality analysis)
+  # Exception: jobs with sessionKey in the allowed list or matching allowed
+  # patterns may override the model (e.g., update-check and report jobs use
+  # gemini-pro for higher-quality analysis)
   local allowed_model_overrides='["agent:tech-manager:cron:update-check"]'
   local bad
   bad=$(jq -r --argjson allowed "$allowed_model_overrides" \
     '.jobs[] | select(.payload.model != null) |
-    select(.sessionKey as $sk | $allowed | index($sk) | not) |
+    select(
+      (.sessionKey as $sk | $allowed | index($sk))
+      or (.sessionKey | test(":report$"))
+      | not
+    ) |
     .name + " (payload.model: " + (.payload.model // "null") + ")"' "$CRON_CONFIG")
   if [[ -z "$bad" ]]; then
     pass
