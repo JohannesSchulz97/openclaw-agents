@@ -112,10 +112,10 @@ Good (1 message):
 Create GitHub issues in <your-org> org repositories. **Includes duplicate detection** — before creating, the script searches open issues for similar titles. If potential duplicates are found, it returns them instead of creating the issue.
 
 ```bash
-bash scripts/create-issue.sh --repo tob-app --title "Bug: login broken"
-bash scripts/create-issue.sh --repo tob-app --title "feat: dark mode" --body "Add dark mode toggle" --label enhancement
+bash scripts/create-issue.sh --repo tob-app --title "Bug: login broken" --author <github-username>
+bash scripts/create-issue.sh --repo tob-app --title "feat: dark mode" --body "Add dark mode toggle" --label enhancement --author <github-username>
 # If duplicates were found and you've confirmed the issue is genuinely new:
-bash scripts/create-issue.sh --repo tob-app --title "feat: dark mode" --body "Add dark mode toggle" --label enhancement --force
+bash scripts/create-issue.sh --repo tob-app --title "feat: dark mode" --body "Add dark mode toggle" --label enhancement --author <github-username> --force
 ```
 
 Options:
@@ -123,6 +123,7 @@ Options:
 - `--title TITLE` (required) — issue title
 - `--body BODY` (optional) — issue description
 - `--label LABEL` (optional, repeatable) — label to add
+- `--author USER` (recommended) — GitHub username of the developer who requested the issue. **Always pass this** — get it from USER.md. Prepends a "Requested by @user" header so the original author is visible in GitHub.
 - `--force` (optional) — skip duplicate check and create the issue
 
 **Duplicate detection:** When potential duplicates are found, the response has `data.created: false` and `data.potential_duplicates` listing matching issues (including their body text). Before deciding to `--force`:
@@ -130,7 +131,7 @@ Options:
 2. An issue is only a true duplicate if it would be **closed by the same fix**. If the solutions would be different, they are different issues — create yours with `--force`.
 3. If an existing issue truly describes the same problem, **tell your developer** — don't silently skip the creation. Share the existing issue link and ask whether they want you to add context to it or create a new one anyway. Only comment on the existing issue using `comment-on-issue.sh` if your developer confirms and you have genuinely new information that changes or expands the issue's scope.
    ```bash
-   bash scripts/comment-on-issue.sh --repo tob-app --issue 146 --body "Additional context: ..."
+   bash scripts/comment-on-issue.sh --repo tob-app --issue 146 --body "Additional context: ..." --author <github-username>
    ```
 4. **When in doubt, create the issue.** A duplicate issue is easy to close; a missing issue is invisible work. Use `--force` and let a human deduplicate later if needed.
 
@@ -140,13 +141,14 @@ Output: JSON with `success`, `data.url`, `data.number`, `data.repo`, `data.title
 Add a comment to an existing GitHub issue in <your-org> org repositories.
 
 ```bash
-bash scripts/comment-on-issue.sh --repo tob-app --issue 146 --body "Additional context from investigation: ..."
+bash scripts/comment-on-issue.sh --repo tob-app --issue 146 --body "Additional context from investigation: ..." --author <github-username>
 ```
 
 Options:
 - `--repo REPO` (required) — repository name without org prefix (e.g. `tob-app`)
 - `--issue NUMBER` (required) — issue number to comment on
 - `--body BODY` (required) — comment text
+- `--author USER` (recommended) — GitHub username of the developer on whose behalf the comment is made. **Always pass this** — get it from USER.md. Prepends an "On behalf of @user" header.
 
 Output: JSON with `success`, `data.url`, `data.issue`, `data.repo`. Only works for `<your-org>` org repos.
 

@@ -23,11 +23,12 @@ REPO=""
 TITLE=""
 BODY=""
 LABELS=""
+AUTHOR=""
 FORCE=false
 
 usage() {
     cat >&2 <<EOF
-Usage: $(basename "$0") --repo <repo-name> --title <title> [--body <body>] [--label <label>] [--force]
+Usage: $(basename "$0") --repo <repo-name> --title <title> [--body <body>] [--label <label>] [--author <github-username>] [--force]
 
 Create a GitHub issue in the $ORG organization.
 
@@ -40,6 +41,7 @@ Options:
   --title  TITLE   Issue title (required)
   --body   BODY    Issue body/description (optional)
   --label  LABEL   Label to add (can be repeated)
+  --author USER    GitHub username of the person who requested the issue
   --force          Create even if potential duplicates are found
 EOF
     exit 1
@@ -61,6 +63,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --label)
             LABELS="${LABELS:+$LABELS,}$2"
+            shift 2
+            ;;
+        --author)
+            AUTHOR="$2"
             shift 2
             ;;
         --force)
@@ -125,6 +131,20 @@ if [[ "$FORCE" != true ]]; then
                 message: "Potential duplicate issues found. Review the list and re-run with --force to create anyway."
             }')"
         exit 0
+    fi
+fi
+
+# ── Author attribution ──────────────────────────
+if [[ -n "$AUTHOR" ]]; then
+    ATTRIBUTION="🙋 **Requested by @${AUTHOR}**"
+    if [[ -n "$BODY" ]]; then
+        BODY="${ATTRIBUTION}
+
+---
+
+${BODY}"
+    else
+        BODY="$ATTRIBUTION"
     fi
 fi
 
