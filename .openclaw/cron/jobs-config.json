@@ -59,7 +59,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run the evening report orchestration script:\n\nbash scripts/evening-report.sh\n\nThis script handles all data collection, per-developer narrative generation (via isolated dev-pa agent calls), team summary composition, and Slack delivery autonomously.\n\nOutput the script's stdout and stderr. If it exits non-zero, send a brief error notification to channel:<channel-id> (#<manager-agent>-feedback) explaining what failed.",
+        "message": "Run the evening report orchestration script:\\n\\nbash scripts/evening-report.sh\\n\\nThis script handles all data collection, per-developer narrative generation (via isolated dev-pa agent calls), team summary composition, and Slack delivery autonomously.\\n\\nOutput the script's stdout and stderr. If it exits non-zero, send a brief error notification to channel:<channel-id> (#<manager-agent>-feedback) explaining what failed.",
         "timeoutSeconds": 900,
         "thinking": "medium"
       },
@@ -1652,6 +1652,397 @@
         "thinking": "medium"
       },
       "sessionKey": "agent:dev10:cron:summary",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "a424add7-5938-46e6-b55f-cb3939e35321",
+      "agentId": "dev10",
+      "name": "dev10 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u07lthhbbl2",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev10:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "5e60af78-2e77-4d46-8c4c-44945cb46210",
+      "agentId": "dev10",
+      "name": "dev10 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u088a9d6a57",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev10:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "bb8f5866-5a45-4fed-a571-b8162f354b55",
+      "agentId": "dev1",
+      "name": "dev1 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Asia/Kolkata"
+      },
+      "sessionTarget": "session:slack:direct:u09l59gj3qt",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev1:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "6801eb77-1a35-481b-8c72-7e0f7c17a643",
+      "agentId": "dev7",
+      "name": "dev7 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u09a9k7bgta",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev7:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "9b14fba9-aee3-4f55-b67d-942d6169460f",
+      "agentId": "dev10",
+      "name": "dev10 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u0ae37ygtpa",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev10:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "4050c784-6a3d-4d57-af81-cc1fad9dbfb9",
+      "agentId": "dev10",
+      "name": "dev10 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u0998266edq",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev10:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "ec6fcac1-1715-4656-b82b-7c8f9ea12c48",
+      "agentId": "dev10-jean",
+      "name": "dev10 Jean Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u09r2aydckz",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev10-jean:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "25433a46-4360-4c79-b393-41124299ab74",
+      "agentId": "dev6",
+      "name": "dev6 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u099grragmp",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev6:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "1f4596bb-1cd3-4fa3-b242-c9a3dd0cb4fb",
+      "agentId": "dev5",
+      "name": "dev5 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u08mcd8qvmk",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev5:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "b1cde749-9cbd-4331-a08a-de24a02ad6c1",
+      "agentId": "<github-username>",
+      "name": "dev4 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u08mbgcsfmf",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:<github-username>:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "73eeff18-7ea2-4089-ac28-b4c3ba2e2a94",
+      "agentId": "dev9",
+      "name": "dev9 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u0adn2mdh4m",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev9:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "822b436d-8596-4e48-892c-e7f587748b63",
+      "agentId": "dev10",
+      "name": "dev10 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u0afyr6856x",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev10:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "69ea39bb-a000-42a0-9f36-f8d0642d88b5",
+      "agentId": "dev3",
+      "name": "dev3 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u0891uze0p7",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev3:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "dec25938-9b4f-4c87-877e-2d64f096bc75",
+      "agentId": "dev10",
+      "name": "dev10 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u0aglv1en92",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev10:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "803b5dfe-fa36-479d-9873-a8a856f7ef61",
+      "agentId": "<your-org>",
+      "name": "<your-org> Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u07h87k34qj",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:<your-org>:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "b13dd594-af2b-47b5-8d56-314dd58518b2",
+      "agentId": "dev8",
+      "name": "dev8 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u0ad8usrpqs",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev8:cron:report",
+      "delivery": {
+        "mode": "none"
+      }
+    },
+    {
+      "id": "79d39c22-f828-40cb-8d9c-bb6da239acae",
+      "agentId": "dev10",
+      "name": "dev10 Evening Work Report",
+      "enabled": true,
+      "schedule": {
+        "kind": "cron",
+        "cronExpr": "0 19 * * 1-5",
+        "tz": "Europe/Berlin"
+      },
+      "sessionTarget": "session:slack:direct:u0af8p99l6q",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\n\\nIf success is false, stop and output the error.\\nIf data.file_exists is true, output NO_ACTION.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Under 500 words, scannable.\\n\\n## Work Report — <data.date>\\n\\n**Done** — What was completed or meaningfully advanced. Reference PRs, issues, repos by name/number.\\n\\n**In Progress** — What's actively being worked on and current status.\\n\\n**Blockers** — What's stalled, who/what can unblock it, how long. Write \\\"None\\\" if clear.\\n\\n**Next Steps** — Priorities for the next working day, if the developer mentioned them. Otherwise write \\\"Not discussed.\\\"\\n\\nRules:\\n- Be factual. Zero editorializing.\\n- Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "timeoutSeconds": 300,
+        "thinking": "medium"
+      },
+      "sessionKey": "agent:dev10:cron:report",
       "delivery": {
         "mode": "none"
       }

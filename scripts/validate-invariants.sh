@@ -229,8 +229,24 @@ check_cron_summary_schedule() {
   fi
 }
 
+check_cron_report_schedule() {
+  # Invariant 1.13: report jobs must run at 19:00
+  local bad
+  bad=$(jq -r '.jobs[] |
+    select(.sessionKey | test(":report$")) |
+    select(.schedule.cronExpr | test("^0 19 ") | not) |
+    .name + " (cronExpr: " + (.schedule.cronExpr // "null") + ")"' "$CRON_CONFIG")
+  if [[ -z "$bad" ]]; then
+    pass
+  else
+    while IFS= read -r line; do
+      fail "report_schedule" "Report job not at 19:00: $line"
+    done <<< "$bad"
+  fi
+}
+
 check_cron_no_duplicate_agent_type() {
-  # Invariant 1.13: no duplicate agentId + type suffix
+  # Invariant 1.14: no duplicate agentId + type suffix
   local dupes
   dupes=$(jq -r '
     [.jobs[] | . as $job | $job.agentId + ":" + ($job.sessionKey | split(":") | last)] |
@@ -327,6 +343,7 @@ run_cron_checks() {
   check_cron_timeout_minimum
   check_cron_summary_timezone
   check_cron_summary_schedule
+  check_cron_report_schedule
   check_cron_no_duplicate_agent_type
 }
 
