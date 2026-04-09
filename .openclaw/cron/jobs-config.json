@@ -102,11 +102,11 @@
         "cronExpr": "0 9 * * *",
         "tz": "Europe/Vienna"
       },
-      "sessionTarget": "session:slack:direct:u07lthhbbl2",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -125,11 +125,11 @@
         "cronExpr": "0 13 * * *",
         "tz": "Europe/Vienna"
       },
-      "sessionTarget": "session:slack:direct:u07lthhbbl2",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -148,11 +148,11 @@
         "cronExpr": "30 16 * * *",
         "tz": "Europe/Vienna"
       },
-      "sessionTarget": "session:slack:direct:u07lthhbbl2",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -171,11 +171,11 @@
         "cronExpr": "0 22 * * *",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u07lthhbbl2",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -194,11 +194,11 @@
         "cronExpr": "0 8 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u088a9d6a57",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -217,11 +217,11 @@
         "cronExpr": "0 14 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u088a9d6a57",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -240,11 +240,11 @@
         "cronExpr": "30 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u088a9d6a57",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -263,11 +263,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u088a9d6a57",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -286,11 +286,11 @@
         "cronExpr": "0 5 * * 1-5",
         "tz": "Asia/Kolkata"
       },
-      "sessionTarget": "session:slack:direct:u09l59gj3qt",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -309,11 +309,11 @@
         "cronExpr": "30 12 * * 1-5",
         "tz": "Asia/Kolkata"
       },
-      "sessionTarget": "session:slack:direct:u09l59gj3qt",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -332,11 +332,11 @@
         "cronExpr": "30 19 * * 1-5",
         "tz": "Asia/Kolkata"
       },
-      "sessionTarget": "session:slack:direct:u09l59gj3qt",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -355,11 +355,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u09l59gj3qt",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -378,11 +378,11 @@
         "cronExpr": "0 11 * * 1-5",
         "tz": "Asia/Tbilisi"
       },
-      "sessionTarget": "session:slack:direct:u09a9k7bgta",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -401,11 +401,11 @@
         "cronExpr": "30 15 * * 1-5",
         "tz": "Asia/Tbilisi"
       },
-      "sessionTarget": "session:slack:direct:u09a9k7bgta",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -424,11 +424,11 @@
         "cronExpr": "30 19 * * 1-5",
         "tz": "Asia/Tbilisi"
       },
-      "sessionTarget": "session:slack:direct:u09a9k7bgta",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -447,11 +447,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u09a9k7bgta",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -470,11 +470,11 @@
         "cronExpr": "0 11 * * 1-5",
         "tz": "Asia/Tbilisi"
       },
-      "sessionTarget": "session:slack:direct:u0ae37ygtpa",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -493,11 +493,11 @@
         "cronExpr": "0 15 * * 1-5",
         "tz": "Asia/Tbilisi"
       },
-      "sessionTarget": "session:slack:direct:u0ae37ygtpa",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -516,11 +516,11 @@
         "cronExpr": "30 18 * * 1-5",
         "tz": "Asia/Tbilisi"
       },
-      "sessionTarget": "session:slack:direct:u0ae37ygtpa",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -539,11 +539,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0ae37ygtpa",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -562,11 +562,11 @@
         "cronExpr": "0 8 * * 1-5",
         "tz": "Europe/Madrid"
       },
-      "sessionTarget": "session:slack:direct:u0998266edq",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -585,11 +585,11 @@
         "cronExpr": "0 13 * * 1-5",
         "tz": "Europe/Madrid"
       },
-      "sessionTarget": "session:slack:direct:u0998266edq",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -608,11 +608,11 @@
         "cronExpr": "30 17 * * 1-5",
         "tz": "Europe/Madrid"
       },
-      "sessionTarget": "session:slack:direct:u0998266edq",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -631,11 +631,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0998266edq",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -654,11 +654,11 @@
         "cronExpr": "0 9 * * 1-5",
         "tz": "Europe/Zurich"
       },
-      "sessionTarget": "session:slack:direct:u09r2aydckz",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -677,11 +677,11 @@
         "cronExpr": "30 13 * * 1-5",
         "tz": "Europe/Zurich"
       },
-      "sessionTarget": "session:slack:direct:u09r2aydckz",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -700,11 +700,11 @@
         "cronExpr": "30 17 * * 1-5",
         "tz": "Europe/Zurich"
       },
-      "sessionTarget": "session:slack:direct:u09r2aydckz",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -723,11 +723,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u09r2aydckz",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -746,11 +746,11 @@
         "cronExpr": "0 9 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u099grragmp",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -769,11 +769,11 @@
         "cronExpr": "0 13 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u099grragmp",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -792,11 +792,11 @@
         "cronExpr": "30 16 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u099grragmp",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -815,11 +815,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u099grragmp",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -838,11 +838,11 @@
         "cronExpr": "0 9 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u08mcd8qvmk",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -861,11 +861,11 @@
         "cronExpr": "0 13 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u08mcd8qvmk",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -884,11 +884,11 @@
         "cronExpr": "30 16 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u08mcd8qvmk",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -907,11 +907,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u08mcd8qvmk",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -930,11 +930,11 @@
         "cronExpr": "0 9 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u08mbgcsfmf",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -953,11 +953,11 @@
         "cronExpr": "0 13 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u08mbgcsfmf",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -976,11 +976,11 @@
         "cronExpr": "30 16 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u08mbgcsfmf",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -999,11 +999,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u08mbgcsfmf",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1022,11 +1022,11 @@
         "cronExpr": "0 9 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0adn2mdh4m",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1045,11 +1045,11 @@
         "cronExpr": "0 13 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0adn2mdh4m",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1068,11 +1068,11 @@
         "cronExpr": "30 16 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0adn2mdh4m",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1091,11 +1091,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0adn2mdh4m",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1114,11 +1114,11 @@
         "cronExpr": "0 9 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0afyr6856x",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1137,11 +1137,11 @@
         "cronExpr": "0 13 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0afyr6856x",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1160,11 +1160,11 @@
         "cronExpr": "30 16 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0afyr6856x",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1183,11 +1183,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0afyr6856x",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1206,11 +1206,11 @@
         "cronExpr": "0 9 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0891uze0p7",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1229,11 +1229,11 @@
         "cronExpr": "0 13 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0891uze0p7",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1252,11 +1252,11 @@
         "cronExpr": "30 16 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0891uze0p7",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1275,11 +1275,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0891uze0p7",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1298,11 +1298,11 @@
         "cronExpr": "0 9 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0aglv1en92",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1321,11 +1321,11 @@
         "cronExpr": "0 13 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0aglv1en92",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1344,11 +1344,11 @@
         "cronExpr": "30 16 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0aglv1en92",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1367,11 +1367,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0aglv1en92",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1390,11 +1390,11 @@
         "cronExpr": "0 9 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u07h87k34qj",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1413,11 +1413,11 @@
         "cronExpr": "0 13 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u07h87k34qj",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1436,11 +1436,11 @@
         "cronExpr": "30 16 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u07h87k34qj",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1459,11 +1459,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u07h87k34qj",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1482,11 +1482,11 @@
         "cronExpr": "0 9 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0ad8usrpqs",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1505,11 +1505,11 @@
         "cronExpr": "0 13 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0ad8usrpqs",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1528,11 +1528,11 @@
         "cronExpr": "30 16 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0ad8usrpqs",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1551,11 +1551,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0ad8usrpqs",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1574,11 +1574,11 @@
         "cronExpr": "0 9 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0af8p99l6q",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1597,11 +1597,11 @@
         "cronExpr": "0 13 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0af8p99l6q",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1620,11 +1620,11 @@
         "cronExpr": "30 16 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0af8p99l6q",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Review the conversation history in this session. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
+        "message": "Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\\n\\nRead IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\"",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1643,11 +1643,11 @@
         "cronExpr": "0 22 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0af8p99l6q",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's session conversations since data.last_summary_epoch (0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1666,11 +1666,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u07lthhbbl2",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -1690,11 +1690,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u088a9d6a57",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -1714,11 +1714,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Asia/Kolkata"
       },
-      "sessionTarget": "session:slack:direct:u09l59gj3qt",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -1738,11 +1738,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u09a9k7bgta",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -1762,11 +1762,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0ae37ygtpa",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -1786,11 +1786,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0998266edq",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -1810,11 +1810,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u09r2aydckz",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -1834,11 +1834,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u099grragmp",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -1858,11 +1858,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u08mcd8qvmk",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -1882,11 +1882,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u08mbgcsfmf",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -1906,11 +1906,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0adn2mdh4m",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -1930,11 +1930,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0afyr6856x",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -1954,11 +1954,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0891uze0p7",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -1978,11 +1978,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0aglv1en92",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -2002,11 +2002,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u07h87k34qj",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -2026,11 +2026,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0ad8usrpqs",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"
@@ -2050,11 +2050,11 @@
         "cronExpr": "0 19 * * 1-5",
         "tz": "Europe/Berlin"
       },
-      "sessionTarget": "session:slack:direct:u0af8p99l6q",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and your session history. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from your session history. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
+        "message": "Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nCompose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, `backticks` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. If available, include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across `plugins install --force` — added two-layer save/restore in `update-openclaw.sh` to back up `openclaw.json` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If no GitHub events and no work discussed in session, write: \\\"No activity recorded today.\\\"\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nSend the report to your developer via Slack DM. Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"",
         "timeoutSeconds": 300,
         "thinking": "medium",
         "model": "google/gemini-3.1-pro-preview"

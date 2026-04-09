@@ -30,7 +30,7 @@ The file `.openclaw/cron/jobs-config.json` is the declarative cron config. Never
 
    If adding a non-standard job, ask the user for: purpose, schedule, and message content.
 
-3. **Look up the agent's Slack ID** in `CLAUDE.md` (agent table) for the `sessionTarget`.
+3. **Determine the `sessionTarget`:** Dev-pa agents use `"isolated"` (fresh session per run). Tech-manager uses `"session:main"` or `"session:slack:channel:<id>"`.
 
 4. **Generate a UUID:**
    ```bash
@@ -50,7 +50,7 @@ The file `.openclaw/cron/jobs-config.json` is the declarative cron config. Never
     "cronExpr": "<5-field cron expression>",
     "tz": "<IANA timezone>"
   },
-  "sessionTarget": "session:slack:direct:<slack-id-lowercase>",
+  "sessionTarget": "isolated",
   "wakeMode": "now",
   "payload": {
     "kind": "agentTurn",
@@ -65,7 +65,7 @@ The file `.openclaw/cron/jobs-config.json` is the declarative cron config. Never
 }
 ```
 
-For channel-targeted jobs (tech-manager): use `"session:slack:channel:<channel-id-lowercase>"`.
+For channel-targeted jobs (tech-manager): use `"session:slack:channel:<channel-id-lowercase>"`. For tech-manager main session jobs: use `"session:main"`.
 
 6. **Add the entry** to the `jobs` array in `.openclaw/cron/jobs-config.json`.
 
@@ -79,7 +79,7 @@ For channel-targeted jobs (tech-manager): use `"session:slack:channel:<channel-i
 | `schedule.cronExpr` | 5-field cron | Only with `"kind": "cron"`. Standard syntax (minute hour day month weekday) |
 | `schedule.tz` | IANA timezone | Only with `"kind": "cron"`. e.g., `"Europe/Berlin"`, `"Asia/Tbilisi"`. Omitting defaults to UTC |
 | `schedule.everyMs` | milliseconds | Only with `"kind": "every"`. No `cronExpr` or `tz` needed |
-| `sessionTarget` | `session:slack:direct:<id>` | Slack user ID, lowercase |
+| `sessionTarget` | `isolated` | Dev-pa: fresh session per run. Tech-manager: `session:main` or `session:slack:channel:<id>` |
 | `sessionKey` | `agent:<name>:cron:<type>` | Determines session isolation. Different keys = different sessions |
 | `delivery.mode` | `"none"` | Agent sends messages itself via `openclaw message send` |
 | `payload.thinking` | `"medium"` | Standard for check-ins |
@@ -94,11 +94,11 @@ For channel-targeted jobs (tech-manager): use `"session:slack:channel:<channel-i
 
 ## Important
 
-- **`sessionKey` is required.** It determines which session the job runs in. Jobs with different session keys are isolated from each other and from chat.
-- **Session routing:** `sessionTarget` points to the developer's Slack DM session (`session:slack:direct:<id>`). The cron job executes within that DM session context, but does **not** have access to prior chat history — it only sees messages from previous cron runs in the same session.
+- **`sessionKey` is required.** It identifies the job for `apply-cron.sh` reconciliation.
+- **Session routing:** Dev-pa cron jobs use `sessionTarget: "isolated"` — each run gets a fresh session with no prior history. Conversation context is provided via `scripts/lib/dm-digest.sh` (standalone for check-ins) or `data.conversation_digest` (embedded in prepare scripts for summaries/reports). This prevents cron output from polluting the DM session (#276).
 - **`delivery.mode` is always `"none"`** in our setup. Agents decide whether and how to message via `openclaw message send` in their payload instructions.
 - **Do not set `payload.model`** — ever. Jobs inherit the agent's default model from gateway config. Leftover model fields have caused unnecessary gateway restarts.
-- **Slack IDs must be lowercase** in `sessionTarget`.
+- **Channel IDs must be lowercase** in `sessionTarget` (for tech-manager channel sessions).
 - When modifying existing jobs, match by `sessionKey` to find the right entry.
 
 ## Validation
