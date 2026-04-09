@@ -62,7 +62,8 @@ Capture what matters. Decisions, context, things to remember. Skip the secrets u
 - Don't exfiltrate private data. Ever.
 - Don't run destructive commands without asking.
 - **NEVER run git commands.** No git add, commit, push, checkout, branch, merge, rebase, reset, stash, or any other git operation. Your workspace is symlinked to a shared repo -- git commands here affect the entire codebase.
-- **NEVER run gh CLI commands.** No gh pr, gh issue, gh api, gh repo, or any other GitHub CLI operation. You do not have authorization to interact with GitHub directly. If you need something done on GitHub, ask your developer.
+- **NEVER run gh CLI write commands.** No `gh issue create`, `gh issue close`, `gh issue comment`, `gh pr create`, `gh pr merge`, `gh api` with mutations, `gh repo`, or any other GitHub CLI operation that creates or modifies data. Use the provided wrapper scripts (`create-issue.sh`, `comment-on-issue.sh`) for write operations.
+- **Read-only gh commands are allowed.** You may use `gh issue view`, `gh issue list`, `gh pr view`, `gh pr list`, and other read-only queries directly. All queries must be scoped to <your-org> org.
 - `trash` > `rm` (recoverable beats gone forever)
 - When in doubt, ask.
 
@@ -108,11 +109,13 @@ Good (1 message):
 - [image attached] "Here's your wizard icon — dark robes, glowing staff, purple energy. Want me to try a different style?"
 
 ### `scripts/create-issue.sh`
-Create GitHub issues in <your-org> org repositories.
+Create GitHub issues in <your-org> org repositories. **Includes duplicate detection** — before creating, the script searches open issues for similar titles. If potential duplicates are found, it returns them instead of creating the issue.
 
 ```bash
 bash scripts/create-issue.sh --repo tob-app --title "Bug: login broken"
 bash scripts/create-issue.sh --repo tob-app --title "feat: dark mode" --body "Add dark mode toggle" --label enhancement
+# If duplicates were found and you've confirmed the issue is genuinely new:
+bash scripts/create-issue.sh --repo tob-app --title "feat: dark mode" --body "Add dark mode toggle" --label enhancement --force
 ```
 
 Options:
@@ -120,8 +123,31 @@ Options:
 - `--title TITLE` (required) — issue title
 - `--body BODY` (optional) — issue description
 - `--label LABEL` (optional, repeatable) — label to add
+- `--force` (optional) — skip duplicate check and create the issue
+
+**Duplicate detection:** When potential duplicates are found, the response has `data.created: false` and `data.potential_duplicates` listing matching issues (including their body text). Before deciding to `--force`:
+1. Compare your intended issue's title **and body** against each potential duplicate's title and body.
+2. If an existing issue describes the same underlying problem — even with different wording — it is a duplicate. Do not create a new one. Instead, add your context to the existing issue using `comment-on-issue.sh`:
+   ```bash
+   bash scripts/comment-on-issue.sh --repo tob-app --issue 146 --body "Additional context: ..."
+   ```
+3. Only use `--force` if you've confirmed that none of the returned issues cover the same problem you're reporting.
 
 Output: JSON with `success`, `data.url`, `data.number`, `data.repo`, `data.title`. Only works for `<your-org>` org repos.
+
+### `scripts/comment-on-issue.sh`
+Add a comment to an existing GitHub issue in <your-org> org repositories.
+
+```bash
+bash scripts/comment-on-issue.sh --repo tob-app --issue 146 --body "Additional context from investigation: ..."
+```
+
+Options:
+- `--repo REPO` (required) — repository name without org prefix (e.g. `tob-app`)
+- `--issue NUMBER` (required) — issue number to comment on
+- `--body BODY` (required) — comment text
+
+Output: JSON with `success`, `data.url`, `data.issue`, `data.repo`. Only works for `<your-org>` org repos.
 
 ### `scripts/github-activity.sh`
 Query GitHub activity for a user within <your-org> org.

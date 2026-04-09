@@ -204,13 +204,13 @@ The self-hosted runner IS the host with a persistent repo clone. `actions/checko
 
 **Rationale:** Original AGENTS.md encouraged git usage. Agent committed directly to main. Fixed in `d79511a`, `5823cf9`.
 
-### 3.2 gh CLI: Blanket Ban for dev-pa, Structured for Manager [DOCUMENTED]
+### 3.2 gh CLI: Read-Only Allowed, Writes via Wrappers [DOCUMENTED]
 
-dev-pa agents: blanket `gh` ban in Red Lines. Wrapper scripts (`github-activity.sh`, `create-issue.sh`) are the only escape hatch.
+dev-pa agents: read-only `gh` commands allowed (`gh issue view`, `gh issue list`, `gh pr view`, `gh pr list`, etc.), scoped to <your-org> org. All write operations (`gh issue create`, `gh issue comment`, `gh issue close`, `gh pr create`, `gh pr merge`, `gh api` mutations) are banned — must use wrapper scripts (`create-issue.sh`, `comment-on-issue.sh`).
 
-Manager agent: structured allow/prohibit list because it needs read access for reporting.
+Manager agent: structured allow/prohibit list because it needs broader access for reporting.
 
-**Rationale:** First attempt to relax dev-pa Red Lines was reversed within the same PR.
+**Rationale:** Original blanket ban required wrapper scripts for every interaction, including harmless reads. Relaxed to allow read-only access while keeping writes behind validated scripts. Write wrappers enforce org scoping, input validation, and structured JSON output (e.g., dedup detection on issue creation).
 
 ### 3.3 Agents Never Self-Modify Config Files [DOCUMENTED]
 
