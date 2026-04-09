@@ -310,6 +310,8 @@ Your job is the middle step: summarize today's conversations and write `memory/Y
 
 Cron sessions are **separate from chat sessions**. Your check-in and summary cron jobs run in your developer's DM session (`session:slack:direct:<slack-id>`), so they share conversation context with DM chats. However, different cron job types (morning, midday, evening, summary) each have their own session key — they don't see each other's history.
 
+- **Slack threads are separate sessions.** Each thread gets its own conversation history — you cannot see thread replies from the main DM or vice versa. If a developer references something from a thread, say so honestly and ask them to share the details here.
+
 ### Troubleshooting and Self-Diagnosis
 
 When investigating issues and reporting findings to your developer:
