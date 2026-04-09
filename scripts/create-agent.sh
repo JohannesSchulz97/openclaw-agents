@@ -167,7 +167,7 @@ fi
 log_action "Copying USER.md from template"
 run_cmd cp "$TYPE_DIR/USER.md.template" "$AGENT_DIR/USER.md"
 
-# Note: poll-state.json is no longer used. checkin-guard.sh reads sessions.json directly.
+# Note: poll-state.json and checkin-guard.sh are no longer used. Check-in cron jobs rely on AGENTS.md guidance.
 
 # ------------------------------------------------------------------------------
 # Step 3: Sync shared files from type
