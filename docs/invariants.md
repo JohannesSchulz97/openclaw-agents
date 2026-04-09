@@ -27,7 +27,7 @@ Source file: `.openclaw/cron/jobs-config.json`
 ### 1.1 Session Key Format [ENFORCED]
 
 `sessionKey` must match `agent:<agentId>:cron:<type>` where `<type>` is one of:
-- dev-pa: `morning`, `midday`, `evening`, `summary`
+- dev-pa: `morning`, `midday`, `evening`, `report`, `summary`
 - manager: `monitoring`, `morning-report`, `evening-report`
 
 The `<agentId>` in the sessionKey must match the job's `agentId` field.
@@ -105,7 +105,13 @@ All daily summary jobs must run at 22:00 (`cronExpr` starting with `"0 22 "`). D
 
 **Rationale:** Summaries are agent self-memory, not an evening report input (decoupled in #225/#226). Running at 22:00 avoids the race condition where summaries and the evening report both fired at 20:00. The 2-hour gap ensures the evening report completes first. Previous collision at 19:30 with evening check-ins broke 3 agents (`559bb7b`).
 
-### 1.13 No Duplicate Agent+Type [ENFORCED]
+### 1.13 Report Schedule [ENFORCED]
+
+All evening work report jobs (sessionKey ending in `:report`) must run at 19:00 (`cronExpr` starting with `"0 19 "`). Day-of-week pattern varies per developer's work schedule.
+
+**Rationale:** Reports must complete before the tech-manager's evening report at 20:00 CET. Running at 19:00 gives a 1-hour buffer for all agents to finish their reports. Introduced in #253.
+
+### 1.14 No Duplicate Agent+Type [ENFORCED]
 
 No two jobs may have the same `agentId` combined with the same sessionKey type suffix (the part after the last `:`).
 
