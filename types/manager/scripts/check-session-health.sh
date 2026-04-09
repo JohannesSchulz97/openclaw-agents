@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-SIZE_THRESHOLD_KB="${1:-2048}"
+SIZE_THRESHOLD_KB="${1:-25600}"
 DUPLICATE_THRESHOLD="${2:-10}"
 TAIL_LINES=100
 OPENCLAW_DIR="$HOME/.openclaw/agents"
