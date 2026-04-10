@@ -12,7 +12,7 @@ DRY_RUN=false
 [[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
 
 # Shared files to sync (directories handled separately)
-SHARED_FILES=(SOUL.md AGENTS.md TOOLS.md HEARTBEAT.md BOOTSTRAP.md poll-config.json DAILY-SUMMARY.template.md)
+SHARED_FILES=(SOUL.md AGENTS.md TOOLS.md HEARTBEAT.md BOOTSTRAP.md poll-config.json DAILY-SUMMARY.template.md EVENING-REPORT.template.md)
 
 # Template files — only copied if target does not exist
 TEMPLATE_FILES=(IDENTITY.md USER.md bootstrap-state.json)

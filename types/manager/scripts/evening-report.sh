@@ -145,8 +145,8 @@ log "Found ${#AGENTS[@]} dev-pa agents: $AGENT_LIST"
 log "=== Collecting per-developer reports ==="
 
 DEVELOPERS="[]"
-AGENTS_WITH_REPORTS=0
-AGENTS_WITHOUT_REPORTS=0
+DEVS_WITH_REPORTS=0
+DEVS_WITHOUT_REPORTS=0
 
 for i in "${!AGENTS[@]}"; do
     agent="${AGENTS[$i]}"
@@ -154,30 +154,39 @@ for i in "${!AGENTS[@]}"; do
     report_file="$BASE_DIR/$agent/memory/reports/$TODAY.md"
 
     has_report=false
+    has_meaningful_report=false
     report_content=""
 
     if [[ -f "$report_file" ]] && [[ -s "$report_file" ]]; then
         has_report=true
         report_content=$(cat "$report_file")
-        AGENTS_WITH_REPORTS=$((AGENTS_WITH_REPORTS + 1))
+        # Check if report has meaningful content beyond "no activity" boilerplate
+        has_meaningful_report=true
+        stripped=$(echo "$report_content" | sed 's/#.*//;s/[[:space:]]//g' | tr '[:upper:]' '[:lower:]')
+        if [[ "$stripped" == *"noactivityrecordedtoday"* ]] && [[ ${#stripped} -lt 100 ]]; then
+            has_meaningful_report=false
+        fi
+        DEVS_WITH_REPORTS=$((DEVS_WITH_REPORTS + 1))
     else
-        AGENTS_WITHOUT_REPORTS=$((AGENTS_WITHOUT_REPORTS + 1))
+        DEVS_WITHOUT_REPORTS=$((DEVS_WITHOUT_REPORTS + 1))
     fi
 
     DEVELOPERS=$(printf '%s' "$DEVELOPERS" | jq \
         --arg agent "$agent" \
         --arg slack_id "$slack_id" \
         --argjson has_report "$has_report" \
+        --argjson has_meaningful_report "${has_meaningful_report:-false}" \
         --arg report "$report_content" \
         '. + [{
             agent: $agent,
             slack_id: $slack_id,
             has_report: $has_report,
+            has_meaningful_report: $has_meaningful_report,
             report: $report
         }]')
 done
 
-log "Reports: $AGENTS_WITH_REPORTS found, $AGENTS_WITHOUT_REPORTS missing"
+log "Reports: $DEVS_WITH_REPORTS found, $DEVS_WITHOUT_REPORTS missing"
 
 # ── Run check-status.sh ─────────────────────
 log "Running check-status.sh"
@@ -211,7 +220,7 @@ log "Data collection complete."
 touch "$MARKER_FILE"
 
 # ── Build final output ───────────────────────
-CHANNEL_SESSION_KEY="slack:channel:$(echo "$CHANNEL_ID" | tr '[:upper:]' '[:lower:]')"
+CHANNEL_SESSION_KEY="agent:tech-manager:slack:channel:$(echo "$CHANNEL_ID" | tr '[:upper:]' '[:lower:]')"
 
 RESULT=$(jq -n \
     --arg date "$TODAY" \
@@ -219,9 +228,9 @@ RESULT=$(jq -n \
     --arg channel_session_key "$CHANNEL_SESSION_KEY" \
     --arg template "$TEMPLATE_CONTENT" \
     --arg output_file "$OUTPUT_FILE" \
-    --argjson total_agents "${#AGENTS[@]}" \
-    --argjson agents_with_reports "$AGENTS_WITH_REPORTS" \
-    --argjson agents_without_reports "$AGENTS_WITHOUT_REPORTS" \
+    --argjson total_developers "${#AGENTS[@]}" \
+    --argjson developers_with_reports "$DEVS_WITH_REPORTS" \
+    --argjson developers_without_reports "$DEVS_WITHOUT_REPORTS" \
     --argjson developers "$DEVELOPERS" \
     --argjson status_summary "$STATUS_SUMMARY" \
     --argjson missed_alerts "$MISSED_ALERTS" \
@@ -232,9 +241,9 @@ RESULT=$(jq -n \
         channel_session_key: $channel_session_key,
         template: $template,
         output_file: $output_file,
-        total_agents: $total_agents,
-        agents_with_reports: $agents_with_reports,
-        agents_without_reports: $agents_without_reports,
+        total_developers: $total_developers,
+        developers_with_reports: $developers_with_reports,
+        developers_without_reports: $developers_without_reports,
         developers: $developers,
         status_summary: $status_summary,
         missed_alerts: $missed_alerts,
