@@ -88,8 +88,8 @@ if [[ "$PHASE" == "prepare" ]]; then
     # ── Fetch GitHub activity ────────────────
     GITHUB_ACTIVITY='{}'
     if [[ -n "$GITHUB_USERNAMES" && "$GITHUB_USERNAMES" != *"<"* ]]; then
-        log "Running github-activity.sh --user $GITHUB_USERNAMES --since 16"
-        GITHUB_ACTIVITY=$("$SCRIPT_DIR/github-activity.sh" --user "$GITHUB_USERNAMES" --since 16 2>/dev/null) || {
+        log "Running github-activity.sh --user $GITHUB_USERNAMES --since 24"
+        GITHUB_ACTIVITY=$("$SCRIPT_DIR/github-activity.sh" --user "$GITHUB_USERNAMES" --since 24 2>/dev/null) || {
             log "WARNING: github-activity.sh failed, continuing without GitHub data"
             GITHUB_ACTIVITY='{"success":false,"data":{}}'
         }
