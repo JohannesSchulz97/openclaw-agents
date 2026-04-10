@@ -154,7 +154,7 @@ check_cron_no_model() {
   # Exception: jobs with sessionKey in the allowed list or matching allowed
   # patterns may override the model (e.g., update-check and report jobs use
   # gemini-pro for higher-quality analysis)
-  local allowed_model_overrides='["agent:tech-manager:cron:update-check"]'
+  local allowed_model_overrides='["agent:tech-manager:cron:update-check","agent:tech-manager:cron:evening-report"]'
   local bad
   bad=$(jq -r --argjson allowed "$allowed_model_overrides" \
     '.jobs[] | select(.payload.model != null) |

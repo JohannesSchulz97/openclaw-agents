@@ -157,16 +157,17 @@ All periodic agent behavior (check-ins, daily summaries, monitoring) runs throug
 
 ### Job patterns
 
-Each dev-pa agent has 4 cron jobs:
+Each dev-pa agent has 5 cron jobs:
 
 | Job | Session key pattern | Purpose |
 |-----|-------------------|---------|
 | Morning check-in | `agent:<name>:cron:morning` | Start-of-day greeting + priorities |
 | Midday check-in | `agent:<name>:cron:midday` | Mid-day status check |
 | Evening check-in | `agent:<name>:cron:evening` | End-of-day wrap-up |
-| Daily summary | `agent:<name>:cron:summary` | GitHub activity summary |
+| Evening work report | `agent:<name>:cron:report` | End-of-day work report to developer + tech-manager |
+| Daily summary | `agent:<name>:cron:summary` | Agent self-memory summary |
 
-The tech-manager agent has 3 jobs: `monitoring` (hourly), `morning-report`, `evening-report`.
+The tech-manager agent has 4 jobs: `monitoring` (hourly), `morning-report`, `evening-report`, `update-check` (weekly).
 
 ### Key fields in a cron job entry
 
@@ -203,6 +204,25 @@ The tech-manager agent has 3 jobs: `monitoring` (hourly), `morning-report`, `eve
 - **Dev-pa cron jobs use `sessionTarget: "isolated"`** (current config). Each cron run gets a fresh session with no prior history. Conversation context is provided via `scripts/lib/dm-digest.sh` which reads the DM session file and returns a compact digest. This prevents cron output from polluting the DM session (#276).
 - **`delivery.mode: "none"`** means the agent's response stays in the cron session only and is not delivered to the user as a notification. The agent itself decides whether to send a Slack message using `openclaw message send`.
 - See `docs/research/openclaw-session-key-vs-target-2026-04-09.md` for the full source-code analysis.
+
+### DM session injection via `sessions_send`
+
+Isolated cron jobs produce clean sessions, but outbound messages (check-ins, reports) must also appear in the developer's DM session so replies have context. The pattern:
+
+1. Agent composes the message in the isolated cron session
+2. Agent calls `sessions_send` to inject the message into the DM session (fire-and-forget)
+3. Agent calls `openclaw message send` to deliver the Slack DM
+
+`sessions_send` parameters:
+```
+sessionKey: "agent:<name>:slack:direct:<slack-id-lowercase>"
+message: "<the composed message>"
+timeoutSeconds: 0
+```
+
+- `tools.sessions.visibility` must be set to `"agent"` in `openclaw.json` (already applied on host). This allows `sessions_send` to reach any session owned by the same agent — the default `"tree"` blocks cross-session sends from isolated sessions.
+- Only inject messages the developer would see and might reply to (check-ins, reports). Do NOT inject script output, tool results, or intermediate work.
+- Daily summary jobs write to a file and don't DM the developer, so they do not need `sessions_send`.
 
 ### Adding a new cron job
 
