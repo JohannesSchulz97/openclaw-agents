@@ -175,6 +175,14 @@ add_cron_jobs() {
     local bootstrap_preamble
     bootstrap_preamble="Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\n\n"
 
+    # Build sessions_send instruction with agent-specific DM session key (#292)
+    local slack_id_lower
+    slack_id_lower=$(echo "$slack_id" | tr '[:upper:]' '[:lower:]')
+    local sessions_send_instruction=""
+    if [[ -n "$slack_id" ]]; then
+        sessions_send_instruction="\\n\\nBefore sending, inject the message into the DM session so replies have context:\\nsessions_send sessionKey=\"agent:${agent_name}:slack:direct:${slack_id_lower}\" message=\"<your composed message>\" timeoutSeconds=0\\n\\n"
+    fi
+
     # Create 3 jobs with type-specific payloads
     for type in morning midday evening; do
         local job_id
@@ -185,17 +193,17 @@ add_cron_jobs() {
             morning)
                 cron_expr="$morning_cron"
                 name_suffix="Morning Check-in"
-                checkin_message="Read IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\""
+                checkin_message="Read IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware morning check-in following the Cron Job Responses guidance in AGENTS.md. ${sessions_send_instruction}Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\""
                 ;;
             midday)
                 cron_expr="$midday_cron"
                 name_suffix="Midday Check-in"
-                checkin_message="Read IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\""
+                checkin_message="Read IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware midday check-in following the Cron Job Responses guidance in AGENTS.md. ${sessions_send_instruction}Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\""
                 ;;
             evening)
                 cron_expr="$evening_cron"
                 name_suffix="Evening Check-in"
-                checkin_message="Read IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\""
+                checkin_message="Read IDENTITY.md for your Slack user ID. Run scripts/lib/dm-digest.sh and parse the JSON for recent conversation context. Send a context-aware evening check-in following the Cron Job Responses guidance in AGENTS.md. ${sessions_send_instruction}Send via: openclaw message send --channel slack --target user:<SLACK_ID> --message \"<your message>\""
                 ;;
         esac
 
