@@ -25,10 +25,19 @@ PHASE="${1:-}"
 case "$PHASE" in
     prepare|finalize) ;;
     *)
-        json_error "work-report" "INVALID_PHASE" "Usage: work-report.sh <prepare|finalize>"
+        json_error "work-report" "INVALID_PHASE" "Usage: work-report.sh <prepare|finalize> [--no-dm]"
         exit 1
         ;;
 esac
+shift
+
+DM=true
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --no-dm) DM=false; shift ;;
+        *) shift ;;
+    esac
+done
 
 # ── Config ────────────────────────────────────
 AGENT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -100,6 +109,7 @@ if [[ "$PHASE" == "prepare" ]]; then
         --argjson file_exists "$FILE_EXISTS" \
         --arg agent "$AGENT_NAME" \
         --arg slack_user_id "$SLACK_USER_ID" \
+        --argjson dm "$DM" \
         --argjson github_activity "$GITHUB_ACTIVITY" \
         --argjson conversation_digest "$<channel-id>N_DIGEST" \
         '{
@@ -109,6 +119,7 @@ if [[ "$PHASE" == "prepare" ]]; then
             file_exists: $file_exists,
             agent_name: $agent,
             slack_user_id: $slack_user_id,
+            dm: $dm,
             github_activity: $github_activity,
             conversation_digest: $conversation_digest
         }')"
