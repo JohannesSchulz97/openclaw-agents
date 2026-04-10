@@ -117,6 +117,18 @@ No two jobs may have the same `agentId` combined with the same sessionKey type s
 
 **Rationale:** 16 legacy every-2h jobs coexisted with new 3-per-day jobs, causing duplicate check-ins. Fixed in `a366867`.
 
+### 1.15 DM-Sending Cron Jobs Must Use sessions_send [DOCUMENTED]
+
+Cron jobs that send a Slack DM (`openclaw message send`) must first call `sessions_send` to inject the composed message into the developer's DM session (`agent:<name>:slack:direct:<slack-id-lowercase>`) with `timeoutSeconds: 0`. Without this, the DM session has no record of the outbound message and developer replies lack context.
+
+**Rationale:** Isolated sessions (#276, PR #279) solved session bloat but broke the DM context loop — agents send messages the developer replies to, but the DM session had no trace of what was sent. `sessions_send` restores the context link without re-introducing session pollution. Verified on host 2026-04-10 (#292).
+
+### 1.16 sessions.visibility Must Be "agent" [DOCUMENTED]
+
+`tools.sessions.visibility` in `openclaw.json` must be set to `"agent"`. The default `"tree"` blocks `sessions_send` from isolated cron sessions because isolated sessions are not in the same session tree as the DM session.
+
+**Rationale:** Discovered during #292 testing — `sessions_send` silently failed under `visibility: "tree"`. Switching to `"agent"` allows cross-session sends within the same agent. Already applied on host 2026-04-10.
+
 ---
 
 ## Area 2: Sync / Deploy Pipeline

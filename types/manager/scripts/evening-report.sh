@@ -97,6 +97,20 @@ fi
 
 log "Evening report targeting channel: $CHANNEL_ID"
 
+# ── Read report template ───────────────────
+TEMPLATE_FILE="$BASE_DIR/tech-manager/EVENING-REPORT.template.md"
+TEMPLATE_CONTENT=""
+if [[ -f "$TEMPLATE_FILE" ]]; then
+    TEMPLATE_CONTENT=$(cat "$TEMPLATE_FILE")
+else
+    log "WARNING: Template not found at $TEMPLATE_FILE"
+fi
+
+# ── Define output file ─────────────────────
+REPORTS_DIR="$BASE_DIR/tech-manager/memory/reports"
+OUTPUT_FILE="$REPORTS_DIR/$TODAY.md"
+mkdir -p "$REPORTS_DIR"
+
 # ── Discover dev-pa agents ───────────────────
 AGENTS=()
 AGENT_SLACK_IDS=()
@@ -197,9 +211,14 @@ log "Data collection complete."
 touch "$MARKER_FILE"
 
 # ── Build final output ───────────────────────
+CHANNEL_SESSION_KEY="slack:channel:$(echo "$CHANNEL_ID" | tr '[:upper:]' '[:lower:]')"
+
 RESULT=$(jq -n \
     --arg date "$TODAY" \
     --arg channel_id "$CHANNEL_ID" \
+    --arg channel_session_key "$CHANNEL_SESSION_KEY" \
+    --arg template "$TEMPLATE_CONTENT" \
+    --arg output_file "$OUTPUT_FILE" \
     --argjson total_agents "${#AGENTS[@]}" \
     --argjson agents_with_reports "$AGENTS_WITH_REPORTS" \
     --argjson agents_without_reports "$AGENTS_WITHOUT_REPORTS" \
@@ -210,6 +229,9 @@ RESULT=$(jq -n \
     '{
         date: $date,
         channel_id: $channel_id,
+        channel_session_key: $channel_session_key,
+        template: $template,
+        output_file: $output_file,
         total_agents: $total_agents,
         agents_with_reports: $agents_with_reports,
         agents_without_reports: $agents_without_reports,
