@@ -129,6 +129,12 @@ Cron jobs that send a Slack DM (`openclaw message send`) must first call `sessio
 
 **Rationale:** Discovered during #292 testing — `sessions_send` silently failed under `visibility: "tree"`. Switching to `"agent"` allows cross-session sends within the same agent. Already applied on host 2026-04-10.
 
+### 1.17 Every Dev-PA Agent Has a Work Report Cron [ENFORCED]
+
+Every dev-pa agent (identified by having a `:morning` check-in sessionKey) must also have a `:report` work-report sessionKey. Both must share the same `agentId`.
+
+**Rationale:** The historical `add_cron_jobs()` function in `scripts/lib/cron-utils.sh` only created 4 of the 5 dev-pa cron jobs (morning / midday / evening check-ins + daily summary) — the work-report entry was not generated. The 17 existing work-report entries were added manually and were silently wiped any time `update-cron-schedule.sh` re-ran against an existing agent (it removes all jobs by `agentId`, then re-adds only the 4 from `add_cron_jobs`). Post-#310, `add_cron_jobs` creates all 5; this invariant prevents regression. Introduced in #310.
+
 ---
 
 ## Area 2: Sync / Deploy Pipeline

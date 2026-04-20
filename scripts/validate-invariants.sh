@@ -265,6 +265,24 @@ check_cron_no_duplicate_agent_type() {
   fi
 }
 
+check_cron_dev_pa_has_report() {
+  # Invariant 1.17: every dev-pa agent must have a work-report cron entry.
+  # Dev-pa agents are identified by having a :morning check-in (tech-manager
+  # uses :morning-report, not :morning, so the suffix match is exact).
+  local missing
+  missing=$(jq -r '
+    ([.jobs[] | select(.sessionKey | endswith(":morning")) | .agentId] | unique) as $devpa |
+    ([.jobs[] | select(.sessionKey | endswith(":report")) | .agentId] | unique) as $with_report |
+    ($devpa - $with_report)[]' "$CRON_CONFIG")
+  if [[ -z "$missing" ]]; then
+    pass
+  else
+    while IFS= read -r line; do
+      fail "dev_pa_has_report" "Dev-pa agent has no work-report cron: $line"
+    done <<< "$missing"
+  fi
+}
+
 # ── Gitignore checks ────────────────────────────────────────
 
 check_gitignore_required_patterns() {
@@ -350,6 +368,7 @@ run_cron_checks() {
   check_cron_summary_schedule
   check_cron_report_schedule
   check_cron_no_duplicate_agent_type
+  check_cron_dev_pa_has_report
 }
 
 run_gitignore_checks() {

@@ -139,7 +139,18 @@ add_cron_job() {
 }
 
 # --------------------------------------------------------------------------- #
-# add_cron_jobs — add 3 time-of-day check-in jobs (morning, midday, evening) + 1 daily summary job
+# add_cron_jobs — add the full dev-pa cron bundle for an agent.
+#
+# Creates five jobs:
+#   - morning check-in       (cron: start_hour:00 in <timezone>)
+#   - midday check-in        (cron: midpoint of work window in <timezone>)
+#   - evening check-in       (cron: end_hour-1:30 in <timezone>)
+#   - evening work report    (cron: 19:00 daily in <timezone> — runs every day
+#                             regardless of <works_weekends> so ad-hoc weekend
+#                             work is captured; the script self-suppresses the
+#                             DM on zero-activity days, issue #310)
+#   - daily summary          (cron: 22:00 in <timezone>, weekdays unless
+#                             <works_weekends> is true)
 #
 # Usage: add_cron_jobs <cron_file> <agent_name> <display_name> <model> <start_hour> <end_hour> <timezone> <works_weekends> <slack_id>
 # --------------------------------------------------------------------------- #
@@ -272,6 +283,7 @@ add_cron_jobs() {
        --arg name "${display_name} Daily Summary" \
        --arg message "$summary_message" \
        --arg cronExpr "$summary_cron_expr" \
+       --arg tz "$timezone" \
        --arg sessionKey "agent:${agent_name}:cron:summary" \
        --arg sessionTarget "$session_target" \
        '.jobs += [{
@@ -282,7 +294,7 @@ add_cron_jobs() {
             schedule: {
                 kind: "cron",
                 cronExpr: $cronExpr,
-                tz: "Europe/Berlin"
+                tz: $tz
             },
             sessionTarget: $sessionTarget,
             wakeMode: "now",
@@ -300,6 +312,65 @@ add_cron_jobs() {
 
     mv "$tmp_file" "$cron_file"
     echo "Added cron job '${display_name} Daily Summary' for agent '${agent_name}' (id: ${summary_id})"
+
+    # ═════════════════════════════════════════════════════════════════════
+    # Evening Work Report — runs 19:00 daily in agent's timezone.
+    #
+    # Daily regardless of works_weekends (#310): developers occasionally do
+    # ad-hoc weekend work and we don't want to lose it. The script detects
+    # "no activity" via work-report.sh and tells the model to exit early
+    # without writing a file or DM, so idle weekends stay silent.
+    # ═════════════════════════════════════════════════════════════════════
+    local report_id
+    report_id=$(generate_uuid)
+    local report_slack_id_lower
+    report_slack_id_lower=$(echo "$slack_id" | tr '[:upper:]' '[:lower:]')
+
+    local report_sessions_send_line=""
+    if [[ -n "$slack_id" ]]; then
+        report_sessions_send_line="\\n\\nBefore sending, inject the report into the DM session so replies have context:\\nsessions_send sessionKey=\"agent:${agent_name}:slack:direct:${report_slack_id_lower}\" message=\"<report>\" timeoutSeconds=0\\n\\n"
+    fi
+
+    local report_message
+    report_message="Run scripts/work-report.sh prepare and parse the JSON output.\\nIf success is false, stop and output the error.\\n\\nIf data.no_activity is true, stop here. Do NOT compose a report, do NOT write a file, do NOT call finalize, do NOT send a DM. The prepare step already recorded that the cron fired (report-state.last_run_epoch). Output only 'NO_ACTIVITY'.\\n\\nOtherwise, compose an end-of-day work report using data.github_activity and data.conversation_digest. Format richly using bold, italic, \`backticks\` for technical terms (script names, config keys, file paths), and linked PR/issue references.\\n\\nUse these sections:\\n\\n## Work Report — <data.date>\\n\\n### ✅ What was accomplished\\nEach distinct item (feature, fix, investigation, review, discussion) gets its OWN bullet with a detailed explanation of what and why. NEVER combine multiple PRs or features into a single bullet point. Include both GitHub activity and work from data.conversation_digest. Link PRs and issues using full markdown links to <your-org> org.\\n\\nExample bullet:\\n- **Preserved LCM plugin config** across \`plugins install --force\` — added two-layer save/restore in \`update-openclaw.sh\` to back up \`openclaw.json\` and launchd plist env vars before reinstall ([#257](https://github.com/<your-org>/openclaw-agents/pull/257), fixes [#256](https://github.com/<your-org>/openclaw-agents/issues/256))\\n\\n### ⚠️ Challenges\\nBlockers, complexity, dependencies, things that need attention. Write \\\"None\\\" if clear.\\n\\n### 📋 Next steps\\nOpen PRs, carry-over items, plans for the next working day. Only write \\\"Not discussed\\\" if there is genuinely no indication of what comes next.\\n\\nRules:\\n- One bullet per distinct item. Each PR or piece of work is separate.\\n- Each bullet should explain what was done and why — the reader should understand the change without looking up the PR.\\n- Be factual. Do NOT fabricate PR titles, issue numbers, or feature names.\\n- If data.file_exists is true, mention \\\"Updated report\\\" in the DM.\\n\\nSave the report to data.output_file.\\nRun scripts/work-report.sh finalize.\\n\\nIf data.dm is true, send the report to your developer via Slack DM.${report_sessions_send_line}Convert the markdown formatting to Slack equivalents — keep all rich formatting (bold, italic, inline code, emojis, links) but use Slack syntax:\\nopenclaw message send --channel slack --target user:<data.slack_user_id> --message \\\"<report>\\\"\\nIf data.dm is false, skip the DM — only write the report to data.output_file."
+
+    tmp_file=$(mktemp)
+    trap "rm -f '$tmp_file'" RETURN
+
+    jq --arg id "$report_id" \
+       --arg agentId "$agent_name" \
+       --arg name "${display_name} Evening Work Report" \
+       --arg message "$report_message" \
+       --arg tz "$timezone" \
+       --arg sessionKey "agent:${agent_name}:cron:report" \
+       --arg sessionTarget "$session_target" \
+       '.jobs += [{
+            id: $id,
+            agentId: $agentId,
+            name: $name,
+            enabled: true,
+            schedule: {
+                kind: "cron",
+                cronExpr: "0 19 * * *",
+                tz: $tz
+            },
+            sessionTarget: $sessionTarget,
+            wakeMode: "now",
+            payload: {
+                kind: "agentTurn",
+                message: $message,
+                timeoutSeconds: 300,
+                thinking: "medium",
+                model: "google/gemini-3.1-pro-preview"
+            },
+            sessionKey: $sessionKey,
+            delivery: {
+                mode: "none"
+            }
+        }]' "$cron_file" > "$tmp_file"
+
+    mv "$tmp_file" "$cron_file"
+    echo "Added cron job '${display_name} Evening Work Report' for agent '${agent_name}' (id: ${report_id})"
 }
 
 # --------------------------------------------------------------------------- #

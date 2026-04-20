@@ -10,7 +10,11 @@ set -euo pipefail
 # Phase 1 only (bash, no LLM). The cron prompt handles synthesis and Slack delivery.
 #
 # Usage:
-#   bash scripts/evening-report.sh [--base-dir DIR] [--dry-run] [--force]
+#   bash scripts/evening-report.sh [--date YYYY-MM-DD] [--base-dir DIR]
+#                                  [--channel CHANNEL_ID] [--dry-run] [--force]
+#
+# --date defaults to the host's local date. Use to pin a specific report day
+# when a cron run has been delayed or is being re-run manually.
 #
 # Output: JSON via json-response.sh
 
@@ -30,6 +34,7 @@ BASE_DIR="$HOME/.openclaw/agents"
 CHANNEL_OVERRIDE=""
 DRY_RUN=false
 FORCE=false
+TODAY=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -39,6 +44,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --base-dir)
             BASE_DIR="$2"
+            shift 2
+            ;;
+        --date)
+            TODAY="${2:-}"
+            if ! [[ "$TODAY" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+                json_error "evening-report" "BAD_DATE" "--date requires a YYYY-MM-DD value, got: ${TODAY:-<missing>}"
+                exit 1
+            fi
             shift 2
             ;;
         --dry-run)
@@ -56,7 +69,8 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-TODAY=$(date '+%Y-%m-%d')
+# Default to the host's local date. Aligns with cron tz when --date is not passed.
+TODAY="${TODAY:-$(date '+%Y-%m-%d')}"
 
 # ── Idempotency guard ───────────────────────
 MARKER_FILE="/tmp/evening-report-${TODAY}.sent"
@@ -147,46 +161,67 @@ log "=== Collecting per-developer reports ==="
 DEVELOPERS="[]"
 DEVS_WITH_REPORTS=0
 DEVS_WITHOUT_REPORTS=0
+ACTIVE_COUNT=0
+IDLE_COUNT=0
+MISSED_COUNT=0
 
 for i in "${!AGENTS[@]}"; do
     agent="${AGENTS[$i]}"
     slack_id="${AGENT_SLACK_IDS[$i]}"
     report_file="$BASE_DIR/$agent/memory/reports/$TODAY.md"
+    state_file="$BASE_DIR/$agent/memory/report-state.json"
 
     has_report=false
-    has_meaningful_report=false
     report_content=""
+    report_status="cron_missed"
 
     if [[ -f "$report_file" ]] && [[ -s "$report_file" ]]; then
         has_report=true
         report_content=$(cat "$report_file")
-        # Check if report has meaningful content beyond "no activity" boilerplate
-        has_meaningful_report=true
-        stripped=$(echo "$report_content" | sed 's/#.*//;s/[[:space:]]//g' | tr '[:upper:]' '[:lower:]')
-        if [[ "$stripped" == *"noactivityrecordedtoday"* ]] && [[ ${#stripped} -lt 100 ]]; then
-            has_meaningful_report=false
-        fi
+        report_status="active"
         DEVS_WITH_REPORTS=$((DEVS_WITH_REPORTS + 1))
+        ACTIVE_COUNT=$((ACTIVE_COUNT + 1))
     else
         DEVS_WITHOUT_REPORTS=$((DEVS_WITHOUT_REPORTS + 1))
+        # Distinguish "cron fired, dev was idle" from "cron never fired"
+        # by checking report-state.last_run_epoch against today's date.
+        if [[ -f "$state_file" ]]; then
+            last_run_epoch=$(jq -r '.last_run_epoch // 0' "$state_file" 2>/dev/null || echo 0)
+            if [[ "$last_run_epoch" -gt 0 ]]; then
+                last_run_date=$(date -r "$last_run_epoch" '+%Y-%m-%d' 2>/dev/null || echo "")
+                if [[ "$last_run_date" == "$TODAY" ]]; then
+                    report_status="idle"
+                fi
+            fi
+        fi
+        if [[ "$report_status" == "idle" ]]; then
+            IDLE_COUNT=$((IDLE_COUNT + 1))
+        else
+            MISSED_COUNT=$((MISSED_COUNT + 1))
+        fi
     fi
 
+    # has_meaningful_report retained for backward compat with existing tech-manager
+    # cron payload. After the "skip writing empty reports" change lands, it is
+    # always equal to has_report (empty "No activity" files no longer exist).
     DEVELOPERS=$(printf '%s' "$DEVELOPERS" | jq \
         --arg agent "$agent" \
         --arg slack_id "$slack_id" \
         --argjson has_report "$has_report" \
-        --argjson has_meaningful_report "${has_meaningful_report:-false}" \
+        --argjson has_meaningful_report "$has_report" \
+        --arg report_status "$report_status" \
         --arg report "$report_content" \
         '. + [{
             agent: $agent,
             slack_id: $slack_id,
             has_report: $has_report,
             has_meaningful_report: $has_meaningful_report,
+            report_status: $report_status,
             report: $report
         }]')
 done
 
-log "Reports: $DEVS_WITH_REPORTS found, $DEVS_WITHOUT_REPORTS missing"
+log "Reports: $DEVS_WITH_REPORTS found, $DEVS_WITHOUT_REPORTS missing (active=$ACTIVE_COUNT, idle=$IDLE_COUNT, cron_missed=$MISSED_COUNT)"
 
 # ── Run check-status.sh ─────────────────────
 log "Running check-status.sh"
@@ -231,6 +266,9 @@ RESULT=$(jq -n \
     --argjson total_developers "${#AGENTS[@]}" \
     --argjson developers_with_reports "$DEVS_WITH_REPORTS" \
     --argjson developers_without_reports "$DEVS_WITHOUT_REPORTS" \
+    --argjson active_count "$ACTIVE_COUNT" \
+    --argjson idle_count "$IDLE_COUNT" \
+    --argjson cron_missed_count "$MISSED_COUNT" \
     --argjson developers "$DEVELOPERS" \
     --argjson status_summary "$STATUS_SUMMARY" \
     --argjson missed_alerts "$MISSED_ALERTS" \
@@ -244,6 +282,9 @@ RESULT=$(jq -n \
         total_developers: $total_developers,
         developers_with_reports: $developers_with_reports,
         developers_without_reports: $developers_without_reports,
+        active_count: $active_count,
+        idle_count: $idle_count,
+        cron_missed_count: $cron_missed_count,
         developers: $developers,
         status_summary: $status_summary,
         missed_alerts: $missed_alerts,

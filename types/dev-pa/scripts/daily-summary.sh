@@ -36,7 +36,25 @@ AGENT_NAME="$(basename "$AGENT_DIR")"
 MEMORY_DIR="$AGENT_DIR/memory"
 SUMMARY_STATE_FILE="$MEMORY_DIR/summary-state.json"
 TEMPLATE_FILE="$AGENT_DIR/DAILY-SUMMARY.template.md"
-TODAY_DATE=$(date -u +%Y-%m-%d)
+
+# Resolve today's date in the agent's local timezone (from work-schedule.json).
+# OpenClaw does not propagate the cron schedule's tz into the process env, so a
+# bare `date` would return host-local (CET) and `date -u` would return UTC —
+# both misalign the filename for devs whose 22:00 local doesn't land in the
+# host's calendar day. Explicit TZ= is the pattern used elsewhere (#310).
+AGENT_TZ=""
+for ws_file in "$AGENT_DIR/memory/work-schedule.json" "$AGENT_DIR/work-schedule.json"; do
+    if [[ -f "$ws_file" ]]; then
+        AGENT_TZ=$(jq -r '.timezone // ""' "$ws_file" 2>/dev/null || true)
+        [[ -n "$AGENT_TZ" ]] && break
+    fi
+done
+if [[ -n "$AGENT_TZ" ]]; then
+    TODAY_DATE=$(TZ="$AGENT_TZ" date '+%Y-%m-%d')
+else
+    TODAY_DATE=$(date '+%Y-%m-%d')
+fi
+
 OUTPUT_FILE="$MEMORY_DIR/$TODAY_DATE.md"
 
 # ── Ensure summary-state.json exists ──────────

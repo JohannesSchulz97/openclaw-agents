@@ -5,8 +5,15 @@ set -euo pipefail
 # Handles data gathering and state management; the model only synthesizes content.
 #
 # Usage:
-#   work-report.sh prepare   → JSON with date, output path, slack ID, GitHub activity
-#   work-report.sh finalize  → validates output file, updates report-state.json
+#   work-report.sh prepare [--date YYYY-MM-DD] [--no-dm]
+#                          → JSON with date, output path, slack ID, GitHub activity,
+#                            and no_activity flag. Bumps report-state.last_run_epoch.
+#   work-report.sh finalize [--date YYYY-MM-DD]
+#                          → validates output file, bumps report-state.last_report_epoch.
+#
+# --date defaults to "today" in the agent's timezone (read from work-schedule.json).
+# Falls back to host-local if the schedule file is missing. Use --date to pin a
+# specific report day when a cron run has been delayed or is being re-run manually.
 #
 # Output: JSON via json-response.sh
 
@@ -25,16 +32,25 @@ PHASE="${1:-}"
 case "$PHASE" in
     prepare|finalize) ;;
     *)
-        json_error "work-report" "INVALID_PHASE" "Usage: work-report.sh <prepare|finalize> [--no-dm]"
+        json_error "work-report" "INVALID_PHASE" "Usage: work-report.sh <prepare|finalize> [--date YYYY-MM-DD] [--no-dm]"
         exit 1
         ;;
 esac
 shift
 
 DM=true
+TODAY_DATE=""
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --no-dm) DM=false; shift ;;
+        --date)
+            TODAY_DATE="${2:-}"
+            if ! [[ "$TODAY_DATE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+                json_error "work-report" "BAD_DATE" "--date requires a YYYY-MM-DD value, got: ${TODAY_DATE:-<missing>}"
+                exit 1
+            fi
+            shift 2
+            ;;
         *) shift ;;
     esac
 done
@@ -47,7 +63,27 @@ REPORTS_DIR="$MEMORY_DIR/reports"
 REPORT_STATE_FILE="$MEMORY_DIR/report-state.json"
 USER_FILE="$AGENT_DIR/USER.md"
 IDENTITY_FILE="$AGENT_DIR/IDENTITY.md"
-TODAY_DATE=$(date -u +%Y-%m-%d)
+
+# Resolve the default report date in the agent's local timezone (from
+# work-schedule.json). OpenClaw does not propagate the cron schedule's tz
+# into the process env, so a bare `date` would return host-local (CET) and
+# misalign the filename for devs whose 19:00 local doesn't land in the
+# host's calendar day. Explicit TZ= is the same pattern check-status.sh uses.
+if [[ -z "$TODAY_DATE" ]]; then
+    AGENT_TZ=""
+    for ws_file in "$AGENT_DIR/memory/work-schedule.json" "$AGENT_DIR/work-schedule.json"; do
+        if [[ -f "$ws_file" ]]; then
+            AGENT_TZ=$(jq -r '.timezone // ""' "$ws_file" 2>/dev/null || true)
+            [[ -n "$AGENT_TZ" ]] && break
+        fi
+    done
+    if [[ -n "$AGENT_TZ" ]]; then
+        TODAY_DATE=$(TZ="$AGENT_TZ" date '+%Y-%m-%d')
+    else
+        TODAY_DATE=$(date '+%Y-%m-%d')
+    fi
+fi
+
 OUTPUT_FILE="$REPORTS_DIR/$TODAY_DATE.md"
 
 # ── Ensure directories and state file exist ──
@@ -100,13 +136,37 @@ if [[ "$PHASE" == "prepare" ]]; then
     # ── Fetch DM conversation digest ───────────
     <channel-id>N_DIGEST=$(get_dm_digest "$AGENT_NAME")
 
-    log "Agent: $AGENT_NAME, date: $TODAY_DATE, last_report_epoch: $LAST_REPORT_EPOCH, file_exists: $FILE_EXISTS"
+    # ── Detect "no activity" ─────────────────────
+    # Only set when we have definitive zero counts from both sources.
+    # Ambiguous/missing counts (e.g. GitHub API failure) fail open: treat as
+    # "has activity" so the report is still written rather than suppressed.
+    NO_ACTIVITY=$(jq -n \
+        --argjson ga "$GITHUB_ACTIVITY" \
+        --argjson cd "$<channel-id>N_DIGEST" \
+        '
+        ($ga.data.summary.total_events) as $events |
+        ($cd.message_count) as $msgs |
+        (($events | type) == "number" and $events == 0
+         and ($msgs | type) == "number" and $msgs == 0)
+        ')
+
+    # ── Bump last_run_epoch on every prepare run ────────────
+    # Proof the cron fired, independent of whether a report ends up written.
+    NOW_EPOCH=$(date -u +%s)
+    tmp_state=$(mktemp)
+    trap "rm -f '$tmp_state'" EXIT
+    jq --argjson epoch "$NOW_EPOCH" \
+       '. + {last_run_epoch: $epoch}' \
+       "$REPORT_STATE_FILE" > "$tmp_state" 2>/dev/null && mv "$tmp_state" "$REPORT_STATE_FILE"
+
+    log "Agent: $AGENT_NAME, date: $TODAY_DATE, last_report_epoch: $LAST_REPORT_EPOCH, file_exists: $FILE_EXISTS, no_activity: $NO_ACTIVITY"
 
     json_success "work-report:prepare" "$(jq -n \
         --arg date "$TODAY_DATE" \
         --arg output_file "$OUTPUT_FILE" \
         --argjson last_report_epoch "$LAST_REPORT_EPOCH" \
         --argjson file_exists "$FILE_EXISTS" \
+        --argjson no_activity "$NO_ACTIVITY" \
         --arg agent "$AGENT_NAME" \
         --arg slack_user_id "$SLACK_USER_ID" \
         --argjson dm "$DM" \
@@ -117,6 +177,7 @@ if [[ "$PHASE" == "prepare" ]]; then
             output_file: $output_file,
             last_report_epoch: $last_report_epoch,
             file_exists: $file_exists,
+            no_activity: $no_activity,
             agent_name: $agent,
             slack_user_id: $slack_user_id,
             dm: $dm,
@@ -156,16 +217,17 @@ if [[ "$PHASE" == "finalize" ]]; then
     fi
 
     # ── Update report-state.json ─────────────
+    # Merge over existing state so last_run_epoch (set by prepare) is preserved.
     tmp_state=$(mktemp)
     trap "rm -f '$tmp_state'" EXIT
 
-    jq -n \
+    jq \
         --argjson epoch "$NOW_EPOCH" \
         --arg date "$TODAY_DATE" \
-        '{
+        '. + {
             last_report_epoch: $epoch,
             last_report_date: $date
-        }' > "$tmp_state" 2>/dev/null && mv "$tmp_state" "$REPORT_STATE_FILE"
+        }' "$REPORT_STATE_FILE" > "$tmp_state" 2>/dev/null && mv "$tmp_state" "$REPORT_STATE_FILE"
 
     log "Agent: $AGENT_NAME, date: $TODAY_DATE, report finalized, epoch: $NOW_EPOCH"
 
