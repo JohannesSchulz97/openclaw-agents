@@ -2,10 +2,15 @@
 # session-watchdog.sh — Runs every 5 min, detects retry loops, auto-remediates
 # Intended to run as a system cron or launchd job (no LLM needed)
 #
-# Actions on retry_loop detection:
-#   1. Rename session .jsonl -> .jsonl.loop-detected-<epoch> (breaks the loop)
-#   2. Send Slack alert via openclaw message send
-#   3. Log to ~/.openclaw/logs/session-watchdog.log
+# Actions on retry_loop detection (non-destructive migration, #313):
+#   1. Rename active session .jsonl -> .loop-detected-<epoch>.jsonl (backup)
+#   2. Copy backup to <new-uuid>.jsonl with the looping user/assistant turns
+#      stripped out, preserving all other conversation history
+#   3. Update sessions.json so every key that pointed at the old session_id
+#      now points at the new UUID (OpenClaw re-reads sessions.json per
+#      interaction, so no gateway restart is needed)
+#   4. Send Slack alert via openclaw message send with migration summary
+#   5. Log to ~/.openclaw/logs/session-watchdog.log
 #
 # Usage: bash scripts/session-watchdog.sh
 # Exit 0 always (watchdog must never crash the scheduler)
@@ -27,6 +32,122 @@ mkdir -p "$LOG_DIR"
 
 log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG_FILE"
+}
+
+# Migrate a looping session into a new UUID, stripping the looping turns.
+#
+# Steps:
+#   1. Rename active .jsonl -> .loop-detected-<epoch>.jsonl (backup)
+#   2. Read backup, drop any user message whose first 200 chars match the
+#      loop fingerprint, and drop the immediately-following assistant message
+#      (and any tool_use/tool_result lines in between, if present)
+#   3. Write remaining lines to <new-uuid>.jsonl in the same sessions dir
+#   4. Update sessions.json: every key whose sessionId is the old UUID now
+#      points at the new UUID (other metadata preserved). OpenClaw re-reads
+#      sessions.json on the next interaction, so no gateway restart needed
+#
+# On success, echoes: new_uuid<TAB>kept_lines<TAB>stripped_turns
+# On failure, echoes nothing and returns non-zero (caller logs & skips).
+migrate_loop_session() {
+  local agent="$1"
+  local session_id="$2"
+  local fingerprint="$3"
+  local epoch="$4"
+
+  local sessions_dir="$OPENCLAW_DIR/agents/$agent/sessions"
+  local sessions_json="$sessions_dir/sessions.json"
+  local active_file="$sessions_dir/${session_id}.jsonl"
+  local backup_file="$sessions_dir/${session_id}.loop-detected-${epoch}.jsonl"
+
+  [[ -f "$active_file" ]] || return 1
+
+  # Atomic rename — gateway mid-write is safe on same filesystem
+  mv "$active_file" "$backup_file" || return 1
+
+  # Filter + write new-uuid.jsonl + update sessions.json in one python invocation
+  python3 - "$sessions_dir" "$backup_file" "$sessions_json" "$session_id" "$fingerprint" <<'PY'
+import json, os, sys, uuid, tempfile
+
+sessions_dir, backup_file, sessions_json, old_sid, fingerprint = sys.argv[1:6]
+new_sid = str(uuid.uuid4())
+new_file = os.path.join(sessions_dir, f"{new_sid}.jsonl")
+
+kept, stripped_turns = 0, 0
+skip_until_assistant = False
+
+with open(backup_file, 'r') as src, open(new_file, 'w') as dst:
+    for line in src:
+        raw = line.rstrip('\n')
+        if not raw.strip():
+            dst.write(line)
+            continue
+        try:
+            obj = json.loads(raw)
+        except json.JSONDecodeError:
+            # Preserve non-JSON lines as-is; don't lose data we can't parse
+            dst.write(line)
+            kept += 1
+            continue
+
+        msg = obj.get('message') if isinstance(obj.get('message'), dict) else {}
+        role = msg.get('role', '') if msg else ''
+
+        if skip_until_assistant:
+            # Swallow tool_use / tool_result / anything until we see the
+            # assistant "message" line that closes the turn
+            if obj.get('type') == 'message' and role == 'assistant':
+                skip_until_assistant = False
+                stripped_turns += 1
+            continue
+
+        # Check if this is a user "message" line that matches the loop
+        # fingerprint. Normalization must match check-session-health.sh.
+        is_loop_user = False
+        if obj.get('type') == 'message' and role == 'user':
+            contents = msg.get('content', [])
+            if isinstance(contents, list):
+                for c in contents:
+                    if isinstance(c, dict) and c.get('type') == 'text':
+                        text = (c.get('text', '') or '').strip()
+                        text_fp = ' '.join(text.split())[:200]
+                        if text_fp == fingerprint:
+                            is_loop_user = True
+                            break
+
+        if is_loop_user:
+            skip_until_assistant = True
+            continue
+
+        dst.write(line)
+        kept += 1
+
+# Update sessions.json: repoint any key with sessionId == old_sid to new_sid
+updated_keys = 0
+if os.path.isfile(sessions_json):
+    try:
+        with open(sessions_json, 'r') as f:
+            data = json.load(f)
+    except Exception:
+        data = None
+    if isinstance(data, dict):
+        for key, meta in data.items():
+            if isinstance(meta, dict) and meta.get('sessionId') == old_sid:
+                meta['sessionId'] = new_sid
+                updated_keys += 1
+        if updated_keys > 0:
+            # Atomic write via tempfile + rename on same filesystem
+            fd, tmp = tempfile.mkstemp(dir=os.path.dirname(sessions_json), prefix='.sessions-', suffix='.json')
+            try:
+                with os.fdopen(fd, 'w') as f:
+                    json.dump(data, f, indent=2)
+                os.replace(tmp, sessions_json)
+            except Exception:
+                try: os.unlink(tmp)
+                except Exception: pass
+                raise
+
+print(f"{new_sid}\t{kept}\t{stripped_turns}\t{updated_keys}")
+PY
 }
 
 # Reads last 50 lines of a session file and identifies the likely root cause
@@ -95,11 +216,14 @@ except Exception:
 alerts = data.get('alerts', [])
 for a in alerts:
     if a.get('type') == 'retry_loop':
+        # Preview is the full fingerprint (up to 200 chars, whitespace
+        # normalized by check-session-health.sh). Carry it through for the
+        # migration step; truncate only for Slack display downstream.
         print('\t'.join([
             a.get('agent', ''),
             a.get('session_id', ''),
             str(a.get('duplicate_count', 0)),
-            a.get('message_preview', '')[:80],
+            a.get('message_preview', '')[:200],
             str(a.get('size_kb', 0)),
             str(a.get('lines', 0))
         ]))
@@ -117,36 +241,46 @@ while IFS=$'\t' read -r agent session_id dup_count preview size_kb lines; do
   session_file="$OPENCLAW_DIR/agents/$agent/sessions/${session_id}.jsonl"
   timestamp=$(date +%s)
 
-  # 1. Detect root cause before renaming (reads last 50 lines only)
+  # 1. Detect root cause before any action (reads last 50 lines only)
   loop_cause=""
   if [[ -f "$session_file" ]]; then
     loop_cause=$(detect_loop_cause "$session_file" | sed 's/^CAUSE: //')
   fi
 
-  # 2. Rename session file to break the loop
-  if [[ -f "$session_file" ]]; then
-    renamed="${session_file}.loop-detected-${timestamp}"
-    mv "$session_file" "$renamed"
-    log "REMEDIATED: agent=$agent session=$session_id renamed to $(basename "$renamed")"
-  else
+  if [[ ! -f "$session_file" ]]; then
     log "WARN: session file not found for agent=$agent session=$session_id (may already be resolved)"
     continue
   fi
 
+  # 2. Migrate the session: rename active to backup, write a new-uuid file
+  # with the looping turns stripped, and repoint sessions.json. The preview
+  # is the fingerprint (first 200 chars of the duplicate user message).
+  migration_result=$(migrate_loop_session "$agent" "$session_id" "$preview" "$timestamp" 2>>"$LOG_FILE") || migration_result=""
+  if [[ -z "$migration_result" ]]; then
+    log "ERROR: migration failed for agent=$agent session=$session_id — backup may or may not have been created"
+    action_summary="Migration failed. Session may be in partial state — investigate ~/.openclaw/agents/$agent/sessions/."
+    new_uuid=""
+    kept_lines=0
+    stripped_turns=0
+    updated_keys=0
+  else
+    IFS=$'\t' read -r new_uuid kept_lines stripped_turns updated_keys <<< "$migration_result"
+    action_summary="Migrated to new session ${new_uuid} (${kept_lines} lines preserved, ${stripped_turns} looping turns stripped, ${updated_keys} sessions.json keys repointed). Backup at ${session_id}.loop-detected-${timestamp}.jsonl."
+    log "MIGRATED: agent=$agent old=$session_id new=$new_uuid kept=$kept_lines stripped=$stripped_turns keys=$updated_keys"
+  fi
+
   # 3. Send Slack alert
   preview_truncated="${preview:0:100}"
-  alert_msg="⚠️ Retry loop detected and auto-remediated
+  alert_msg="⚠️ Retry loop detected and migrated
 
 Agent: ${agent}
 Session: ${session_id}
 Duplicates: ${dup_count} repeated messages (${size_kb}KB, ${lines} lines)
 Preview: \"${preview_truncated}\"
 
-Action taken: Session file renamed to break the loop. The agent will start a fresh session on next interaction.
+Action taken: ${action_summary}
 
 Root cause: ${loop_cause:-Unknown}
-
-No immediate action needed — the loop is stopped. If the agent was mid-conversation, the developer may need to re-send their last message.
 
 cc <@<slack-id>>"
   openclaw message send \

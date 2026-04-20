@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # check-session-health.sh — Detect retry loops and oversized sessions
 # Called by tech-manager hourly monitoring
-# Primary detection: duplicate inbound messages in last 100 lines (retry loops)
+# Primary detection: duplicate inbound user messages arriving within a short
+# time window (real retry loops fire many messages in seconds/minutes;
+# scheduled traffic like heartbeats is spaced far enough apart to not trip it)
 # Secondary detection: file size > 2MB (catches edge cases)
 # Outputs JSON with categorized alerts
 
@@ -9,7 +11,8 @@ set -euo pipefail
 
 SIZE_THRESHOLD_KB="${1:-25600}"
 DUPLICATE_THRESHOLD="${2:-10}"
-TAIL_LINES=100
+WINDOW_SECONDS="${3:-300}"
+TAIL_LINES=500
 OPENCLAW_DIR="$HOME/.openclaw/agents"
 
 # Require python3 for JSON parsing
@@ -22,11 +25,24 @@ fi
 python3 -c "
 import json, os, subprocess, sys
 from collections import Counter
+from datetime import datetime, timedelta, timezone
 
 agents_dir = '$OPENCLAW_DIR'
 size_threshold_kb = $SIZE_THRESHOLD_KB
 dup_threshold = $DUPLICATE_THRESHOLD
 tail_lines = $TAIL_LINES
+window_seconds = $WINDOW_SECONDS
+
+window_start = datetime.now(timezone.utc) - timedelta(seconds=window_seconds)
+
+def parse_ts(ts):
+    if not ts or not isinstance(ts, str):
+        return None
+    try:
+        # Python 3.11+ accepts 'Z'; older versions do not
+        return datetime.fromisoformat(ts.replace('Z', '+00:00'))
+    except (ValueError, TypeError):
+        return None
 
 alerts = []
 sessions_checked = 0
@@ -65,7 +81,11 @@ for agent_name in sorted(os.listdir(agents_dir)):
         except Exception:
             tail_text = ''
 
-        # Extract user message texts from the tail
+        # Extract user messages from the tail, keeping only those whose
+        # timestamp falls inside the detection window. Messages with no
+        # parseable timestamp are skipped (can't prove they're recent).
+        # Fingerprint: whitespace-normalized, first 200 chars. Must match the
+        # same normalization in session-watchdog.sh migrate_loop_session.
         user_messages = []
         for line in tail_text.splitlines():
             if not line.strip():
@@ -79,28 +99,36 @@ for agent_name in sorted(os.listdir(agents_dir)):
                 continue
             if msg.get('role') != 'user':
                 continue
+            ts = parse_ts(obj.get('timestamp'))
+            if ts is None or ts < window_start:
+                continue
             contents = msg.get('content', [])
             if isinstance(contents, list):
                 for c in contents:
                     if isinstance(c, dict) and c.get('type') == 'text':
                         text = c.get('text', '').strip()
                         if text:
-                            # Normalize: use first 200 chars as fingerprint
-                            user_messages.append(text[:200])
+                            fp = ' '.join(text.split())[:200]
+                            user_messages.append(fp)
 
         # Count line total from tail (approximate; exact only if needed)
         line_count = tail_text.count('\n')
 
-        # Check for retry loops: any message appearing > threshold times
+        # Retry loop: any fingerprint appearing dup_threshold+ times within
+        # the time window. A real loop fires many messages in seconds/minutes;
+        # scheduled traffic (heartbeat, cron) is spaced far enough to not hit
+        # the threshold within the window.
         is_loop = False
         max_dup_count = 0
         dup_preview = ''
         if user_messages:
             counts = Counter(user_messages)
             most_common_msg, max_dup_count = counts.most_common(1)[0]
-            if max_dup_count > dup_threshold:
+            if max_dup_count >= dup_threshold:
                 is_loop = True
-                dup_preview = most_common_msg[:80]
+                # Full 200-char fingerprint — consumers (watchdog migration,
+                # tech-manager alerts) can truncate for display.
+                dup_preview = most_common_msg
 
         # Check for oversized file
         is_large = size_kb >= size_threshold_kb
