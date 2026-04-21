@@ -3,6 +3,14 @@
 # Run on the OpenClaw host. Default: check-only (show version status).
 #
 # Usage: scripts/update-openclaw.sh [--apply] [--check-only] [--component NAME] [--skip-restart] [--help]
+
+# Launchd (com.openclaw-agents.update-check.plist) runs this with a minimal PATH
+# (/usr/bin:/bin:/usr/sbin:/sbin). openclaw and npm are installed via Homebrew
+# at /opt/homebrew/bin, so ensure they're on PATH before any invocation.
+# Interactive shell runs already have /opt/homebrew/bin on PATH; this line is
+# idempotent there. See issue #318.
+export PATH="/opt/homebrew/bin:$PATH"
+
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"

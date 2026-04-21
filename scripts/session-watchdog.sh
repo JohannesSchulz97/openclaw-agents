@@ -17,6 +17,11 @@
 #
 # Install: cp scripts/com.openclaw-agents.session-watchdog.plist ~/Library/LaunchAgents/ && launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.openclaw-agents.session-watchdog.plist
 
+# Launchd runs this with a minimal PATH (/usr/bin:/bin:/usr/sbin:/sbin).
+# openclaw is installed via Homebrew at /opt/homebrew/bin, so ensure it's on
+# PATH before any `openclaw ...` invocation (see issue #318).
+export PATH="/opt/homebrew/bin:$PATH"
+
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -287,7 +292,7 @@ cc <@<slack-id>>"
     --channel slack \
     --target "channel:${ALERT_CHANNEL}" \
     -m "$alert_msg" \
-    2>/dev/null || log "WARN: Failed to send Slack alert for agent=$agent"
+    2>>"$LOG_FILE" || log "WARN: Failed to send Slack alert for agent=$agent (stderr captured above)"
 
   # 4. Log details
   log "ALERT: agent=$agent session=$session_id dups=$dup_count size=${size_kb}KB lines=$lines cause='${loop_cause:-Unknown}' preview='${preview}'"
@@ -319,7 +324,7 @@ cc <@<slack-id>>"
       --channel slack \
       --target "channel:${ALERT_CHANNEL}" \
       -m "$recovery_msg" \
-      2>/dev/null || log "WARN: Failed to send runner recovery Slack alert"
+      2>>"$LOG_FILE" || log "WARN: Failed to send runner recovery Slack alert (stderr captured above)"
     rm -f "$RUNNER_MARKER"
     log "RUNNER: recovered — alert cleared"
   fi
@@ -334,7 +339,7 @@ cc <@<slack-id>>"
       --channel slack \
       --target "channel:${ALERT_CHANNEL}" \
       -m "$down_msg" \
-      2>/dev/null || log "WARN: Failed to send runner-down Slack alert"
+      2>>"$LOG_FILE" || log "WARN: Failed to send runner-down Slack alert (stderr captured above)"
     touch "$RUNNER_MARKER"
     log "RUNNER: alert sent — next alert suppressed for ${RUNNER_COOLDOWN_SECS}s"
   else

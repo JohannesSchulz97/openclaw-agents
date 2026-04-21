@@ -295,6 +295,20 @@ Don't mix `${repo_root}/.openclaw/` with `$HOME/.openclaw/`. Don't traverse `../
 
 **Rationale:** Repo vs live path bug, two-levels-up bug, double-slash paths. Fixed in `5386631`, `e9d24ef`, `d4c342b`.
 
+### 4.6 Launchd-Invoked Scripts Must Export PATH [DOCUMENTED]
+
+Any shell script invoked by a launchd job (anything in `~/Library/LaunchAgents/*.plist` that runs a openclaw-agents script) must export PATH explicitly near the top, before any external command is called:
+
+```bash
+export PATH="/opt/homebrew/bin:$PATH"
+```
+
+Launchd runs scripts with a minimal default `PATH=/usr/bin:/bin:/usr/sbin:/sbin`. Homebrew-installed tools — `openclaw`, `npm`, `node`, etc. — live under `/opt/homebrew/bin` and are **not** on that PATH. Bare invocations exit 127 (`command not found`) and, if the call's stderr is piped to `/dev/null`, the failure is silent.
+
+**Scope:** Any script referenced from a `.plist` under `~/Library/LaunchAgents/`. Currently: `session-watchdog.sh`, `update-openclaw.sh`. Add to the list here when introducing new launchd-invoked scripts.
+
+**Rationale:** `session-watchdog.sh` had this bug from 2026-04-02 to 2026-04-21. 91 of 94 Slack alerts silently failed (`openclaw: command not found`, `2>/dev/null` hid the real error). Fixed in issue #318 / PR #319.
+
 ---
 
 ## Area 5: Slack / Messaging
