@@ -9,6 +9,10 @@ set -euo pipefail
 #   bootstrap-check.sh update --field <key> --value <v> → updates a field, returns new state
 #   bootstrap-check.sh identity-asked                   → increments agent_identity ask_count
 #   bootstrap-check.sh identity-declined                → marks identity as completed (skipped)
+#   bootstrap-check.sh set-schedule                     → validates args, writes work-schedule.json,
+#       --timezone <IANA>  --start <HH:MM>              → updates bootstrap-state.json fields
+#       --end <HH:MM>  --hours-per-day <N>
+#       [--weekends <true|false>]
 #
 # Output: JSON via json-response.sh
 
@@ -24,9 +28,9 @@ fi
 # ── Args ──────────────────────────────────────
 PHASE="${1:-}"
 case "$PHASE" in
-    prepare|update|identity-asked|identity-declined) ;;
+    prepare|update|identity-asked|identity-declined|set-schedule) ;;
     *)
-        json_error "bootstrap-check" "INVALID_PHASE" "Usage: bootstrap-check.sh <prepare|update|identity-asked|identity-declined>"
+        json_error "bootstrap-check" "INVALID_PHASE" "Usage: bootstrap-check.sh <prepare|update|identity-asked|identity-declined|set-schedule>"
         exit 1
         ;;
 esac
@@ -261,6 +265,126 @@ if [[ "$PHASE" == "identity-asked" ]]; then
         --argjson bootstrap_complete "$(jq -r '.bootstrap_complete' "$STATE_FILE")" \
         --arg agent "$AGENT_NAME" \
         '{ask_count: $ask_count, bootstrap_complete: $bootstrap_complete, agent_name: $agent}')"
+    exit 0
+fi
+
+# ══════════════════════════════════════════════
+# SET-SCHEDULE phase
+# ══════════════════════════════════════════════
+if [[ "$PHASE" == "set-schedule" ]]; then
+
+    SS_TZ=""
+    SS_START=""
+    SS_END=""
+    SS_HOURS=""
+    SS_WEEKENDS="false"
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --timezone)     SS_TZ="$2";      shift 2 ;;
+            --start)        SS_START="$2";   shift 2 ;;
+            --end)          SS_END="$2";     shift 2 ;;
+            --hours-per-day) SS_HOURS="$2"; shift 2 ;;
+            --weekends)     SS_WEEKENDS="$2"; shift 2 ;;
+            *) shift ;;
+        esac
+    done
+
+    # ── Validate required args ─────────────────
+    if [[ -z "$SS_TZ" || -z "$SS_START" || -z "$SS_END" || -z "$SS_HOURS" ]]; then
+        json_error "bootstrap-check" "MISSING_ARGS" \
+            "Usage: bootstrap-check.sh set-schedule --timezone <IANA> --start <HH:MM> --end <HH:MM> --hours-per-day <N> [--weekends <true|false>]"
+        exit 1
+    fi
+
+    # ── Validate timezone (IANA) ───────────────
+    # Check zoneinfo database — macOS date silently ignores invalid TZ
+    if [[ ! -f "/usr/share/zoneinfo/$SS_TZ" ]]; then
+        json_error "bootstrap-check" "INVALID_TIMEZONE" \
+            "Not a valid IANA timezone: $SS_TZ. Use identifiers like Europe/Berlin, Asia/Kolkata."
+        exit 1
+    fi
+
+    # ── Validate HH:MM format ──────────────────
+    hhmm_re='^([01][0-9]|2[0-3]):[0-5][0-9]$'
+    if ! [[ "$SS_START" =~ $hhmm_re ]]; then
+        json_error "bootstrap-check" "INVALID_TIME" "start must be HH:MM (24h), got: $SS_START"
+        exit 1
+    fi
+    if ! [[ "$SS_END" =~ $hhmm_re ]]; then
+        json_error "bootstrap-check" "INVALID_TIME" "end must be HH:MM (24h), got: $SS_END"
+        exit 1
+    fi
+
+    # ── Validate start < end (no overnight) ───
+    start_mins=$(( 10#${SS_START%%:*} * 60 + 10#${SS_START##*:} ))
+    end_mins=$(( 10#${SS_END%%:*} * 60 + 10#${SS_END##*:} ))
+    if (( start_mins >= end_mins )); then
+        json_error "bootstrap-check" "INVALID_RANGE" \
+            "start ($SS_START) must be before end ($SS_END). Overnight schedules are not supported."
+        exit 1
+    fi
+
+    # ── Validate hours-per-day (positive number) ──
+    if ! [[ "$SS_HOURS" =~ ^[0-9]+([.][0-9]+)?$ ]] || \
+       [[ "$(jq -rn --arg h "$SS_HOURS" '$h | tonumber <= 0')" == "true" ]]; then
+        json_error "bootstrap-check" "INVALID_HOURS" "hours-per-day must be a positive number, got: $SS_HOURS"
+        exit 1
+    fi
+
+    # ── Validate weekends ─────────────────────
+    if [[ "$SS_WEEKENDS" != "true" && "$SS_WEEKENDS" != "false" ]]; then
+        json_error "bootstrap-check" "INVALID_WEEKENDS" "weekends must be true or false, got: $SS_WEEKENDS"
+        exit 1
+    fi
+
+    # ── Write work-schedule.json ───────────────
+    tmp=$(mktemp)
+    trap "rm -f '$tmp'" EXIT
+    jq -n \
+        --arg tz "$SS_TZ" \
+        --arg start "$SS_START" \
+        --arg end "$SS_END" \
+        --argjson hours "$(echo "$SS_HOURS" | jq -R 'tonumber')" \
+        --argjson weekends "$(echo "$SS_WEEKENDS" | jq -R 'if . == "true" then true else false end')" \
+        '{
+            timezone: $tz,
+            working_hours: { start: $start, end: $end },
+            hours_per_day: $hours,
+            works_weekends: $weekends
+        }' > "$tmp" && mv "$tmp" "$WORK_SCHEDULE_FILE"
+
+    log "Wrote work-schedule.json for $AGENT_NAME: tz=$SS_TZ start=$SS_START end=$SS_END hours=$SS_HOURS weekends=$SS_WEEKENDS"
+
+    # ── Update bootstrap-state.json ───────────
+    tmp=$(mktemp)
+    trap "rm -f '$tmp'" EXIT
+    WS_JSON=$(jq -c '.' "$WORK_SCHEDULE_FILE")
+    jq \
+        --argjson ws "$WS_JSON" \
+        --arg tz "$SS_TZ" \
+        '.fields.work_schedule.completed = true | .fields.work_schedule.value = $ws |
+         .fields.developer_timezone.completed = true | .fields.developer_timezone.value = $tz' \
+        "$STATE_FILE" > "$tmp" && mv "$tmp" "$STATE_FILE"
+
+    check_completeness
+
+    json_success "bootstrap-check:set-schedule" "$(jq -n \
+        --arg tz "$SS_TZ" \
+        --arg start "$SS_START" \
+        --arg end "$SS_END" \
+        --argjson hours "$(echo "$SS_HOURS" | jq -R 'tonumber')" \
+        --argjson weekends "$(echo "$SS_WEEKENDS" | jq -R 'if . == "true" then true else false end')" \
+        --argjson bootstrap_complete "$(jq -r '.bootstrap_complete' "$STATE_FILE")" \
+        --arg agent "$AGENT_NAME" \
+        '{
+            timezone: $tz,
+            working_hours: { start: $start, end: $end },
+            hours_per_day: $hours,
+            works_weekends: $weekends,
+            bootstrap_complete: $bootstrap_complete,
+            agent_name: $agent
+        }')"
     exit 0
 fi
 

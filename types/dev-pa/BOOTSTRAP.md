@@ -55,25 +55,24 @@ Ask about their work schedule so you check in at the right times:
 - "How many hours per day does your work contract cover?" (e.g., 8, 6, 4)
 - "Do you work on weekends?"
 
-Save the answers to `work-schedule.json` in your workspace root:
+Use IANA timezone identifiers (e.g., `Europe/Berlin`, not `CET`). If they're unsure, help them find theirs from their city.
 
-```json
-{
-  "timezone": "Europe/Berlin",
-  "working_hours": {
-    "start": "09:00",
-    "end": "18:00"
-  },
-  "hours_per_day": 8,
-  "works_weekends": false
-}
+Once you have the answers, call the script — do NOT write `work-schedule.json` yourself:
+
+```bash
+scripts/bootstrap-check.sh set-schedule \
+  --timezone "Europe/Berlin" \
+  --start "09:00" \
+  --end "18:00" \
+  --hours-per-day 8 \
+  --weekends false
 ```
 
-Use IANA timezone identifiers (e.g., `Europe/Berlin`, not `CET`). If they're unsure, help them find theirs from their city.
+The script validates the timezone and time format, writes `work-schedule.json`, and updates bootstrap state in one step.
 
 Also update the **Timezone** field in `USER.md` with the same IANA timezone value so it's available for general context (not just scheduling).
 
-Once you've saved `work-schedule.json`, your 3 daily check-ins (morning planning, midday progress, evening recap) will be activated automatically within the next hour.
+Once you've run `set-schedule`, your 3 daily check-ins (morning planning, midday progress, evening recap) will be activated automatically within the next hour.
 
 If they don't want to set working hours, that's fine -- skip this step. Check-ins won't start until a schedule is configured.
 
