@@ -96,6 +96,49 @@ For team-wide reports, use scripts from your own scripts directory:
 - `scripts/check-session-health.sh` — session health
 - `scripts/check-session-sizes.sh` — session sizes
 - `scripts/collect-github-activity.sh [--since <hours>]` — collects GitHub activity for all dev-pa agents (reads usernames from each agent's USER.md, flags agents with missing usernames)
+- `scripts/create-issue.sh` — create GitHub issues with duplicate detection
+- `scripts/comment-on-issue.sh` — add comments to existing GitHub issues
+
+### `scripts/create-issue.sh`
+Create GitHub issues in <your-org> org repositories. **Includes duplicate detection** — before creating, the script searches open issues for similar titles. If potential duplicates are found, it returns them instead of creating the issue.
+
+**Quality bar — only create an issue if all three hold:**
+1. **Concrete symptom or action** — a specific observed problem or clearly scoped change. Not "investigate X", "research Y", or "consolidate Z".
+2. **Clear close condition** — you can tell when it's done. There is a specific fix, behavior change, or deliverable.
+3. **Actionable now** — there is something to actually do today or soon. Not "wait for upstream to ship", "maybe when we expand", or "investigate whether this could happen".
+
+When in doubt, **propose the issue to the relevant developer first** rather than creating it.
+
+```bash
+bash scripts/create-issue.sh --repo openclaw-agents --title "Bug: cron job not firing" --author <manager-agent>
+# If duplicates were found and you've confirmed the issue is genuinely new:
+bash scripts/create-issue.sh --repo openclaw-agents --title "Bug: cron job not firing" --author <manager-agent> --force
+```
+
+Options:
+- `--repo REPO` (required) — repository name without org prefix (e.g. `openclaw-agents`)
+- `--title TITLE` (required) — issue title
+- `--body BODY` (optional) — issue description
+- `--label LABEL` (optional, repeatable) — label to add
+- `--author USER` (recommended) — GitHub username to attribute the issue to. Prepends a "Requested by @user" header.
+- `--force` (optional) — skip duplicate check and create the issue
+
+Output: JSON with `success`, `data.url`, `data.number`, `data.repo`, `data.title`. Only works for `<your-org>` org repos.
+
+### `scripts/comment-on-issue.sh`
+Add a comment to an existing GitHub issue in <your-org> org repositories.
+
+```bash
+bash scripts/comment-on-issue.sh --repo openclaw-agents --issue 214 --body "Investigation findings: ..." --author <manager-agent>
+```
+
+Options:
+- `--repo REPO` (required) — repository name without org prefix
+- `--issue NUMBER` (required) — issue number to comment on
+- `--body BODY` (required) — comment text
+- `--author USER` (recommended) — GitHub username on whose behalf the comment is made. Prepends an "On behalf of @user" header.
+
+Output: JSON with `success`, `data.url`, `data.issue`, `data.repo`. Only works for `<your-org>` org repos.
 
 ## Channel Presence
 
@@ -246,12 +289,13 @@ Capture what matters: patterns you have noticed, recurring issues, team dynamics
 **Allowed (read + create):**
 - `gh search commits/issues/prs` — query activity
 - `gh api` — read-only API queries
-- `gh issue create` — file new issues
-- `gh issue comment` — add comments to issues
+- `scripts/create-issue.sh` — file new issues (use wrapper, not `gh issue create` directly)
+- `scripts/comment-on-issue.sh` — add comments to issues (use wrapper, not `gh issue comment` directly)
 - `gh pr list`, `gh pr view`, `gh pr checks` — read PR state
 - Running scripts that internally use `gh` (e.g., `github-activity.sh`)
 
 **Prohibited (state changes + destructive):**
+- `gh issue create`, `gh issue comment` — use wrapper scripts instead
 - `gh issue close`, `gh issue edit` — modifying issue state
 - `gh pr close`, `gh pr merge`, `gh pr review --approve`
 - `git commit`, `git push`, `git checkout` — all git write operations

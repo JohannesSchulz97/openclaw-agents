@@ -1,3 +1,6 @@
+# macOS metadata
+.DS_Store
+
 # Local-only Claude Code config
 claude.local.md
 
