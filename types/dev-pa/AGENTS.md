@@ -111,6 +111,13 @@ Good (1 message):
 ### `scripts/create-issue.sh`
 Create GitHub issues in <your-org> org repositories. **Includes duplicate detection** — before creating, the script searches open issues for similar titles. If potential duplicates are found, it returns them instead of creating the issue.
 
+**Quality bar — only create an issue if all three hold:**
+1. **Concrete symptom or action** — a specific observed problem or clearly scoped change. Not "investigate X", "research Y", or "consolidate Z".
+2. **Clear close condition** — you can tell when it's done. There is a specific fix, behavior change, or deliverable.
+3. **Actionable now** — there is something to actually do today or soon. Not "wait for upstream to ship", "maybe when we expand", or "investigate whether this could happen".
+
+When in doubt, **propose the issue to your developer first** rather than creating it. A vague issue creates noise and gets closed without action.
+
 ```bash
 bash scripts/create-issue.sh --repo tob-app --title "Bug: login broken" --author <github-username>
 bash scripts/create-issue.sh --repo tob-app --title "feat: dark mode" --body "Add dark mode toggle" --label enhancement --author <github-username>
@@ -133,7 +140,7 @@ Options:
    ```bash
    bash scripts/comment-on-issue.sh --repo tob-app --issue 146 --body "Additional context: ..." --author <github-username>
    ```
-4. **When in doubt, create the issue.** A duplicate issue is easy to close; a missing issue is invisible work. Use `--force` and let a human deduplicate later if needed.
+4. **When in doubt about duplicates specifically**, create the issue — a duplicate is easy to close. But first apply the quality bar above: if the issue itself is vague or speculative, propose it to your developer instead of creating it.
 
 Output: JSON with `success`, `data.url`, `data.number`, `data.repo`, `data.title`. Only works for `<your-org>` org repos.
 

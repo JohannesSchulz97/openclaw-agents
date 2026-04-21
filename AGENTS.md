@@ -54,6 +54,15 @@ Issues are living documents, not fire-and-forget tickets:
 - **Close with a resolution summary.** When closing, state what was done and what the outcome was. If a PR fixes it, the link alone is not enough — summarize what the PR actually changed and why.
 - **Don't let issues go stale.** If work is paused or deprioritized, say so in a comment. An issue with no activity and no explanation is a blind spot.
 
+### Issue quality bar
+
+Only create an issue if all three hold:
+1. **Concrete symptom or action** — a specific observed problem or clearly scoped change. Not "investigate X", "research Y", or "consolidate Z".
+2. **Clear close condition** — you can tell when it's done. There is a specific fix, behavior change, or deliverable.
+3. **Actionable now** — there is something to actually do today or soon. Not "wait for upstream to ship", "maybe when we expand to other departments", or "investigate whether this could happen".
+
+When in doubt, propose the issue first rather than creating it.
+
 ### What counts as "operational"
 
 This isn't limited to code changes. All of the following need issue documentation:
