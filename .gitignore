@@ -10,6 +10,7 @@ claude.local.md
 .openclaw/agents/*/memory/daily/
 .openclaw/agents/*/memory/archives/
 .openclaw/agents/*/memory/poll-state.json
+.openclaw/agents/*/memory/summary-state.json
 .openclaw/agents/*/memory/*.md
 
 # Runtime cron state - managed by openclaw, not stow
@@ -23,6 +24,7 @@ claude.local.md
 .openclaw/agents/*/BOOTSTRAP.md
 .openclaw/agents/*/scripts/
 .openclaw/agents/*/poll-config.json
+.openclaw/agents/*/EVENING-REPORT.template.md
 
 # Agent-generated reports - runtime only, never committed
 .openclaw/agents/*/reports/
