@@ -93,11 +93,11 @@ All jobs for the same dev-pa agent must share the same `sessionTarget`. Manager 
 
 **Rationale:** 180s caused timeout errors with GLM-5 via Fireworks even when the agent completed its work. Fixed in `a693ec4`.
 
-### 1.11 Summary Timezone [ENFORCED]
+### 1.11 Cron Timezone Consistency [ENFORCED]
 
-All daily summary jobs (sessionKey ending in `:summary`) must use `schedule.tz = "Europe/Berlin"` regardless of the developer's local timezone.
+All cron jobs for a given dev-pa agent must use the same `schedule.tz` value. An agent's jobs must not mix timezones.
 
-**Rationale:** Summaries must run at a coordinated time so the tech-manager's evening report (20:00 CET) completes before summaries begin.
+**Rationale:** Each agent's tz comes from `work-schedule.json` on the host. Before #310, all jobs defaulted to `Europe/Berlin` regardless of the developer's location — reports and summaries fired at the wrong local time for non-Berlin devs. After #310, `cron-utils.sh` derives the tz from the agent's work-schedule.json. This invariant catches any future drift where some jobs for an agent are updated and others are not.
 
 ### 1.12 Summary Schedule [ENFORCED]
 

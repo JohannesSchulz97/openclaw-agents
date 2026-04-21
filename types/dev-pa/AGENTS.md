@@ -161,15 +161,19 @@ bash scripts/github-activity.sh --user <github-username> [--since <hours>]
 
 ### `scripts/work-report.sh`
 Deterministic wrapper for the evening work report cron job. Two phases:
-- `prepare` — returns JSON with date, github usernames, output path (`memory/reports/YYYY-MM-DD.md`), Slack user ID, and last report epoch
-- `finalize` — validates the output file exists, has expected sections, and updates `report-state.json`
+- `prepare [--date YYYY-MM-DD] [--no-dm]` — returns JSON with date, github activity, Slack user ID, conversation digest, and a `no_activity` flag (true iff GitHub events == 0 AND DM messages == 0). Always bumps `report-state.last_run_epoch`, even on no-activity days, so the tech-manager aggregator can distinguish an idle developer from a missed cron.
+- `finalize [--date YYYY-MM-DD]` — validates the output file exists, has expected sections, and bumps `report-state.last_report_epoch`. Merges into existing state (preserves `last_run_epoch`).
 
 Called by the evening work report cron payload. You don't call this directly — the cron prompt tells you when to run each phase.
 
+**`--date` default:** today's date in the agent's local timezone (read from `work-schedule.json`). Falls back to host-local only when no schedule file is present. Pass `--date` explicitly for delayed catch-up runs or manual re-runs.
+
+**`no_activity` early-exit:** when `prepare` returns `no_activity: true`, the cron prompt skips writing a report file, skips `finalize`, and skips the DM. The `last_run_epoch` bump in `prepare` is proof the cron fired.
+
 ### `scripts/daily-summary.sh`
 Deterministic wrapper for the daily summary cron job. Two phases:
-- `prepare` — returns JSON with date, paths, template, and epoch info
-- `finalize` — validates the output file exists and updates `summary-state.json`
+- `prepare` — returns JSON with date, paths, template, and epoch info. Date default follows the same agent-tz rule as `work-report.sh`.
+- `finalize` — validates the output file exists and updates `summary-state.json`.
 
 **Note:** Daily summary cron is disabled — superseded by evening work report. Kept for reference.
 

@@ -202,18 +202,22 @@ check_cron_timeout_minimum() {
   fi
 }
 
-check_cron_summary_timezone() {
-  # Invariant 1.11: summary jobs must use Europe/Berlin
+check_cron_timezone_consistency() {
+  # Invariant 1.11: all cron jobs for a dev-pa agent must use the same schedule.tz
   local bad
-  bad=$(jq -r '.jobs[] |
-    select(.sessionKey | test(":summary$")) |
-    select(.schedule.tz != "Europe/Berlin") |
-    .name + " (tz: " + (.schedule.tz // "null") + ")"' "$CRON_CONFIG")
+  bad=$(jq -r '
+    [.jobs[] | select(.agentId != "tech-manager") | {agentId, tz: .schedule.tz}] |
+    group_by(.agentId) |
+    .[] |
+    {agent: .[0].agentId, tzs: ([.[].tz] | unique)} |
+    select(.tzs | length > 1) |
+    .agent + " has mixed tz: " + (.tzs | join(", "))
+  ' "$CRON_CONFIG")
   if [[ -z "$bad" ]]; then
     pass
   else
     while IFS= read -r line; do
-      fail "summary_timezone" "Summary job not using Europe/Berlin: $line"
+      fail "timezone_consistency" "Agent has inconsistent cron timezones: $line"
     done <<< "$bad"
   fi
 }
@@ -364,7 +368,7 @@ run_cron_checks() {
   check_cron_no_model
   check_cron_thinking_valid
   check_cron_timeout_minimum
-  check_cron_summary_timezone
+  check_cron_timezone_consistency
   check_cron_summary_schedule
   check_cron_report_schedule
   check_cron_no_duplicate_agent_type
