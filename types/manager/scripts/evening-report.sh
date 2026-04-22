@@ -138,6 +138,7 @@ for agent_dir in "$BASE_DIR"/*/; do
     [[ "$agent_type" == "dev-pa" ]] || continue
 
     agent_name=$(basename "$agent_dir")
+    [[ "$agent_name" == "<your-org>" ]] && continue
     slack_id=$(extract_slack_user_id "$agent_dir/IDENTITY.md")
 
     AGENTS+=("$agent_name")
