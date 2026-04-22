@@ -265,14 +265,10 @@ add_cron_jobs() {
     # Add daily summary job — runs at 20:00 CET (after evening check-in, before tech-manager report)
     local summary_id summary_message
     summary_id=$(generate_uuid)
-    summary_message="Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself."
+    summary_message="Run scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself."
 
     local summary_cron_expr
-    if [[ "$works_weekends" == "true" ]]; then
-        summary_cron_expr="0 20 * * *"
-    else
-        summary_cron_expr="0 20 * * 1-5"
-    fi
+    summary_cron_expr="0 22 * * *"
 
     local tmp_file
     tmp_file=$(mktemp)

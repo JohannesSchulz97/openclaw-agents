@@ -88,7 +88,14 @@ if [[ "$PHASE" == "prepare" ]]; then
     # ── Fetch DM conversation digest ───────────
     <channel-id>N_DIGEST=$(get_dm_digest "$AGENT_NAME")
 
-    log "Agent: $AGENT_NAME, date: $TODAY_DATE, last_summary_epoch: $LAST_SUMMARY_EPOCH, file_exists: $FILE_EXISTS"
+    # no_activity: true when developer sent no messages (agent-only turns need no summary)
+    USER_MSG_COUNT=$(jq '[.messages[] | select(.role == "user")] | length' <<< "$<channel-id>N_DIGEST" 2>/dev/null || echo "0")
+    NO_ACTIVITY=false
+    if (( USER_MSG_COUNT == 0 )); then
+        NO_ACTIVITY=true
+    fi
+
+    log "Agent: $AGENT_NAME, date: $TODAY_DATE, last_summary_epoch: $LAST_SUMMARY_EPOCH, file_exists: $FILE_EXISTS, no_activity: $NO_ACTIVITY"
 
     json_success "daily-summary:prepare" "$(jq -n \
         --arg date "$TODAY_DATE" \
@@ -99,6 +106,7 @@ if [[ "$PHASE" == "prepare" ]]; then
         --arg agent "$AGENT_NAME" \
         --arg memory_dir "$MEMORY_DIR" \
         --argjson conversation_digest "$<channel-id>N_DIGEST" \
+        --argjson no_activity "$NO_ACTIVITY" \
         '{
             date: $date,
             output_file: $output_file,
@@ -107,7 +115,8 @@ if [[ "$PHASE" == "prepare" ]]; then
             file_exists: $file_exists,
             agent_name: $agent,
             memory_dir: $memory_dir,
-            conversation_digest: $conversation_digest
+            conversation_digest: $conversation_digest,
+            no_activity: $no_activity
         }')"
     exit 0
 fi

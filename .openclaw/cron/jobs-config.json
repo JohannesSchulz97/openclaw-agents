@@ -24,28 +24,6 @@
       }
     },
     {
-      "id": "c4e6a9b1-2d7f-4c83-a5e8-9b0d1f3c7a2e",
-      "agentId": "tech-manager",
-      "name": "Tech Manager Morning Status Report",
-      "enabled": false,
-      "schedule": {
-        "kind": "every",
-        "everyMs": 86400000
-      },
-      "sessionTarget": "session:slack:channel:c0ap3lr6ads",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:tech-manager:cron:morning-report. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nYou are the Tech Manager agent. Generate your morning status report.\n\n1. Run `scripts/check-status.sh --agents dev6,dev5,dev10,dev10,dev1,<github-username>,dev9,dev7,dev10,dev3,dev10,dev10,dev10,dev10-jean,dev8,dev10`\n   Parse the JSON output for overall team status. Key fields per agent: `last_dm_interaction` (ISO timestamp of last DM), `hours_since_interaction`, `sessions_today`, `work_schedule`, `is_working_hours`. Summary includes `silent_12h_plus` (count of agents with no DM for 12+ hours).\n\n2. For each monitored agent, check if they have a github-activity.sh script available:\n   - Read USER.md to get the list of monitored agents\n   - For each agent, check if `~/.openclaw/agents/<agent>/scripts/github-activity.sh` exists\n   - If it does, read that agent's USER.md for their GitHub username(s)\n   - Run the script with --since 24 to get yesterday's activity\n\n3. Read IDENTITY.md for the Slack Channel ID.\n\n4. Compose a structured morning report with these sections:\n   📊 **Morning Status Report — [DATE]**\n   \n   **Team Overview:** X active today, Y silent (12h+), Z inactive\n   Focus on developers who are expected to be working today (use `work_schedule` and `is_working_hours` from check-status.sh). Note any developers who are off today (weekend, outside working hours, or not yet bootstrapped).\n   \n   **Per Developer (working today):**\n   For each developer expected to be working today:\n   - Last DM interaction (from `last_dm_interaction` and `hours_since_interaction`)\n   - GitHub activity summary (PRs, commits, issues from last 24h)\n   - Sessions today\n   \n   **Off Today:** Brief note listing any developers not expected to be working today and why (weekend, out-of-hours, not bootstrapped).\n   \n   **Notable:** Any patterns, highlights, or concerns\n\n5. Send via: openclaw message send --channel slack --target channel:<CHANNEL_ID> --message \"<report>\"\n\n6. IMPORTANT: Only reference GitHub activity from <your-org> organization. Do NOT query GitHub APIs independently.",
-        "timeoutSeconds": 300,
-        "thinking": "medium"
-      },
-      "sessionKey": "agent:tech-manager:cron:morning-report",
-      "delivery": {
-        "mode": "none"
-      }
-    },
-    {
       "id": "d5f7b0c2-3e8a-4d94-b6f1-0a1e2c4d6f8a",
       "agentId": "tech-manager",
       "name": "Tech Manager Evening Report",
@@ -166,7 +144,7 @@
       "id": "0fe0391f-870a-4135-a8b4-1047d4ff8420",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * *",
@@ -176,7 +154,7 @@
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -258,17 +236,17 @@
       "id": "5859e759-63da-462c-bac8-8c48dd7517aa",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -350,17 +328,17 @@
       "id": "d14b8b1e-7263-48ac-bbc9-90eeba973401",
       "agentId": "dev1",
       "name": "dev1 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Asia/Kolkata"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev1:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev1:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -442,17 +420,17 @@
       "id": "e1d1ccb2-ae5a-48b4-8925-0cb6f6d136c6",
       "agentId": "dev7",
       "name": "dev7 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Asia/Tbilisi"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev7:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev7:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -534,17 +512,17 @@
       "id": "7208daf8-0528-48e8-9ba5-65964ebfe31e",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Asia/Tbilisi"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -626,17 +604,17 @@
       "id": "3fbb26e7-ff3f-4fd9-9ef7-1e9b7bb0cc10",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Europe/Madrid"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -718,17 +696,17 @@
       "id": "61533cf0-a039-416c-8e63-725a73bf379a",
       "agentId": "dev10-jean",
       "name": "dev10 Jean Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Europe/Zurich"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10-jean:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10-jean:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -810,17 +788,17 @@
       "id": "0da9f139-a576-4cdd-82a2-f5cadf9b50a1",
       "agentId": "dev6",
       "name": "dev6 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Asia/Bangkok"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev6:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev6:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -902,17 +880,17 @@
       "id": "87f8e7c9-c2ef-4e72-a49e-7fda49c53712",
       "agentId": "dev5",
       "name": "dev5 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev5:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev5:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -994,17 +972,17 @@
       "id": "8f6db88e-56fc-4afc-bf1d-b1f2d82ff69f",
       "agentId": "<github-username>",
       "name": "dev4 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:<github-username>:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:<github-username>:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1086,17 +1064,17 @@
       "id": "5654ca9a-9a47-427a-a1ac-5bd89dfc9342",
       "agentId": "dev9",
       "name": "dev9 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev9:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev9:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1178,17 +1156,17 @@
       "id": "b15db44e-1f39-4b93-9572-2c9b67b2c9ca",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1270,17 +1248,17 @@
       "id": "0c99f18d-c66c-4571-8249-07821035b355",
       "agentId": "dev3",
       "name": "dev3 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev3:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev3:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1362,17 +1340,17 @@
       "id": "39db6c55-2488-4002-8ca6-bc4a9bb637cf",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1546,17 +1524,17 @@
       "id": "801e1720-a0f3-4e08-8f7e-5ba9f65fd323",
       "agentId": "dev8",
       "name": "dev8 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Europe/Vienna"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev8:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev8:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
@@ -1638,17 +1616,17 @@
       "id": "5ccd37e7-4801-4931-b7f4-a8363281eed7",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": false,
+      "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
+        "cronExpr": "0 22 * * *",
         "tz": "Asia/Tbilisi"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
         "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
+        "message": "Run scripts/lib/cron-guard.sh --session-key agent:dev10:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\n\nIf data.no_activity is true, stop here. Do NOT write a file, do NOT call finalize. Output only 'NO_ACTIVITY'.\n\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\n3. Run scripts/daily-summary.sh finalize.\n\nDo not modify any state files yourself.",
         "timeoutSeconds": 300,
         "thinking": "medium"
       },
