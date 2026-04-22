@@ -273,11 +273,16 @@ check_cron_dev_pa_has_report() {
   # Invariant 1.17: every dev-pa agent must have a work-report cron entry.
   # Dev-pa agents are identified by having a :morning check-in (tech-manager
   # uses :morning-report, not :morning, so the suffix match is exact).
+  # Exemptions: test/non-reporting accounts that intentionally have no report cron.
+  local -a exempt=("<your-org>")
+  local exempt_filter
+  exempt_filter=$(printf '"%s",' "${exempt[@]}")
+  exempt_filter="[${exempt_filter%,}]"
   local missing
-  missing=$(jq -r '
+  missing=$(jq -r --argjson exempt "$exempt_filter" '
     ([.jobs[] | select(.sessionKey | endswith(":morning")) | .agentId] | unique) as $devpa |
     ([.jobs[] | select(.sessionKey | endswith(":report")) | .agentId] | unique) as $with_report |
-    ($devpa - $with_report)[]' "$CRON_CONFIG")
+    ($devpa - $with_report - $exempt)[]' "$CRON_CONFIG")
   if [[ -z "$missing" ]]; then
     pass
   else
