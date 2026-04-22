@@ -1664,8 +1664,8 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
-        "tz": "Europe/Vienna"
+        "cronExpr": "30 19 * * *",
+        "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
@@ -1688,7 +1688,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
+        "cronExpr": "30 19 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
@@ -1712,8 +1712,8 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
-        "tz": "Asia/Kolkata"
+        "cronExpr": "30 19 * * *",
+        "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
@@ -1736,8 +1736,8 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
-        "tz": "Asia/Tbilisi"
+        "cronExpr": "30 19 * * *",
+        "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
@@ -1760,8 +1760,8 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
-        "tz": "Asia/Tbilisi"
+        "cronExpr": "30 19 * * *",
+        "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
@@ -1784,8 +1784,8 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
-        "tz": "Europe/Madrid"
+        "cronExpr": "30 19 * * *",
+        "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
@@ -1808,8 +1808,8 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
-        "tz": "Europe/Zurich"
+        "cronExpr": "30 19 * * *",
+        "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
@@ -1832,8 +1832,8 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
-        "tz": "Asia/Bangkok"
+        "cronExpr": "30 19 * * *",
+        "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
@@ -1856,7 +1856,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
+        "cronExpr": "30 19 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
@@ -1880,7 +1880,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
+        "cronExpr": "30 19 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
@@ -1904,7 +1904,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
+        "cronExpr": "30 19 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
@@ -1928,7 +1928,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
+        "cronExpr": "30 19 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
@@ -1952,7 +1952,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
+        "cronExpr": "30 19 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
@@ -1976,7 +1976,7 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
+        "cronExpr": "30 19 * * *",
         "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
@@ -2000,8 +2000,8 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
-        "tz": "Europe/Vienna"
+        "cronExpr": "30 19 * * *",
+        "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
@@ -2024,8 +2024,8 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 19 * * *",
-        "tz": "Asia/Tbilisi"
+        "cronExpr": "30 19 * * *",
+        "tz": "Europe/Berlin"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
