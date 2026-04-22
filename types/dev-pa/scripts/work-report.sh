@@ -115,12 +115,6 @@ if [[ "$PHASE" == "prepare" ]]; then
         SLACK_USER_ID=$(sed -n 's/.*\*\*Slack User ID:\*\* \(U[A-Z0-9]*\).*/\1/p' "$IDENTITY_FILE" 2>/dev/null | head -1 || true)
     fi
 
-    # Check if output file already exists (re-run)
-    FILE_EXISTS=false
-    if [[ -f "$OUTPUT_FILE" ]]; then
-        FILE_EXISTS=true
-    fi
-
     # ── Fetch GitHub activity ────────────────
     GITHUB_ACTIVITY='{}'
     if [[ -n "$GITHUB_USERNAMES" && "$GITHUB_USERNAMES" != *"<"* ]]; then
@@ -159,13 +153,12 @@ if [[ "$PHASE" == "prepare" ]]; then
        '. + {last_run_epoch: $epoch}' \
        "$REPORT_STATE_FILE" > "$tmp_state" 2>/dev/null && mv "$tmp_state" "$REPORT_STATE_FILE"
 
-    log "Agent: $AGENT_NAME, date: $TODAY_DATE, last_report_epoch: $LAST_REPORT_EPOCH, file_exists: $FILE_EXISTS, no_activity: $NO_ACTIVITY"
+    log "Agent: $AGENT_NAME, date: $TODAY_DATE, last_report_epoch: $LAST_REPORT_EPOCH, no_activity: $NO_ACTIVITY"
 
     json_success "work-report:prepare" "$(jq -n \
         --arg date "$TODAY_DATE" \
         --arg output_file "$OUTPUT_FILE" \
         --argjson last_report_epoch "$LAST_REPORT_EPOCH" \
-        --argjson file_exists "$FILE_EXISTS" \
         --argjson no_activity "$NO_ACTIVITY" \
         --arg agent "$AGENT_NAME" \
         --arg slack_user_id "$SLACK_USER_ID" \
@@ -176,7 +169,6 @@ if [[ "$PHASE" == "prepare" ]]; then
             date: $date,
             output_file: $output_file,
             last_report_epoch: $last_report_epoch,
-            file_exists: $file_exists,
             no_activity: $no_activity,
             agent_name: $agent,
             slack_user_id: $slack_user_id,
