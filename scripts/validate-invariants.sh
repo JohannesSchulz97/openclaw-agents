@@ -203,10 +203,12 @@ check_cron_timeout_minimum() {
 }
 
 check_cron_timezone_consistency() {
-  # Invariant 1.11: all cron jobs for a dev-pa agent must use the same schedule.tz
+  # Invariant 1.11: all non-report cron jobs for a dev-pa agent must use the same schedule.tz
+  # Report jobs are exempt — they intentionally use Europe/Berlin so all reports
+  # land before the tech-manager's 20:00 CET run, regardless of agent local tz.
   local bad
   bad=$(jq -r '
-    [.jobs[] | select(.agentId != "tech-manager") | {agentId, tz: .schedule.tz}] |
+    [.jobs[] | select(.agentId != "tech-manager") | select(.sessionKey | test(":report$") | not) | {agentId, tz: .schedule.tz}] |
     group_by(.agentId) |
     .[] |
     {agent: .[0].agentId, tzs: ([.[].tz] | unique)} |
@@ -239,17 +241,17 @@ check_cron_summary_schedule() {
 }
 
 check_cron_report_schedule() {
-  # Invariant 1.13: report jobs must run at 19:00
+  # Invariant 1.13: report jobs must run at 19:30
   local bad
   bad=$(jq -r '.jobs[] |
     select(.sessionKey | test(":report$")) |
-    select(.schedule.cronExpr | test("^0 19 ") | not) |
+    select(.schedule.cronExpr | test("^30 19 ") | not) |
     .name + " (cronExpr: " + (.schedule.cronExpr // "null") + ")"' "$CRON_CONFIG")
   if [[ -z "$bad" ]]; then
     pass
   else
     while IFS= read -r line; do
-      fail "report_schedule" "Report job not at 19:00: $line"
+      fail "report_schedule" "Report job not at 19:30: $line"
     done <<< "$bad"
   fi
 }

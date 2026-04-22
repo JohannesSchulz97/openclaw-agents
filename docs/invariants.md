@@ -95,9 +95,9 @@ All jobs for the same dev-pa agent must share the same `sessionTarget`. Manager 
 
 ### 1.11 Cron Timezone Consistency [ENFORCED]
 
-All cron jobs for a given dev-pa agent must use the same `schedule.tz` value. An agent's jobs must not mix timezones.
+All non-report cron jobs for a given dev-pa agent must use the same `schedule.tz` value. Report jobs (sessionKey ending in `:report`) are exempt — they intentionally use `Europe/Berlin` regardless of agent local timezone so all reports complete before the tech-manager's 20:00 CET run.
 
-**Rationale:** Each agent's tz comes from `work-schedule.json` on the host. Before #310, all jobs defaulted to `Europe/Berlin` regardless of the developer's location — reports and summaries fired at the wrong local time for non-Berlin devs. After #310, `cron-utils.sh` derives the tz from the agent's work-schedule.json. This invariant catches any future drift where some jobs for an agent are updated and others are not.
+**Rationale:** Each agent's tz comes from `work-schedule.json` on the host. Before #310, all jobs defaulted to `Europe/Berlin` regardless of the developer's location — reports and summaries fired at the wrong local time for non-Berlin devs. After #310, `cron-utils.sh` derives the tz from the agent's work-schedule.json. After #304, report jobs were standardized to `Europe/Berlin` + 19:30 CET for tech-manager coordination. This invariant catches drift in non-report jobs.
 
 ### 1.12 Summary Schedule [ENFORCED]
 
@@ -107,9 +107,9 @@ All daily summary jobs must run at 22:00 (`cronExpr` starting with `"0 22 "`). D
 
 ### 1.13 Report Schedule [ENFORCED]
 
-All evening work report jobs (sessionKey ending in `:report`) must run at 19:00 (`cronExpr` starting with `"0 19 "`). Day-of-week pattern varies per developer's work schedule.
+All evening work report jobs (sessionKey ending in `:report`) must run at 19:30 (`cronExpr` starting with `"30 19 "`). Day-of-week pattern varies per developer's work schedule.
 
-**Rationale:** Reports must complete before the tech-manager's evening report at 20:00 CET. Running at 19:00 gives a 1-hour buffer for all agents to finish their reports. Introduced in #253.
+**Rationale:** Reports must complete before the tech-manager's evening report at 20:00 CET. Running at 19:30 CET (Europe/Berlin) gives a 30-minute buffer for all agents to finish. Moved from 19:00 in #304 to consolidate all agents on a single fixed CET time regardless of local timezone.
 
 ### 1.14 No Duplicate Agent+Type [ENFORCED]
 
