@@ -166,7 +166,7 @@
       "id": "0fe0391f-870a-4135-a8b4-1047d4ff8420",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * *",
@@ -258,7 +258,7 @@
       "id": "5859e759-63da-462c-bac8-8c48dd7517aa",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -350,7 +350,7 @@
       "id": "d14b8b1e-7263-48ac-bbc9-90eeba973401",
       "agentId": "dev1",
       "name": "dev1 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -442,7 +442,7 @@
       "id": "e1d1ccb2-ae5a-48b4-8925-0cb6f6d136c6",
       "agentId": "dev7",
       "name": "dev7 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -534,7 +534,7 @@
       "id": "7208daf8-0528-48e8-9ba5-65964ebfe31e",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -626,7 +626,7 @@
       "id": "3fbb26e7-ff3f-4fd9-9ef7-1e9b7bb0cc10",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -718,7 +718,7 @@
       "id": "61533cf0-a039-416c-8e63-725a73bf379a",
       "agentId": "dev10-jean",
       "name": "dev10 Jean Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -810,7 +810,7 @@
       "id": "0da9f139-a576-4cdd-82a2-f5cadf9b50a1",
       "agentId": "dev6",
       "name": "dev6 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -902,7 +902,7 @@
       "id": "87f8e7c9-c2ef-4e72-a49e-7fda49c53712",
       "agentId": "dev5",
       "name": "dev5 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -994,7 +994,7 @@
       "id": "8f6db88e-56fc-4afc-bf1d-b1f2d82ff69f",
       "agentId": "<github-username>",
       "name": "dev4 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -1086,7 +1086,7 @@
       "id": "5654ca9a-9a47-427a-a1ac-5bd89dfc9342",
       "agentId": "dev9",
       "name": "dev9 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -1178,7 +1178,7 @@
       "id": "b15db44e-1f39-4b93-9572-2c9b67b2c9ca",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -1270,7 +1270,7 @@
       "id": "0c99f18d-c66c-4571-8249-07821035b355",
       "agentId": "dev3",
       "name": "dev3 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -1362,7 +1362,7 @@
       "id": "39db6c55-2488-4002-8ca6-bc4a9bb637cf",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -1454,7 +1454,7 @@
       "id": "a36b1a84-aa06-4352-8e5e-eb29f83cf268",
       "agentId": "<your-org>",
       "name": "<your-org> Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -1546,7 +1546,7 @@
       "id": "801e1720-a0f3-4e08-8f7e-5ba9f65fd323",
       "agentId": "dev8",
       "name": "dev8 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
@@ -1638,7 +1638,7 @@
       "id": "5ccd37e7-4801-4931-b7f4-a8363281eed7",
       "agentId": "dev10",
       "name": "dev10 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * 1-5",
