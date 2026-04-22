@@ -245,6 +245,51 @@ timeoutSeconds: 0
 - **Cron expression:** `"kind": "cron", "cronExpr": "0 9 * * *", "tz": "Europe/Berlin"` (standard 5-field cron)
 - **Interval:** `"kind": "every", "everyMs": 3600000` (milliseconds)
 
+## Webhook Triggers
+
+OpenClaw supports inbound HTTP webhooks to trigger agent turns from external services (Cloudflare, Zoom, GitHub, Stripe, etc.).
+
+### Endpoints
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /hooks/wake` | Enqueue system event into agent's main session |
+| `POST /hooks/agent` | Run isolated agent turn with a message payload |
+| `POST /hooks/<name>` | Custom mapped hook resolved via `hooks.mappings` config |
+
+### Configuration (host `openclaw.json`)
+
+```json
+{
+  "hooks": {
+    "enabled": true,
+    "token": "shared-secret",
+    "path": "/hooks"
+  }
+}
+```
+
+### Authentication
+
+Every inbound request must include the token:
+- `Authorization: Bearer <token>` (recommended)
+- `x-openclaw-token: <token>`
+
+Query-string tokens are rejected.
+
+### Security recommendations
+
+- Keep the endpoint behind a reverse proxy or tailnet — do not expose raw to the internet
+- Use `hooks.allowedAgentIds` to restrict which agents a webhook can wake
+- Keep `hooks.allowRequestSessionKey: false` unless explicitly needed
+- Use a dedicated token separate from gateway auth
+
+### Current status
+
+Webhooks are **not yet enabled** on our host. Issues [#338](https://github.com/<your-org>/openclaw-agents/issues/338) (Zoom transcripts) and [#344](https://github.com/<your-org>/openclaw-agents/issues/344) (Cloudflare failure alerts) both depend on this being configured.
+
+See [OpenClaw webhook docs](https://docs.openclaw.ai/automation/webhook) for full reference.
+
 ## Architectural Invariants
 
 This repo has a formal invariants system to prevent recurring breakage. See `docs/invariants.md` for the full catalog.
