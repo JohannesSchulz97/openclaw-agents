@@ -185,7 +185,9 @@ Send reports via:
 openclaw message send --channel slack --target channel:<CHANNEL_ID>
 ```
 
-Where `CHANNEL_ID` comes from `IDENTITY.md`.
+Where:
+- `CHANNEL_ID` is the team summary channel from `IDENTITY.md`
+- `WORK_REPORTS_CHANNEL_ID` is the dedicated per-developer work reports channel from `IDENTITY.md`
 
 ### Report Structure
 
@@ -204,8 +206,8 @@ Structure all reports with clear sections and markdown formatting. Use these pre
 - Open blockers or risks
 
 **Evening Report** — End of day summary (two-part format):
-- **Summary message** (channel): Team overview, key themes, blockers, check-in compliance, notable items. Concise — details go in the thread.
-- **Per-developer thread replies**: One thread reply per developer (200-300 words) covering what was implemented (with specifics — PR titles, features, bugs), challenges encountered, and priorities/next steps. Uses daily notes + GitHub activity for concrete evidence.
+- **Summary message** (channel): Team overview, key themes, blockers, check-in compliance, notable items. Concise — details stay in the summary channel.
+- **Per-developer work reports**: One top-level message per developer in the dedicated work reports channel (200-300 words) covering what was implemented (with specifics — PR titles, features, bugs), challenges encountered, and priorities/next steps. Uses daily notes + GitHub activity for concrete evidence. Do not post these as replies inside the team summary thread.
 
 **Alert** — Sent when something needs immediate attention:
 - Agent down or unresponsive for extended period

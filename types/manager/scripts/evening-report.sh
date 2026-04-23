@@ -11,7 +11,9 @@ set -euo pipefail
 #
 # Usage:
 #   bash scripts/evening-report.sh [--date YYYY-MM-DD] [--base-dir DIR]
-#                                  [--channel CHANNEL_ID] [--dry-run] [--force]
+#                                  [--channel CHANNEL_ID]
+#                                  [--work-reports-channel CHANNEL_ID]
+#                                  [--dry-run] [--force]
 #
 # --date defaults to the host's local date. Use to pin a specific report day
 # when a cron run has been delayed or is being re-run manually.
@@ -32,6 +34,7 @@ done
 # ── Args ─────────────────────────────────────
 BASE_DIR="$HOME/.openclaw/agents"
 CHANNEL_OVERRIDE=""
+WORK_REPORTS_CHANNEL_OVERRIDE=""
 DRY_RUN=false
 FORCE=false
 TODAY=""
@@ -40,6 +43,10 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --channel)
             CHANNEL_OVERRIDE="$2"
+            shift 2
+            ;;
+        --work-reports-channel)
+            WORK_REPORTS_CHANNEL_OVERRIDE="$2"
             shift 2
             ;;
         --base-dir)
@@ -91,25 +98,43 @@ extract_slack_channel_id() {
     sed -n 's/.*\*\*Slack Channel ID:\*\* \(C[A-Z0-9]*\).*/\1/p' "$identity_file" 2>/dev/null | head -1 || true
 }
 
-# ── Resolve channel ID ──────────────────────
-if [[ -n "$CHANNEL_OVERRIDE" ]]; then
-    CHANNEL_ID="$CHANNEL_OVERRIDE"
-else
-    MANAGER_IDENTITY="$BASE_DIR/tech-manager/IDENTITY.md"
-    if [[ ! -f "$MANAGER_IDENTITY" ]]; then
-        log "ERROR: No IDENTITY.md at $MANAGER_IDENTITY and no --channel override"
-        json_error "evening-report" "NO_CHANNEL" "Cannot resolve Slack channel ID"
-        exit 1
-    fi
-    CHANNEL_ID=$(extract_slack_channel_id "$MANAGER_IDENTITY")
-fi
+extract_work_reports_channel_id() {
+    local identity_file="$1"
+    sed -n 's/.*\*\*Slack Work Reports Channel ID:\*\* \(C[A-Z0-9]*\).*/\1/p' "$identity_file" 2>/dev/null | head -1 || true
+}
 
-if [[ -z "$CHANNEL_ID" ]]; then
-    json_error "evening-report" "NO_CHANNEL" "Could not resolve Slack channel ID"
+# ── Resolve channel IDs ─────────────────────
+MANAGER_IDENTITY="$BASE_DIR/tech-manager/IDENTITY.md"
+if [[ ! -f "$MANAGER_IDENTITY" ]] && [[ -z "$CHANNEL_OVERRIDE" || -z "$WORK_REPORTS_CHANNEL_OVERRIDE" ]]; then
+    log "ERROR: No IDENTITY.md at $MANAGER_IDENTITY and no channel overrides"
+    json_error "evening-report" "NO_CHANNEL" "Cannot resolve Slack channel IDs"
     exit 1
 fi
 
-log "Evening report targeting channel: $CHANNEL_ID"
+if [[ -n "$CHANNEL_OVERRIDE" ]]; then
+    CHANNEL_ID="$CHANNEL_OVERRIDE"
+else
+    CHANNEL_ID=$(extract_slack_channel_id "$MANAGER_IDENTITY")
+fi
+
+if [[ -n "$WORK_REPORTS_CHANNEL_OVERRIDE" ]]; then
+    WORK_REPORTS_CHANNEL_ID="$WORK_REPORTS_CHANNEL_OVERRIDE"
+else
+    WORK_REPORTS_CHANNEL_ID=$(extract_work_reports_channel_id "$MANAGER_IDENTITY")
+fi
+
+if [[ -z "$CHANNEL_ID" ]]; then
+    json_error "evening-report" "NO_CHANNEL" "Could not resolve Slack summary channel ID"
+    exit 1
+fi
+
+if [[ -z "$WORK_REPORTS_CHANNEL_ID" ]]; then
+    json_error "evening-report" "NO_CHANNEL" "Could not resolve Slack work reports channel ID"
+    exit 1
+fi
+
+log "Evening report summary channel: $CHANNEL_ID"
+log "Evening report work reports channel: $WORK_REPORTS_CHANNEL_ID"
 
 # ── Read report template ───────────────────
 TEMPLATE_FILE="$BASE_DIR/tech-manager/EVENING-REPORT.template.md"
@@ -261,6 +286,7 @@ CHANNEL_SESSION_KEY="agent:tech-manager:slack:channel:$(echo "$CHANNEL_ID" | tr 
 RESULT=$(jq -n \
     --arg date "$TODAY" \
     --arg channel_id "$CHANNEL_ID" \
+    --arg work_reports_channel_id "$WORK_REPORTS_CHANNEL_ID" \
     --arg channel_session_key "$CHANNEL_SESSION_KEY" \
     --arg template "$TEMPLATE_CONTENT" \
     --arg output_file "$OUTPUT_FILE" \
@@ -277,6 +303,7 @@ RESULT=$(jq -n \
     '{
         date: $date,
         channel_id: $channel_id,
+        work_reports_channel_id: $work_reports_channel_id,
         channel_session_key: $channel_session_key,
         template: $template,
         output_file: $output_file,
