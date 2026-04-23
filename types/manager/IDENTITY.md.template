@@ -9,4 +9,5 @@
 ## Slack
 
 - **Slack Channel ID:** <slack-channel-id>
+- **Slack Work Reports Channel ID:** <work-reports-channel-id>
 - **Message Prefix:** [<agent-display-name>]
