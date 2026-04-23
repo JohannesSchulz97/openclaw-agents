@@ -811,7 +811,7 @@
       "id": "03993e8a-7e1e-48c0-917b-0ede42752ea9",
       "agentId": "dev5",
       "name": "dev5 Morning Check-in",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 9 * * 1-5",
@@ -834,7 +834,7 @@
       "id": "46319d5b-dbba-474b-938d-d0a511d09c20",
       "agentId": "dev5",
       "name": "dev5 Midday Check-in",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 13 * * 1-5",
@@ -857,7 +857,7 @@
       "id": "0647a19e-fd27-43a1-8ce2-159f039e9402",
       "agentId": "dev5",
       "name": "dev5 Evening Check-in",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "30 16 * * 1-5",
@@ -880,7 +880,7 @@
       "id": "87f8e7c9-c2ef-4e72-a49e-7fda49c53712",
       "agentId": "dev5",
       "name": "dev5 Daily Summary",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "0 22 * * *",
@@ -1429,29 +1429,6 @@
       }
     },
     {
-      "id": "a36b1a84-aa06-4352-8e5e-eb29f83cf268",
-      "agentId": "<your-org>",
-      "name": "<your-org> Daily Summary",
-      "enabled": false,
-      "schedule": {
-        "kind": "cron",
-        "cronExpr": "0 22 * * 1-5",
-        "tz": "Europe/Berlin"
-      },
-      "sessionTarget": "isolated",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "Run scripts/lib/cron-guard.sh --session-key agent:<your-org>:cron:summary. If data.result is \"ALREADY_RAN\", output NO_ACTION and stop.\n\nRun scripts/daily-summary.sh prepare and parse the JSON. If success is false, stop.\\n\\n1. Summarize today's conversations using data.conversation_digest (messages since data.last_summary_epoch; 0 means full day). Follow data.template for section format.\\n2. Write to data.output_file. Stay factual — use the developer's own words, do not fabricate.\\n3. Run scripts/daily-summary.sh finalize.\\n\\nDo not modify any state files yourself.",
-        "timeoutSeconds": 300,
-        "thinking": "medium"
-      },
-      "sessionKey": "agent:<your-org>:cron:summary",
-      "delivery": {
-        "mode": "none"
-      }
-    },
-    {
       "id": "136b5072-2479-4f2e-9c00-466c0ade1126",
       "agentId": "dev8",
       "name": "dev8 Morning Check-in",
@@ -1831,7 +1808,7 @@
       "id": "1f4596bb-1cd3-4fa3-b242-c9a3dd0cb4fb",
       "agentId": "dev5",
       "name": "dev5 Evening Work Report",
-      "enabled": true,
+      "enabled": false,
       "schedule": {
         "kind": "cron",
         "cronExpr": "30 19 * * *",

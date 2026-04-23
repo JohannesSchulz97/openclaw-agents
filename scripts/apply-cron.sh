@@ -345,6 +345,11 @@ fi
 echo "=== Phase 3: REMOVE ==="
 REMOVE_COUNT=0
 
+# Refresh gateway state after edits. `openclaw cron edit` leaves disabled
+# historical rows behind, so removal must operate on post-edit runtime state.
+GATEWAY_JOBS=$(openclaw cron list --json --all 2>/dev/null || echo '{"jobs":[]}')
+GATEWAY_COUNT=$(echo "$GATEWAY_JOBS" | jq '.jobs | length')
+
 if [ "$NO_DELETE" = true ]; then
   echo "  (skipped -- --no-delete flag is set)"
 else

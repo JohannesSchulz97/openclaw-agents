@@ -71,10 +71,20 @@ except Exception as e:
     out("PROCEED", f"failed to read jobs.json: {e}")
     sys.exit(0)
 
-job = next((j for j in jobs if j.get('sessionKey') == session_key), None)
-if not job:
+matches = [j for j in jobs if j.get('sessionKey') == session_key]
+if not matches:
     out("PROCEED", f"no job found for sessionKey: {session_key}")
     sys.exit(0)
+
+matches.sort(
+    key=lambda j: (
+        bool(j.get('enabled')),
+        j.get('updatedAtMs') or 0,
+        j.get('createdAtMs') or 0,
+    ),
+    reverse=True,
+)
+job = matches[0]
 
 job_id = job.get('id', '')
 run_file = base / 'runs' / f"{job_id}.jsonl"
