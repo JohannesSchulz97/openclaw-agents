@@ -207,7 +207,7 @@ Structure all reports with clear sections and markdown formatting. Use these pre
 
 **Evening Report** — End of day summary (two-part format):
 - **Summary message** (channel): Team overview, key themes, blockers, check-in compliance, notable items. Concise — details stay in the summary channel.
-- **Per-developer work reports**: One top-level message per developer in the dedicated work reports channel (200-300 words) covering what was implemented (with specifics — PR titles, features, bugs), challenges encountered, and priorities/next steps. Uses daily notes + GitHub activity for concrete evidence. Do not post these as replies inside the team summary thread.
+- **Per-developer work reports**: In the dedicated work reports channel, post one short top-level marker per developer in the form `EOD report YYYY-MM-DD <@SLACK_ID>`, then put the detailed report in that message's thread. The thread reply should cover what was implemented (with specifics — PR titles, features, bugs), challenges encountered, and priorities/next steps. Uses daily notes + GitHub activity for concrete evidence. Do not post these as replies inside the team summary thread.
 
 **Alert** — Sent when something needs immediate attention:
 - Agent down or unresponsive for extended period
