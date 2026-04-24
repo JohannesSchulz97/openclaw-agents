@@ -355,8 +355,8 @@
       "enabled": true,
       "schedule": {
         "kind": "cron",
-        "cronExpr": "0 9 * * 1-5",
-        "tz": "Europe/Vienna"
+        "cronExpr": "30 12 * * 1-5",
+        "tz": "Asia/Kolkata"
       },
       "sessionTarget": "isolated",
       "wakeMode": "now",
