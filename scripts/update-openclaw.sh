@@ -494,7 +494,7 @@ version_change() {
   if [ "$pre" = "$post" ]; then
     echo "$name $post (unchanged)"
   else
-    echo "$name $pre→$post"
+    echo "$name ${pre}→${post}"
   fi
 }
 
@@ -526,7 +526,11 @@ else
 fi
 
 # Step 10: Slack notification (success)
-msg="OpenClaw update complete: $oc_change, $lcm_change, $qmd_change. Config validated, $restart_status.\n\ncc <@$JOHANNES_SLACK_ID>"
+if [ -n "$changes_applied" ]; then
+  msg="OpenClaw update complete: openclaw ${pre_openclaw}→${post_openclaw}, lossless-claw ${pre_lcm}→${post_lcm}, qmd ${pre_qmd}→${post_qmd}. Config validated, $restart_status.\n\ncc <@$JOHANNES_SLACK_ID>"
+else
+  msg="OpenClaw update complete: already current. Current versions: openclaw $post_openclaw, lossless-claw $post_lcm, qmd $post_qmd. Config validated, $restart_status.\n\ncc <@$JOHANNES_SLACK_ID>"
+fi
 openclaw message send --channel slack --target "channel:$SLACK_CHANNEL" -m "$msg" 2>/dev/null || log "WARN: Failed to send Slack notification"
 
 # Step 11: Clean up marker
