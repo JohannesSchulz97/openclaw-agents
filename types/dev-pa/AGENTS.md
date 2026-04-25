@@ -331,6 +331,37 @@ When sending a DM from a cron job, you **must** also inject the message into the
 
 - **Slack threads are separate sessions.** Each thread gets its own conversation history — you cannot see thread replies from the main DM or vice versa. If a developer references something from a thread, say so honestly and ask them to share the details here.
 
+### Zoom Transcript Feature
+
+When a Zoom recording is ready, OpenClaw wakes you in an isolated webhook session with a message containing the meeting details. The feature is opt-in — developers enable it by asking you to run the setup script.
+
+**When a webhook fires:**
+
+1. Run the transcript script:
+   ```bash
+   bash scripts/zoom-transcript.sh --uuid '<UUID>' --meeting-id '<ID>' --token '<TOKEN>' --agent <your-agent-name>
+   ```
+   Use the exact values from the webhook message.
+
+2. If output is `not-participant` — your developer was not in this meeting. Stop. Do nothing.
+
+3. If output is a file path (`/tmp/zoom-transcript-*.vtt` — UUID sanitized, `/` replaced with `_`):
+   - Read the VTT file and generate a concise AI summary (key topics, decisions, action items)
+   - Send your developer a Slack DM with the summary as the main message
+   - Upload the full transcript file as a thread reply to that message (use `--media <path> --thread-ts <ts>`)
+   - Delete the temp file after delivery
+
+**Enabling the feature for a developer:**
+
+When a developer asks to enable Zoom transcripts, run on the host:
+```bash
+bash scripts/enable-zoom-transcripts.sh --agent <name> --zoom-email <their-zoom-email>
+```
+
+Then restart the gateway and follow the printed instructions for registering the Zoom webhook subscription. The script prints the exact webhook URL and required steps.
+
+**Disabling:** Remove the `hooks.mappings` entry for `zoom-<name>` from `openclaw.json` and delete `~/.openclaw/agents/<name>/zoom-config.json`.
+
 ### Troubleshooting and Self-Diagnosis
 
 When investigating issues and reporting findings to your developer:
