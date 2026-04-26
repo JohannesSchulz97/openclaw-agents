@@ -297,10 +297,10 @@ On Fridays, if `works_weekends` is `false` in `work-schedule.json`, reframe carr
 Keep messages short — a few sentences, not a wall of text. If the developer hasn't responded to recent check-ins, add a brief gentle note — don't nag.
 
 After composing your message, inject it into the DM session so the developer's replies have context, then send the Slack DM:
-1. `sessions_send` with `sessionKey: "agent:<your-agent-name>:slack:direct:<slack-id-lowercase>"`, `message: "<your message>"`, `timeoutSeconds: 0`
+1. `node scripts/lib/dm-inject.js --session-key "agent:<your-agent-name>:slack:direct:<slack-id-lowercase>" --message "<your message>"`
 2. `openclaw message send --channel slack --target user:<SLACK_ID> --message "<your message>"`
 
-where `<SLACK_ID>` is from IDENTITY.md (uppercase for `message send`, lowercase for `sessions_send`).
+where `<SLACK_ID>` is from IDENTITY.md (uppercase for `message send`, lowercase for `dm-inject`). `dm-inject` appends the message directly to the session JSONL — no agent turn, no announce.
 
 ### Follow-up Guidance
 
@@ -327,7 +327,7 @@ Your job is the middle step: summarize today's conversations and write `memory/Y
 
 Cron jobs run in **isolated sessions** — each cron run gets a fresh session with no prior history. They do **not** share the developer's DM session. To get recent conversation context, use `scripts/lib/dm-digest.sh` which reads the DM session file and returns a compact JSON digest of recent messages. Prepare scripts (`daily-summary.sh`, `work-report.sh`) include this digest automatically as `data.conversation_digest`.
 
-When sending a DM from a cron job, you **must** also inject the message into the DM session using `sessions_send` (with `timeoutSeconds: 0`) so that the developer's replies have context. The cron payload message will include the exact `sessions_send` parameters to use. Without this step, the DM session has no record of what you sent, and developer replies arrive without context.
+When sending a DM from a cron job, you **must** also inject the message into the DM session using `scripts/lib/dm-inject.js` so that the developer's replies have context. The cron payload message will include the exact `dm-inject` parameters to use. `dm-inject` appends an assistant message directly to the session JSONL — no agent turn is triggered, no ping-pong, no announce. Without this step, the DM session has no record of what you sent, and developer replies arrive without context.
 
 - **Slack threads are separate sessions.** Each thread gets its own conversation history — you cannot see thread replies from the main DM or vice versa. If a developer references something from a thread, say so honestly and ask them to share the details here.
 

@@ -186,13 +186,12 @@ add_cron_jobs() {
     local bootstrap_preamble
     bootstrap_preamble="Run scripts/bootstrap-check.sh prepare. If data.bootstrap_complete == false, read IDENTITY.md for your Slack user ID, ask the developer for the missing fields in data.missing_required via openclaw message send, then stop.\n\n"
 
-    # Build sessions_send instruction with agent-specific DM session key (#292).
-    # Keep this as private bookkeeping so the model only mirrors the final message text.
+    # Build dm-inject instruction with agent-specific DM session key (#366).
     local slack_id_lower
     slack_id_lower=$(echo "$slack_id" | tr '[:upper:]' '[:lower:]')
     local sessions_send_instruction=""
     if [[ -n "$slack_id" ]]; then
-        sessions_send_instruction="\\n\\nMechanical step only: after composing the final user-facing message, inject that exact text into the DM session with sessions_send so replies have context. Use no extra commentary, prefixes, or suffixes in the injected text.\\nsessions_send sessionKey=\"agent:${agent_name}:slack:direct:${slack_id_lower}\" message=\"<final user-facing message text>\" timeoutSeconds=0\\n\\n"
+        sessions_send_instruction="\\n\\nBefore sending, inject the message into the DM session:\\nnode scripts/lib/dm-inject.js --session-key \"agent:${agent_name}:slack:direct:${slack_id_lower}\" --message \"<your composed message>\"\\n\\n"
     fi
 
     # Create 3 jobs with type-specific payloads
@@ -325,7 +324,7 @@ add_cron_jobs() {
 
     local report_sessions_send_line=""
     if [[ -n "$slack_id" ]]; then
-        report_sessions_send_line="\\n\\nMechanical step only: after composing the final report text, inject that exact text into the DM session with sessions_send so replies have context. Use no extra commentary, prefixes, or suffixes in the injected text.\\nsessions_send sessionKey=\"agent:${agent_name}:slack:direct:${report_slack_id_lower}\" message=\"<final report text>\" timeoutSeconds=0\\n\\n"
+        report_sessions_send_line="\\n\\nBefore sending, inject the report into the DM session:\\nnode scripts/lib/dm-inject.js --session-key \"agent:${agent_name}:slack:direct:${report_slack_id_lower}\" --message \"<report>\"\\n\\n"
     fi
 
     local report_message
