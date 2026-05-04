@@ -357,3 +357,19 @@ The LCM (lossless-claw) plugin config in `openclaw.json` must always have a non-
 Running `openclaw plugins install --force` directly (outside of `update-openclaw.sh`) will wipe the LCM plugin config. Always use `update-openclaw.sh --apply --component lossless-claw` instead, which handles config preservation automatically.
 
 **Rationale:** Direct `plugins install` on Apr 6 caused the compaction model to silently fall back to the default agent model. The gateway kept running but sessions grew without compaction until the next manual fix. Fixed in `update-openclaw.sh` config preservation (issue #253).
+
+### 6.3 No Silent Config Key Drops During Update [ENFORCED]
+
+`update-openclaw.sh` snapshots all leaf config paths in `~/.openclaw/openclaw.json` before applying updates and diffs them after. Any keys present pre-update but absent post-update abort the run before gateway restart, unless explicitly listed in `DROPPED_KEYS_ALLOWLIST`.
+
+**Rationale:** On 2026-05-04, the 2026.4.23 → 2026.5.3 update silently dropped `hooks.publicUrl` because the schema renamed it to `plugins.entries.device-pair.config.publicUrl`. `openclaw doctor --fix` rejected the new schema's incompatibility with `tools.web.search.provider: "duckduckgo"`, restored from "last-known-good", then synthesized a best-effort config that dropped any keys the new schema didn't accept. `update-openclaw.sh` previously only protected the LCM plugin config (invariants 6.1/6.2), so the drop went unnoticed until manual review (issue #373).
+
+**Enforcement:** `scripts/update-openclaw.sh` calls `snapshot_config_keys` before update phases and `verify_no_dropped_keys` before gateway restart. Failure aborts with `failed_step` set, triggering the existing Slack notification path.
+
+### 6.4 device-pair.config.publicUrl Must Be Set [ENFORCED]
+
+`plugins.entries.device-pair.config.publicUrl` in `~/.openclaw/openclaw.json` must equal `https://<host-url>`. Companion-app pairing (Android, iOS, macOS) bootstraps device tokens through this URL.
+
+**Rationale:** This was previously `hooks.publicUrl`. The 2026.5.3 schema rename moved it under the device-pair plugin config, and `openclaw doctor --fix` did not migrate the value during update — it dropped it (issue #373). Companion-app pairing fails with no user-visible error until someone tries to pair, so the drop is silent until discovered manually.
+
+**Enforcement:** `scripts/update-openclaw.sh` calls `verify_device_pair_publicurl` post-update; `scripts/validate-invariants.sh check_device_pair_public_url` runs in the `openclaw-config` and `all` targets (host-only — skips silently in CI where the file is absent).

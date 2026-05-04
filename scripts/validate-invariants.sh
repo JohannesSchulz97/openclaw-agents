@@ -5,6 +5,7 @@
 #   bash scripts/validate-invariants.sh                    # all checks
 #   bash scripts/validate-invariants.sh --target cron      # cron checks only
 #   bash scripts/validate-invariants.sh --target gitignore  # gitignore checks only
+#   bash scripts/validate-invariants.sh --target openclaw-config # host openclaw.json checks
 #   bash scripts/validate-invariants.sh --format json      # JSON output for hooks
 #
 # Exit codes: 0 = all pass, 1 = failures found, 2 = script error
@@ -17,6 +18,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 CRON_CONFIG="$REPO_ROOT/.openclaw/cron/jobs-config.json"
 GITIGNORE="$REPO_ROOT/.gitignore"
+OPENCLAW_JSON="$HOME/.openclaw/openclaw.json"
 
 TARGET="all"
 FORMAT="human"
@@ -339,6 +341,25 @@ check_gitignore_required_patterns() {
   fi
 }
 
+# ── Openclaw config checks (host-only) ───────────────────────
+
+check_device_pair_public_url() {
+  # Invariant 6.3: plugins.entries.device-pair.config.publicUrl must equal
+  # https://<host-url> — companion-app pairing depends on it.
+  # Host-only: skips silently in CI where openclaw.json is absent.
+  if [[ ! -f "$OPENCLAW_JSON" ]]; then
+    return
+  fi
+  local expected="https://<host-url>"
+  local val
+  val=$(jq -r '.plugins.entries["device-pair"].config.publicUrl // ""' "$OPENCLAW_JSON")
+  if [[ "$val" == "$expected" ]]; then
+    pass
+  else
+    fail "device_pair_public_url" "plugins.entries.device-pair.config.publicUrl is '$val' (expected '$expected')"
+  fi
+}
+
 # ── Runner ───────────────────────────────────────────────────
 
 run_checks() {
@@ -346,12 +367,16 @@ run_checks() {
     all)
       run_cron_checks
       run_gitignore_checks
+      run_openclaw_config_checks
       ;;
     cron)
       run_cron_checks
       ;;
     gitignore)
       run_gitignore_checks
+      ;;
+    openclaw-config)
+      run_openclaw_config_checks
       ;;
     *)
       echo "Unknown target: $TARGET" >&2
@@ -388,6 +413,12 @@ run_gitignore_checks() {
     return
   fi
   check_gitignore_required_patterns
+}
+
+run_openclaw_config_checks() {
+  # Host-only: check_device_pair_public_url skips silently when openclaw.json
+  # is absent (CI), so calling it unconditionally is safe.
+  check_device_pair_public_url
 }
 
 # ── Output ───────────────────────────────────────────────────

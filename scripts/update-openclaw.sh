@@ -80,6 +80,124 @@ fi
 
 LCM_CONFIG_BACKUP="/tmp/lcm-plugin-config-backup.json"
 LCM_PLIST_BACKUP="/tmp/lcm-plist-envvars-backup.txt"
+CONFIG_SNAPSHOT="/tmp/openclaw-config-snapshot.txt"
+
+# --------------------------------------------------------------------------- #
+# Config key snapshot + drop detection (issue #373)
+# --------------------------------------------------------------------------- #
+# `openclaw doctor --fix` can silently drop keys when the schema rejects the
+# current config (it restores from "last-known-good" then synthesizes a
+# best-effort config, dropping any keys the new schema doesn't accept).
+# This happened on 2026-05-04 with `hooks.publicUrl` during the 2026.4.23 →
+# 2026.5.3 update, breaking companion-app pairing silently.
+#
+# We snapshot all leaf config paths before the update and diff after. Any
+# unexpected drops abort the update before gateway restart.
+#
+# Allowlist below lets operators acknowledge legitimate schema migrations.
+# Each entry: dotted-path # reason (issue/PR)
+
+DROPPED_KEYS_ALLOWLIST=(
+  # (empty — add entries here when a schema migration legitimately removes a key)
+)
+
+snapshot_config_keys() {
+  if [ ! -f "$OPENCLAW_JSON" ]; then
+    log "  WARN: No openclaw.json to snapshot"
+    return
+  fi
+  if ! command -v jq &>/dev/null; then
+    log "  WARN: jq not found, skipping config snapshot"
+    return
+  fi
+  jq -r '[paths(scalars)] | map(map(tostring) | join(".")) | .[]' "$OPENCLAW_JSON" \
+    | sort -u > "$CONFIG_SNAPSHOT"
+  log "  Snapshotted $(wc -l <"$CONFIG_SNAPSHOT" | tr -d ' ') config keys"
+}
+
+verify_no_dropped_keys() {
+  if [ ! -f "$CONFIG_SNAPSHOT" ]; then
+    log "  WARN: No snapshot to compare"
+    return 0
+  fi
+  if [ ! -f "$OPENCLAW_JSON" ]; then
+    log "  ERROR: openclaw.json missing after update"
+    return 1
+  fi
+  if ! command -v jq &>/dev/null; then
+    log "  WARN: jq not found, skipping drop verification"
+    return 0
+  fi
+
+  local current_snapshot="/tmp/openclaw-config-snapshot.current.txt"
+  jq -r '[paths(scalars)] | map(map(tostring) | join(".")) | .[]' "$OPENCLAW_JSON" \
+    | sort -u > "$current_snapshot"
+
+  local dropped
+  dropped=$(comm -23 "$CONFIG_SNAPSHOT" "$current_snapshot")
+  rm -f "$current_snapshot"
+
+  if [ -z "$dropped" ]; then
+    log "  No keys dropped"
+    return 0
+  fi
+
+  # Filter against allowlist
+  local unexpected=""
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    local skip=false
+    for allowed in ${DROPPED_KEYS_ALLOWLIST[@]+"${DROPPED_KEYS_ALLOWLIST[@]}"}; do
+      local allowed_path="${allowed%%#*}"
+      # Trim trailing whitespace
+      allowed_path="$(echo "$allowed_path" | sed 's/[[:space:]]*$//')"
+      [ -z "$allowed_path" ] && continue
+      if [ "$line" = "$allowed_path" ]; then
+        skip=true
+        break
+      fi
+    done
+    if [ "$skip" = false ]; then
+      unexpected="${unexpected}${line}\n"
+    fi
+  done <<< "$dropped"
+
+  if [ -n "$unexpected" ]; then
+    log "  ERROR: Config keys dropped during update (not in allowlist):"
+    printf '%b' "$unexpected" | while IFS= read -r line; do
+      [ -n "$line" ] && log "    - $line"
+    done
+    log "  Pre-update backup: $BACKUP_DIR/openclaw.json.$epoch"
+    log "  If this drop is intentional (schema migration), add the path to"
+    log "  DROPPED_KEYS_ALLOWLIST in scripts/update-openclaw.sh and re-run."
+    return 1
+  fi
+  log "  No unexpected key drops (all matched allowlist)"
+  return 0
+}
+
+verify_device_pair_publicurl() {
+  # Invariant 6.3 (issue #373). Companion-app pairing depends on this URL.
+  # Doctor previously dropped it during a schema rename (hooks.publicUrl →
+  # plugins.entries.device-pair.config.publicUrl).
+  if [ ! -f "$OPENCLAW_JSON" ]; then
+    return 0
+  fi
+  if ! command -v jq &>/dev/null; then
+    return 0
+  fi
+  local expected="https://<host-url>"
+  local val
+  val=$(jq -r '.plugins.entries["device-pair"].config.publicUrl // ""' "$OPENCLAW_JSON")
+  if [ "$val" != "$expected" ]; then
+    log "  ERROR: plugins.entries.device-pair.config.publicUrl is '$val' (expected '$expected')"
+    log "  Companion-app pairing will fail. Restore with:"
+    log "    openclaw config set plugins.entries.device-pair.config.publicUrl '\"$expected\"'"
+    return 1
+  fi
+  log "  device-pair.publicUrl OK"
+  return 0
+}
 
 save_lcm_config() {
   # Save openclaw.json plugin config
@@ -382,6 +500,10 @@ fi
 log "Saving LCM plist env vars..."
 save_lcm_plist_envvars
 
+# Step 1c: Snapshot all config leaf paths to detect silent drops (issue #373)
+log "Snapshotting config leaf paths..."
+snapshot_config_keys
+
 # Step 2: Record pre-update versions
 pre_openclaw="$cur_openclaw"
 pre_lcm="$cur_lcm"
@@ -482,6 +604,20 @@ fi
 # Step 7b: Verify LCM config survived the entire update cycle
 log "Verifying LCM config..."
 verify_lcm_config
+
+# Step 7c: Verify no config keys were silently dropped (issue #373)
+log "Verifying no config keys dropped..."
+if ! verify_no_dropped_keys; then
+  failed_step="config keys dropped"
+fi
+
+# Step 7d: Verify device-pair publicUrl invariant 6.3 (issue #373)
+if [ -z "$failed_step" ]; then
+  log "Verifying device-pair publicUrl..."
+  if ! verify_device_pair_publicurl; then
+    failed_step="device-pair publicUrl missing"
+  fi
+fi
 
 # Step 9: Post-update versions
 post_openclaw=$(get_current_openclaw)
