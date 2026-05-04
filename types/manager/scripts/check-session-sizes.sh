@@ -19,6 +19,11 @@ for agent_dir in "$OPENCLAW_DIR"/*/; do
 
   for session_file in "$sessions_dir"/*.jsonl; do
     [ -f "$session_file" ] || continue
+    # Skip lossless-claw trajectory files: append-only audit history,
+    # naturally large, not a retry-loop signal. See issue #372.
+    case "$session_file" in
+      *.trajectory.jsonl) continue ;;
+    esac
     TOTAL_CHECKED=$((TOTAL_CHECKED + 1))
 
     size_bytes=$(stat -f%z "$session_file" 2>/dev/null || stat -c%s "$session_file" 2>/dev/null || echo 0)
