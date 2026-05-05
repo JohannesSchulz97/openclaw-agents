@@ -10,3 +10,7 @@ agents/[^/]+/memory
 
 # Bootstrap completion markers (gitignored, but protect just in case).
 agents/[^/]+/\.BOOTSTRAP\.md\.done
+
+# Hook transforms must remain real files on the host; OpenClaw rejects
+# modules whose realpath escapes ~/.openclaw/hooks/transforms.
+hooks/transforms
