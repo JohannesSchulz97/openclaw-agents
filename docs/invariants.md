@@ -129,6 +129,14 @@ Cron jobs that send a Slack DM (`openclaw message send`) must first call `sessio
 
 **Rationale:** Discovered during #292 testing — `sessions_send` silently failed under `visibility: "tree"`. Switching to `"agent"` allows cross-session sends within the same agent. Already applied on host 2026-04-10.
 
+### 1.18 No Null agentId or sessionKey [ENFORCED]
+
+Every job in `jobs-config.json` must have a non-null, non-empty `agentId` and `sessionKey`.
+
+**Rationale:** `openclaw cron add` silently accepts null `agentId`. The gateway then routes the job to the first agent in `agents.list`, not the intended one. Null `sessionKey` causes `apply-cron.sh` to never match the job during reconciliation, so orphan jobs persist indefinitely in the runtime state. Root cause of dev1 receiving dev6's German check-in DMs (#378).
+
+---
+
 ### 1.17 Every Dev-PA Agent Has a Work Report Cron [ENFORCED]
 
 Every dev-pa agent (identified by having a `:morning` check-in sessionKey) must also have a `:report` work-report sessionKey. Both must share the same `agentId`.

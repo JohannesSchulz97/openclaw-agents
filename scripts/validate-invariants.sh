@@ -273,6 +273,20 @@ check_cron_no_duplicate_agent_type() {
   fi
 }
 
+check_cron_no_null_fields() {
+  # Invariant 1.18: every job must have non-null agentId and sessionKey
+  local bad
+  bad=$(jq -r '.jobs[] | select(.agentId == null or .agentId == "" or .sessionKey == null or .sessionKey == "") |
+    .name + " (agentId: " + (.agentId // "null") + ", sessionKey: " + (.sessionKey // "null") + ")"' "$CRON_CONFIG")
+  if [[ -z "$bad" ]]; then
+    pass
+  else
+    while IFS= read -r line; do
+      fail "no_null_fields" "Job has null agentId or sessionKey: $line"
+    done <<< "$bad"
+  fi
+}
+
 check_cron_dev_pa_has_report() {
   # Invariant 1.17: every dev-pa agent must have a work-report cron entry.
   # Dev-pa agents are identified by having a :morning check-in (tech-manager
@@ -404,6 +418,7 @@ run_cron_checks() {
   check_cron_summary_schedule
   check_cron_report_schedule
   check_cron_no_duplicate_agent_type
+  check_cron_no_null_fields
   check_cron_dev_pa_has_report
 }
 
