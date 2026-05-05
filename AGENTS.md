@@ -48,8 +48,10 @@ If the work is reactive (e.g. fixing a production incident), it's fine to create
 
 ### Issues stay maintained
 
-Issues are living documents, not fire-and-forget tickets:
-- **Add comments as work progresses.** Intermediate findings, decisions, and pivots go into comments so the full story is traceable.
+Issues are living documents, not fire-and-forget tickets. Follow the **body = current state, comments = changelog** pattern:
+
+- **Keep the body current.** The issue body reflects what is true *now* — current scope, current plan, current status. When scope changes or new findings shift direction, update the body. Anyone opening the issue should see the accurate present state without reading through comments.
+- **Add comments as work progresses.** Intermediate findings, decisions, and pivots go into comments so the full story is traceable. Comments are the changelog; the body is the snapshot.
 - **Link related issues.** If an investigation reveals a new problem, open a new issue and cross-reference both. Don't bury multiple root causes in one thread.
 - **Close with a resolution summary.** When closing, state what was done and what the outcome was. If a PR fixes it, the link alone is not enough — summarize what the PR actually changed and why.
 - **Don't let issues go stale.** If work is paused or deprioritized, say so in a comment. An issue with no activity and no explanation is a blind spot.
