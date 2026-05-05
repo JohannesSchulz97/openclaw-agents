@@ -13,15 +13,16 @@
 #   - payload.kind (implicitly set by --message for agentTurn)
 #   - payload.model clearing (no --clear-model flag; Phase 2b patches jobs.json directly)
 #
-# NOTE: After Phase 2b patches jobs.json, a gateway restart is needed for
-#       in-memory state to reflect the cleared model. The script does NOT
-#       restart the gateway automatically.
+# NOTE: After any change (add/edit/remove/Phase 2b), the script writes a restart
+#       marker at /tmp/openclaw-deploy-needs-restart. deploy.sh picks this up
+#       and restarts the gateway so the live scheduler reloads all changes.
 
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CONFIG_FILE="$REPO_ROOT/.openclaw/cron/jobs-config.json"
 LOCKFILE="/tmp/apply-cron.lock"
+RESTART_MARKER="/tmp/openclaw-deploy-needs-restart"
 
 # --------------------------------------------------------------------------- #
 # Flags
@@ -185,10 +186,54 @@ build_cmd_args() {
 }
 
 # --------------------------------------------------------------------------- #
+# Retry helper — wraps a single openclaw cron command.
+#
+# On 1006 / connection-refused errors the gateway was restarting mid-run.
+# We wait up to 30 s for it to recover, then retry the command once.
+# Genuine config errors (non-connectivity) fail immediately.
+# --------------------------------------------------------------------------- #
+run_cron_cmd() {
+  local cmd_str="$1"
+  local output exit_code=0
+
+  output=$(eval "$cmd_str" 2>&1) || exit_code=$?
+
+  if [ "$exit_code" -eq 0 ]; then
+    echo "    OK"
+    return 0
+  fi
+
+  # Check for gateway connectivity errors (1006 = WS abnormal closure)
+  if echo "$output" | grep -qiE "1006|abnormal.closure|E<channel-id>|connection refused|connect E<channel-id>"; then
+    echo "    Gateway connection error — waiting for recovery (up to 30s)..."
+    local attempt=0
+    while [ "$attempt" -lt 6 ]; do
+      sleep 5
+      attempt=$((attempt + 1))
+      if openclaw cron list --json &>/dev/null; then
+        echo "    Gateway recovered, retrying..."
+        if eval "$cmd_str"; then
+          echo "    OK (after retry)"
+          return 0
+        fi
+        echo "    FAILED after retry" >&2
+        return 1
+      fi
+    done
+    echo "    FAILED: gateway did not recover within 30s" >&2
+    return 1
+  fi
+
+  echo "    FAILED: $output" >&2
+  return 1
+}
+
+# --------------------------------------------------------------------------- #
 # Main
 # --------------------------------------------------------------------------- #
 ERRORS=0
-CLEAR_MODEL_IDS=()   # gateway IDs needing model cleared (no --clear-model in CLI)
+NEEDS_RESTART=false   # set true when any cron change is applied
+CLEAR_MODEL_IDS=()    # gateway IDs needing model cleared (no --clear-model in CLI)
 
 JOB_COUNT=$(jq '.jobs | length' "$CONFIG_FILE")
 echo "Reconciling gateway with $JOB_COUNT config job(s) from $CONFIG_FILE"
@@ -236,10 +281,9 @@ for i in $(seq 0 $((JOB_COUNT - 1))); do
       echo "    [DRY RUN] $CMD_STR"
     else
       echo "    Running: $CMD_STR"
-      if eval "$CMD_STR"; then
-        echo "    OK"
+      if run_cron_cmd "$CMD_STR"; then
+        NEEDS_RESTART=true
       else
-        echo "    FAILED" >&2
         ERRORS=$((ERRORS + 1))
       fi
     fi
@@ -279,10 +323,9 @@ for i in $(seq 0 $((JOB_COUNT - 1))); do
       echo "    [DRY RUN] $CMD_STR"
     else
       echo "    Running: $CMD_STR"
-      if eval "$CMD_STR"; then
-        echo "    OK"
+      if run_cron_cmd "$CMD_STR"; then
+        NEEDS_RESTART=true
       else
-        echo "    FAILED" >&2
         ERRORS=$((ERRORS + 1))
       fi
     fi
@@ -307,7 +350,6 @@ echo ""
 JOBS_JSON="$HOME/.openclaw/cron/jobs.json"
 
 PHASE2B_PATCHED=0
-RESTART_MARKER="/tmp/openclaw-deploy-needs-restart"
 
 if [ "${#CLEAR_MODEL_IDS[@]}" -gt 0 ] && [ -f "$JOBS_JSON" ]; then
   echo "=== Phase 2b: CLEAR MODEL ==="
@@ -330,10 +372,10 @@ if [ "${#CLEAR_MODEL_IDS[@]}" -gt 0 ] && [ -f "$JOBS_JSON" ]; then
     fi
   done
 
-  # Create restart marker if Phase 2b actually patched jobs.json
+  # Phase 2b patches always require a restart (in-memory scheduler won't pick up direct file edits)
   if [ "$PHASE2B_PATCHED" -gt 0 ]; then
-    echo "Phase 2b model clearing applied at $(date)" > "$RESTART_MARKER"
-    echo "  Restart marker created: $RESTART_MARKER ($PHASE2B_PATCHED job(s) patched)"
+    NEEDS_RESTART=true
+    echo "  Phase 2b: $PHASE2B_PATCHED job(s) patched — restart required"
   fi
 
   echo ""
@@ -385,10 +427,9 @@ else
         echo "    [DRY RUN] openclaw cron rm $GW_ID"
       else
         echo "    Running: openclaw cron rm $GW_ID"
-        if openclaw cron rm "$GW_ID"; then
-          echo "    OK"
+        if run_cron_cmd "openclaw cron rm '$GW_ID'"; then
+          NEEDS_RESTART=true
         else
-          echo "    FAILED" >&2
           ERRORS=$((ERRORS + 1))
         fi
       fi
@@ -399,6 +440,15 @@ else
 fi
 
 echo ""
+
+# --------------------------------------------------------------------------- #
+# Restart marker — signal deploy.sh to restart the gateway after all phases.
+# Any add/edit/remove or Phase 2b patch requires the live scheduler to reload.
+# --------------------------------------------------------------------------- #
+if [ "$NEEDS_RESTART" = true ] && [ "$DRY_RUN" = false ]; then
+  echo "Cron changes applied at $(date)" > "$RESTART_MARKER"
+  echo "Restart marker written: $RESTART_MARKER"
+fi
 
 # --------------------------------------------------------------------------- #
 # Summary
