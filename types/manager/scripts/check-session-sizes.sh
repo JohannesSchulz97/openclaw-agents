@@ -1,62 +1,93 @@
 #!/usr/bin/env bash
-# check-session-sizes.sh — Detect oversized session files that may indicate retry loops
-# Called by tech-manager hourly monitoring
-# Outputs JSON with alerts for sessions exceeding size threshold
+# check-session-sizes.sh — Detect runaway session growth that may indicate retry loops.
+# Called by tech-manager hourly monitoring. Outputs JSON with alerts.
+#
+# Detection: delta-based. Alerts when a session grew more than THRESHOLD_KB since
+# the last run. Stable large files (delta = 0) never alert. First-seen sessions
+# are recorded but not alerted (need two samples).
+#
+# State file: ~/.openclaw/state/session-size-history.json
 
 set -euo pipefail
 
-THRESHOLD_KB="${1:-500}"
+THRESHOLD_KB="${1:-1024}"
 OPENCLAW_DIR="$HOME/.openclaw/agents"
-ALERTS="[]"
-TOTAL_CHECKED=0
-TOTAL_ALERTS=0
+STATE_FILE="$HOME/.openclaw/state/session-size-history.json"
 
-for agent_dir in "$OPENCLAW_DIR"/*/; do
-  agent_name=$(basename "$agent_dir")
-  sessions_dir="$agent_dir/sessions"
+mkdir -p "$(dirname "$STATE_FILE")"
 
-  [ -d "$sessions_dir" ] || continue
+python3 - "$THRESHOLD_KB" "$OPENCLAW_DIR" "$STATE_FILE" <<'PYEOF'
+import sys, json, os, subprocess
 
-  for session_file in "$sessions_dir"/*.jsonl; do
-    [ -f "$session_file" ] || continue
-    # Skip lossless-claw trajectory files: append-only audit history,
-    # naturally large, not a retry-loop signal. See issue #372.
-    case "$session_file" in
-      *.trajectory.jsonl) continue ;;
-    esac
-    TOTAL_CHECKED=$((TOTAL_CHECKED + 1))
+threshold_kb = int(sys.argv[1])
+agents_dir = sys.argv[2]
+state_file = sys.argv[3]
 
-    size_bytes=$(stat -f%z "$session_file" 2>/dev/null || stat -c%s "$session_file" 2>/dev/null || echo 0)
-    size_kb=$((size_bytes / 1024))
+try:
+    with open(state_file) as f:
+        prior = json.load(f)
+except (FileNotFoundError, json.JSONDecodeError):
+    prior = {}
 
-    if [ "$size_kb" -ge "$THRESHOLD_KB" ]; then
-      TOTAL_ALERTS=$((TOTAL_ALERTS + 1))
-      line_count=$(wc -l < "$session_file" | tr -d ' ')
-      session_id=$(basename "$session_file" .jsonl)
+new_state = {}
+alerts = []
+sessions_checked = 0
 
-      ALERTS=$(echo "$ALERTS" | python3 -c "
-import sys, json
-alerts = json.load(sys.stdin)
-alerts.append({
-    'agent': '$agent_name',
-    'session_id': '$session_id',
-    'size_kb': $size_kb,
-    'lines': $line_count,
-    'file': '$session_file'
-})
-print(json.dumps(alerts))
-")
-    fi
-  done
-done
+if os.path.isdir(agents_dir):
+    for agent_name in sorted(os.listdir(agents_dir)):
+        sessions_dir = os.path.join(agents_dir, agent_name, 'sessions')
+        if not os.path.isdir(sessions_dir):
+            continue
+        for fname in sorted(os.listdir(sessions_dir)):
+            if not fname.endswith('.jsonl'):
+                continue
+            # Skip lossless-claw trajectory files: append-only audit log, not a retry-loop signal.
+            if fname.endswith('.trajectory.jsonl'):
+                continue
+            fpath = os.path.join(sessions_dir, fname)
+            sessions_checked += 1
+            session_id = fname[:-6]  # strip .jsonl
 
-python3 -c "
-import json
-result = {
-    'sessions_checked': $TOTAL_CHECKED,
-    'alerts': $TOTAL_ALERTS,
-    'threshold_kb': $THRESHOLD_KB,
-    'oversized_sessions': $ALERTS
-}
-print(json.dumps(result, indent=2))
-"
+            try:
+                cur_bytes = os.path.getsize(fpath)
+            except OSError:
+                continue
+
+            new_state[session_id] = cur_bytes
+
+            prev = prior.get(session_id)
+            if prev is None:
+                continue  # first seen, need two samples
+
+            delta_kb = (cur_bytes - prev) // 1024
+            if delta_kb < 0:
+                continue  # file shrank (rotation/truncation), not a loop
+
+            if delta_kb >= threshold_kb:
+                try:
+                    wc = subprocess.run(['wc', '-l', fpath], capture_output=True, text=True, timeout=5)
+                    line_count = int(wc.stdout.strip().split()[0])
+                except Exception:
+                    line_count = 0
+                alerts.append({
+                    'agent': agent_name,
+                    'session_id': session_id,
+                    'delta_kb': delta_kb,
+                    'size_kb': cur_bytes // 1024,
+                    'lines': line_count,
+                    'file': fpath
+                })
+
+# Persist updated state atomically (only currently existing sessions)
+tmp = state_file + '.tmp'
+with open(tmp, 'w') as f:
+    json.dump(new_state, f)
+os.replace(tmp, state_file)
+
+print(json.dumps({
+    'sessions_checked': sessions_checked,
+    'alerts': len(alerts),
+    'threshold_kb': threshold_kb,
+    'growing_sessions': alerts
+}, indent=2))
+PYEOF

@@ -60,6 +60,9 @@ for agent_name in sorted(os.listdir(agents_dir)):
     for fname in os.listdir(sessions_dir):
         if not fname.endswith('.jsonl'):
             continue
+        # Skip lossless-claw trajectory files: append-only audit log, not a retry-loop signal.
+        if fname.endswith('.trajectory.jsonl'):
+            continue
         fpath = os.path.join(sessions_dir, fname)
         sessions_checked += 1
         session_id = fname[:-6]  # strip .jsonl
