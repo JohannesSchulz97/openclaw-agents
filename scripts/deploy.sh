@@ -126,6 +126,24 @@ else
   log "  OK"
 fi
 
+log "Installing hook transforms as real files..."
+if [ "$DRY_RUN" = true ]; then
+  log "  (dry-run) would copy: .openclaw/hooks/transforms/* -> ~/.openclaw/hooks/transforms/"
+else
+  HOOK_TRANSFORMS_SRC="$REPO_ROOT/.openclaw/hooks/transforms"
+  HOOK_TRANSFORMS_DEST="$HOME/.openclaw/hooks/transforms"
+  mkdir -p "$HOOK_TRANSFORMS_DEST"
+  if [ -d "$HOOK_TRANSFORMS_SRC" ]; then
+    for src in "$HOOK_TRANSFORMS_SRC"/*; do
+      [ -f "$src" ] || continue
+      dest="$HOOK_TRANSFORMS_DEST/$(basename "$src")"
+      rm -f "$dest"
+      cp "$src" "$dest"
+    done
+  fi
+  log "  OK"
+fi
+
 log "Applying cron config..."
 if [ "$DRY_RUN" = true ]; then
   log "  (dry-run) would run: bash scripts/apply-cron.sh"
