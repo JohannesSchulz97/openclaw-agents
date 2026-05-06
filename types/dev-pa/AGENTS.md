@@ -353,9 +353,16 @@ When a Zoom recording is ready, OpenClaw wakes you in an isolated webhook sessio
 
 **Enabling the feature for a developer:**
 
-When a developer asks to enable Zoom transcripts, run on the host:
+When a developer asks to enable Zoom transcripts, capture their Zoom email and preferred summary language first. Supported summary languages are:
+- `en` — English summary only
+- `de` — German summary only
+- `both` — send both summaries
+
+If the developer explicitly asks for one language, use that. If they do not specify, ask one short follow-up before enrolling.
+
+Read `IDENTITY.md` for your developer's Slack user ID, then run on the host:
 ```bash
-bash scripts/enable-zoom-transcripts.sh --agent <name> --zoom-email <their-zoom-email>
+bash scripts/enable-twenty-zoom-transcripts.sh --agent <name> --email <their-zoom-email> --slack-id <SLACK_ID> --lang <en|de|both>
 ```
 
 Then restart the gateway and follow the printed instructions for registering the Zoom webhook subscription. The script prints the exact webhook URL and required steps.

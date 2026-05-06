@@ -4,6 +4,7 @@
 #
 # Usage:
 #   enable-twenty-zoom-transcripts.sh --agent NAME --email EMAIL --slack-id ID [--lang en|de|both]
+#   enable-twenty-zoom-transcripts.sh --agent NAME --zoom-email EMAIL --slack-id ID [--lang en|de|both]
 #   enable-twenty-zoom-transcripts.sh --email EMAIL --unenroll
 
 set -euo pipefail
@@ -11,28 +12,32 @@ set -euo pipefail
 REGISTRY="${TWENTY_ZOOM_OPTIN:-$HOME/.openclaw/twenty-zoom-optin.json}"
 
 usage() {
+  local exit_code="${1:-1}"
   cat >&2 <<EOF
 Usage:
   $0 --agent NAME --email EMAIL --slack-id ID [--lang en|de|both]
+  $0 --agent NAME --zoom-email EMAIL --slack-id ID [--lang en|de|both]
   $0 --email EMAIL --unenroll
 EOF
-  exit 1
+  exit "$exit_code"
 }
 
 AGENT=""
 EMAIL=""
 SLACK_ID=""
 LANG="both"
+LANG_SET=0
 UNENROLL=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --agent)    AGENT="$2"; shift 2 ;;
     --email)    EMAIL="$2"; shift 2 ;;
+    --zoom-email) EMAIL="$2"; shift 2 ;;
     --slack-id) SLACK_ID="$2"; shift 2 ;;
-    --lang)     LANG="$2"; shift 2 ;;
+    --lang)     LANG="$2"; LANG_SET=1; shift 2 ;;
     --unenroll) UNENROLL=1; shift ;;
-    -h|--help)  usage ;;
+    -h|--help)  usage 0 ;;
     *)          usage ;;
   esac
 done
@@ -61,6 +66,9 @@ PY
 fi
 
 [[ -z "$AGENT" || -z "$SLACK_ID" ]] && usage
+if (( LANG_SET == 0 )); then
+  echo "WARN: --lang not provided; defaulting to both" >&2
+fi
 
 python3 - "$REGISTRY" "$EMAIL" "$AGENT" "$SLACK_ID" "$LANG" <<'PY'
 import json, sys, datetime

@@ -53,6 +53,17 @@ The OpenClaw side should route that path to the deterministic transform in:
 - The transform uploads the transcript file directly through Slack's file upload API because `openclaw message send --media` rejects host-local `text/plain` files.
 - If the Worker is introduced later, it should inject `OPENCLAW_TOKEN` and add HMAC verification against `TWENTY_SECRET`.
 - Opt-in registry path: `~/.openclaw/twenty-zoom-optin.json`
+- Registry entries can include `summary_lang: "en" | "de" | "both"`. The host transform reads that field and only sends the matching summary variants.
+
+## Enrollment
+
+Enroll a developer with the real script name and an explicit language preference:
+
+```bash
+bash scripts/enable-twenty-zoom-transcripts.sh --agent <name> --email <zoom-email> --slack-id <SLACK_ID> --lang <en|de|both>
+```
+
+If `--lang` is omitted, the script defaults to `both` and prints a warning.
 
 ## Validation
 
