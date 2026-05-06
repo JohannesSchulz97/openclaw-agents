@@ -4,5 +4,7 @@
     "start": "09:00",
     "end": "18:00"
   },
-  "works_weekends": false
+  "works_weekends": false,
+  "working_days": ["mon", "tue", "wed", "thu", "fri"],
+  "time_off": []
 }

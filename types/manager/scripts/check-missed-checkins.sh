@@ -62,8 +62,16 @@ for agent in "${AGENT_LIST[@]}"; do
 
     log "Checking missed check-ins for: $agent"
 
-    # ── Work schedule (optional — unbootstrapped agents still get checked) ──
-    WORK_SCHEDULE_FILE="$AGENT_DIR/memory/work-schedule.json"
+    # ── Availability check — skip if non-working day or time off ───────────
+    AVAILABILITY_GUARD="$AGENT_DIR/scripts/availability-guard.sh"
+    if [[ -f "$AVAILABILITY_GUARD" ]]; then
+        GUARD_RESULT=$(bash "$AVAILABILITY_GUARD" 2>/dev/null || echo '{}')
+        GUARD_STATUS=$(echo "$GUARD_RESULT" | jq -r '.data.status // "proceed"')
+        if [[ "$GUARD_STATUS" != "proceed" ]]; then
+            log "  SKIP: $agent not available today (status: $GUARD_STATUS)"
+            continue
+        fi
+    fi
 
     # ── Get last human DM interaction ──────
     SESSIONS_FILE="$AGENT_DIR/sessions/sessions.json"

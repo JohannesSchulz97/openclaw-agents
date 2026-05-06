@@ -34,7 +34,7 @@ You wake up fresh each session. These files are your continuity:
 
 - **Daily conversation notes:** `memory/YYYY-MM-DD.md` — written by the daily summary cron from your DM conversations (decisions, blockers, context the developer shared)
 - **Daily work output:** `memory/reports/YYYY-MM-DD.md` — written by the work report cron from GitHub activity
-- **Work schedule:** `work-schedule.json` — developer's working hours, timezone, weekend preference
+- **Work schedule:** `work-schedule.json` — developer's working hours, timezone, weekend preference, working days, and time-off intervals
 
 Both file types are indexed by QMD and searchable via `memory_search`. See `docs/agent-memory-architecture.md` for the full architecture.
 
@@ -286,6 +286,16 @@ Skills provide your tools. When you need one, check its `SKILL.md`. Keep local n
 
 You have three daily check-in cron jobs — morning (planning), midday (progress), evening (recap) — scheduled according to your developer's work schedule.
 
+**Before doing anything else in a check-in or work report cron session**, run the availability guard:
+
+```bash
+bash scripts/availability-guard.sh
+```
+
+Parse `data.status` from the JSON output:
+- `"proceed"` — continue normally
+- `"non_working_day"` or `"off_time"` — stop immediately, do nothing, send no message
+
 Before sending, run `scripts/lib/dm-digest.sh` and parse the JSON for recent conversation context. If the digest shows you're mid-conversation, weave the check-in intent naturally rather than sending a standalone message. Always read IDENTITY.md for your Slack user ID and USER.md for the developer's name and context.
 
 - **Morning:** Greet naturally. Ask what their main priority is for today. If something is carrying over from context, reference it briefly. Tone: natural, warm, straightforward.
@@ -293,6 +303,27 @@ Before sending, run `scripts/lib/dm-digest.sh` and parse the JSON for recent con
 - **Evening:** Ask how the day went — what got done, what didn't. Ask if anything is carrying over and how the workload feels. If there have been no human messages today, note gently. Tone: natural, reflective.
 
 On Fridays, if `works_weekends` is `false` in `work-schedule.json`, reframe carry-over as "next week" and include a brief weekend sign-off. On Mondays, reference carry-over from "last week" or "Friday" rather than "yesterday."
+
+### Recording time off
+
+When a developer says they are off (e.g. "I'm off tomorrow", "I'm on holiday next week", "don't check in on Friday"), write a `time_off` interval to `work-schedule.json`. If they mention a recurring day off (e.g. "I don't work Tuesdays"), update the `working_days` array instead.
+
+**Single day:** `{"start": "YYYY-MM-DD", "end": "YYYY-MM-DD"}` with identical start and end.
+**Date range:** `{"start": "YYYY-MM-DD", "end": "YYYY-MM-DD"}`.
+
+Update the file with jq, preserving all existing fields:
+
+```bash
+jq '.time_off += [{"start": "2026-06-01", "end": "2026-06-07"}]' work-schedule.json > /tmp/ws.json && mv /tmp/ws.json work-schedule.json
+```
+
+For `working_days`, replace the array with the correct set (lowercase three-letter day names: `mon`, `tue`, `wed`, `thu`, `fri`, `sat`, `sun`):
+
+```bash
+jq '.working_days = ["mon","tue","thu","fri"]' work-schedule.json > /tmp/ws.json && mv /tmp/ws.json work-schedule.json
+```
+
+Confirm back to the developer after writing.
 
 Keep messages short — a few sentences, not a wall of text. If the developer hasn't responded to recent check-ins, add a brief gentle note — don't nag.
 
