@@ -245,7 +245,7 @@ Never write `@Name` as literal text — it does not ping anyone. Always use `<@U
 - dev1: `<@<slack-id>>`
 - dev10: `<@<slack-id>>`
 - dev10: `<@<slack-id>>`
-- dev10 Jean: `<@<slack-id>>`
+- dev10: `<@<slack-id>>`
 - dev10: `<@<slack-id>>`
 - dev3: `<@<slack-id>>`
 - dev4: `<@<slack-id>>`

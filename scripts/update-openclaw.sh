@@ -72,7 +72,7 @@ fi
 #   1. openclaw.json (plugins.entries.lossless-claw.config) — wiped by plugins install --force
 #   2. launchd plist env vars (LCM_*) — wiped by openclaw doctor --fix
 # The env vars take PRECEDENCE over openclaw.json (LCM resolves env first).
-# See issue #256 and docs/research/lcm-config-reset-investigation-2026-04-09.md
+# See issue #256
 #
 # Required LCM env vars in plist:
 #   LCM_SUMMARY_MODEL, LCM_SUMMARY_PROVIDER, LCM_CONTEXT_THRESHOLD,

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This is the private agent configuration repository for Kais (autonomous AI worker bots on OpenClaw).
+This is the agent configuration repository for autonomous AI worker bots on OpenClaw.
 
 ## Vision & Goals
 
@@ -214,7 +214,6 @@ The tech-manager agent has 4 jobs: `monitoring` (hourly), `morning-report`, `eve
 - **`sessionKey`** serves as the cron scheduler matching key in `apply-cron.sh`. When `sessionTarget` is `"isolated"`, sessionKey is only used for reconciliation, not session identity.
 - **Dev-pa cron jobs use `sessionTarget: "isolated"`** (current config). Each cron run gets a fresh session with no prior history. Conversation context is provided via `scripts/lib/dm-digest.sh` which reads the DM session file and returns a compact digest. This prevents cron output from polluting the DM session (#276).
 - **`delivery.mode: "none"`** means the agent's response stays in the cron session only and is not delivered to the user as a notification. The agent itself decides whether to send a Slack message using `openclaw message send`.
-- See `docs/research/openclaw-session-key-vs-target-2026-04-09.md` for the full source-code analysis.
 
 ### DM session injection via `sessions_send`
 
@@ -324,9 +323,9 @@ When fixing a bug or correcting a broken pattern, ask yourself: **is this a rule
 | dev1 | <slack-id> | <github-username>, <manager-agent> | dev-pa |
 | dev10 | <slack-id> | <github-username> | dev-pa |
 | dev10 | <slack-id> | <github-username> | dev-pa |
-| dev10 Jean | <slack-id> | <github-username> | dev-pa |
 | dev10 | <slack-id> | <github-username> | dev-pa |
-| <your-org> | <slack-id> | -- | dev-pa |
+| dev10 | <slack-id> | <github-username> | dev-pa |
+| dev10 | <slack-id> | -- | dev-pa |
 | dev3 | <slack-id> | <github-username> | dev-pa |
 | dev4 | <slack-id> | <github-username> | dev-pa |
 | dev5 | <slack-id> | <github-username> | dev-pa |
@@ -344,7 +343,7 @@ When fixing a bug or correcting a broken pattern, ask yourself: **is this a rule
 
 ### Lossless Claw (LCM)
 
-Lossless Context Management plugin by Martian Engineering. Replaces OpenClaw's built-in sliding-window compaction with a DAG-based summarization system that preserves every message while keeping active context within model token limits. See `docs/research/lossless-claw-research-2026-03-27.md` for details.
+Lossless Context Management plugin by Martian Engineering. Replaces OpenClaw's built-in sliding-window compaction with a DAG-based summarization system that preserves every message while keeping active context within model token limits.
 
 ### QMD Memory Backend
 
