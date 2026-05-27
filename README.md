@@ -1,68 +1,74 @@
 # openclaw-agents
 
-A production-grade framework for deploying and operating teams of autonomous AI agents on [OpenClaw](https://openclaws.io). Designed to scale: one configuration change propagates to every agent on the next deploy.
+Configuration and automation layer for running a fleet of autonomous AI agents across a distributed software engineering team. 19 developer personal assistants and one manager agent, all deployed from a single repository.
 
 ---
 
-## What this is
+## What it does
 
-This repo is the configuration and automation layer for running two types of AI agents across a software engineering team:
+A distributed team of **19 developers across 5 countries** used Slack for all communication but had no structured way to surface blockers before they became problems, track daily work, or give the tech lead visibility without micromanaging.
 
-**Developer Personal Assistants (`dev-pa`)** — each developer gets a dedicated agent that lives in their Slack DMs. It runs autonomously on a schedule, with no developer intervention required:
-- Morning, midday, and evening check-ins adapted to each developer's working hours and timezone
-- End-of-day work reports generated from GitHub activity
-- Persistent memory across sessions — the agent remembers past conversations, decisions, and blockers
-- Automatic Zoom transcript delivery — developers who opt in receive their meeting transcripts via Slack DM, with configurable language preference (English, German, or both)
-- Natural conversation via Slack DM at any time
+This system deploys one dedicated AI agent per developer, living in their Slack DMs. Each agent operates autonomously — it knows the developer's working hours, timezone, and GitHub activity, runs scheduled check-ins adapted to their schedule, and maintains persistent memory across every session. A separate manager agent monitors the whole team, detects bottlenecks, and posts structured status reports to leadership. No developer files a status update. The agents produce it as a side effect of their normal operation.
 
-**Tech Manager (`manager`)** — a single agent that monitors the entire team. It reads across all developer agents' memory files, detects missed check-ins and blocked work, and delivers structured reports to leadership. It is the AI layer that makes team activity visible without any developer needing to file status updates.
+**Outcomes:**
+- 3 scheduled check-ins per developer per day (morning planning, midday progress, evening recap), each adjusted to local timezone and work schedule
+- Daily work reports generated from GitHub activity — commits, PRs, issues — delivered automatically per developer
+- Persistent cross-session memory: the agent remembers what was discussed, decided, and blocked across every conversation
+- Manager agent runs hourly bottleneck detection across all 19 agents and produces morning and evening team reports
+- Zoom transcript delivery: opt-in routing from Twenty CRM webhook to each developer's Slack DM
+- Voice message support: agents transcribe and integrate voice replies into memory, allowing hands-free check-in responses
+- Single-command provisioning for new agents; the agent bootstraps itself through a natural onboarding conversation
 
 ---
 
-## Why this architecture is worth looking at
+## How it works
 
-### Type system for agent configuration
+### Agent types
 
-All agents of the same type share a single source of truth in `types/`. Edit `types/dev-pa/SOUL.md` once — `sync-agents.sh` propagates the change to every agent on deploy. There is no per-agent duplication to keep in sync. Adding a new developer takes one command:
+**`dev-pa` — Developer Personal Assistant**
 
-```bash
-scripts/create-agent.sh --name dev1 --slack-id <slack-user-id>
-```
+Each developer gets a dedicated agent. On first contact, the agent runs a bootstrap conversation: it introduces itself, collects the developer's preferred name and communication style, asks about working hours and timezone, then writes the work schedule configuration and activates the three cron jobs. From that point, all check-ins fire at the right local time automatically.
 
-The agent bootstraps itself: it introduces itself to the developer, establishes its identity and vibe through natural conversation, collects working hours, and activates its check-in schedule — all without manual configuration.
+During check-ins, the agent pulls a DM digest (recent conversation context) and the developer's latest GitHub activity, then sends a contextual message. The developer can reply by text or voice. That reply gets integrated into memory. At the end of the day, a separate cron job generates a work report from GitHub and writes it to durable memory. A nightly summary distills the day's conversations into a dated memory file.
 
-### Three-layer memory architecture
+**`manager` — Tech Manager**
 
-Agent memory is split by intent, not by mechanism:
+A single agent monitors the entire fleet from a dedicated Slack channel. It has read access to every developer agent's `memory/` directory. Hourly: it checks for missed check-ins and agents stuck in loops. Morning and evening: it aggregates daily notes, correlates GitHub activity with reported progress, and posts structured reports. No developer has to do anything — the manager reads what the developer agents write.
 
-| Layer | Tool | What it stores |
-|-------|------|----------------|
-| Durable memory | QMD (vector search) | Curated knowledge: daily notes, work reports, decisions, blockers |
-| Session recall | LCM (DAG compaction) | What was said in the current conversation |
-| Legacy compatibility | Root `MEMORY.md` | Backward-compatible index |
+### Memory architecture
 
-Cron jobs write two memory files per agent per day: a conversation summary (what the developer discussed, decided, was blocked on) and a work report (GitHub activity, PRs, issues). Both are indexed by QMD and searchable with `memory_search` across all sessions. LCM manages the active conversation context using a DAG-based compaction strategy — every message is preserved in the graph while the active context window stays within model token limits.
+Agent memory is split by intent across three layers:
 
-### Cron jobs as isolated sessions
+| Layer | Mechanism | Scope |
+|-------|-----------|-------|
+| Durable memory | QMD (vector search over dated markdown files) | Persistent, cross-session |
+| Session recall | LCM — DAG-based compaction | Current session only |
+| Legacy index | Root `MEMORY.md` | Backward compatibility |
 
-Scheduled check-ins run in fresh isolated sessions, completely separate from the developer's DM conversation. Conversation context is passed explicitly via a DM digest helper (`scripts/lib/dm-digest.sh`), not by sharing the session. This prevents scheduled work from polluting interactive sessions and was key to keeping DM sessions clean and responsive.
+Two cron jobs write durable memory per agent per day:
 
-### Manager agent with cross-team read access
+- `daily-summary.sh` — conversation context: what the developer worked on, discussed, decided, blocked on
+- `work-report.sh` — work output: GitHub activity fetched via Search API (not Events API, which misses private repos)
 
-The tech-manager agent has read access to every developer agent's `memory/` directory. It aggregates daily notes, detects missed check-ins based on session timestamps, correlates GitHub activity with reported progress, and posts structured team reports to leadership. No developer has to file a status update — the agents write it as a side effect of their normal operation.
+Both files land under `memory/` and are indexed by QMD automatically. The agent can search across all past sessions with `memory_search`. LCM manages the active conversation context using DAG-based summarization — every message is preserved in the graph while the active context window stays within model token limits.
 
-### Declarative cron management
+### Cron isolation
 
-`.openclaw/cron/jobs-config.json` is the single source of truth for all scheduled behavior. `apply-cron.sh` diffs the declared config against the gateway's runtime state and applies changes (add / edit / remove) in order. Cron changes go through PRs like any other change.
+Scheduled check-ins run in **isolated sessions**, completely separate from the developer's DM conversation. Context is passed explicitly via a DM digest helper (`scripts/lib/dm-inject.js`), not by sharing the session. This prevents cron noise from polluting interactive sessions — a lesson learned after session sizes grew to 43 MB and LCM accumulated 2.2 M tokens of cron output before the isolation was introduced.
 
-### Formal invariants with machine enforcement
+### Type system
 
-`docs/invariants.md` catalogs architectural rules with enforcement tags:
-- `[ENFORCED]` — validated by `scripts/validate-invariants.sh`, which runs as a hard-fail CI gate on every deploy
-- `[HOOKED]` — a Claude Code PreToolUse hook fires before editing sensitive files
-- `[DOCUMENTED]` — convention enforced by code review
+All agents of the same type share a single source of truth in `types/`. Edit `types/dev-pa/SOUL.md` once — `sync-agents.sh` propagates the change to every agent on the next deploy. There is no per-agent duplication to drift out of sync. Per-agent files (`IDENTITY.md`, `USER.md`, `work-schedule.json`) are generated once at provisioning and never overwritten by sync.
 
-PreToolUse hooks block direct edits to shared agent files (must go through `types/`) and force reading the relevant skill before editing sensitive config. PostToolUse hooks run validation after every edit and surface failures immediately.
+### Invariant enforcement
+
+`docs/invariants.md` catalogs 30+ architectural rules across cron configuration, the sync/deploy pipeline, agent governance, and plugin config. Rules are tagged by enforcement level:
+
+- **[ENFORCED]** — validated by `scripts/validate-invariants.sh`, which runs as a hard-fail CI gate on every deploy and as a PostToolUse hook during editing
+- **[HOOKED]** — a Claude Code PreToolUse hook fires before edits to sensitive files (e.g., blocking direct edits to `.openclaw/agents/*/` — those must go through `types/`)
+- **[DOCUMENTED]** — convention enforced by code review
+
+The invariants exist because failures were real: wrong session key formats caused cron jobs to pollute DM sessions, null `agentId` fields routed one developer's check-ins to another developer's DM, leftover model fields in cron config caused 9 unnecessary gateway restarts in a single day. Each invariant traces back to a specific incident and commit.
 
 ---
 
@@ -70,55 +76,79 @@ PreToolUse hooks block direct edits to shared agent files (must go through `type
 
 ```
 types/
-├── dev-pa/          # Developer PA type — shared config for all dev agents
-│   ├── SOUL.md      # Agent personality and behavior principles
-│   ├── AGENTS.md    # Instructions, memory model, tool usage, red lines
-│   ├── BOOTSTRAP.md # First-run onboarding flow
-│   ├── HEARTBEAT.md # Check-in behavior
-│   └── scripts/     # check-in, work-report, daily-summary, github-activity, etc.
-└── manager/         # Tech Manager type
+├── dev-pa/               # Developer PA type — shared config for all dev agents
+│   ├── SOUL.md           # Personality and behavior principles
+│   ├── AGENTS.md         # Instructions, memory model, tool usage, red lines
+│   ├── BOOTSTRAP.md      # First-run onboarding flow
+│   ├── HEARTBEAT.md      # Check-in behavior
+│   ├── TOOLS.md          # Available tools and usage guidance
+│   └── scripts/          # check-in, work-report, daily-summary, github-activity, etc.
+└── manager/              # Tech Manager type
     ├── SOUL.md
-    └── scripts/     # bottleneck detection, missed check-ins, evening reports
+    ├── AGENTS.md
+    └── scripts/          # bottleneck detection, missed check-in checks, evening reports
 
-scripts/             # Repo-level automation
-├── deploy.sh        # Full deploy sequence: pull → sync → stow → cron
-├── sync-agents.sh   # Fan-out from types/ to per-agent directories
-├── create-agent.sh  # Onboard a new developer agent
-├── remove-agent.sh  # Remove an agent cleanly
-├── apply-cron.sh    # Reconcile declarative cron config with gateway runtime
-└── validate-invariants.sh  # 14 machine checks — CI deploy gate
+scripts/                  # Repo-level automation
+├── deploy.sh             # Full deploy sequence: pull → validate → sync → stow → cron
+├── sync-agents.sh        # Fan-out from types/ to per-agent directories
+├── create-agent.sh       # Onboard a new developer agent (one command)
+├── remove-agent.sh       # Remove an agent cleanly (flock-based race protection)
+├── apply-cron.sh         # Reconcile declarative cron config with gateway runtime
+├── update-openclaw.sh    # Safe OpenClaw upgrades with LCM config preservation
+├── session-watchdog.sh   # Detects and alerts on stuck agent sessions
+└── validate-invariants.sh # Machine checks — CI deploy gate
 
 .openclaw/cron/
-└── jobs-config.json # Declarative cron job config (source of truth)
+└── jobs-config.json      # Declarative cron job config (single source of truth)
 
 .github/workflows/
-└── deploy.yml       # CI/CD: triggers deploy.sh on host when main is pushed
+└── deploy.yml            # CI/CD: triggers deploy.sh on host when main is pushed
 
-docs/                # Architecture, memory model, invariants, troubleshooting
+docs/                     # Architecture, memory model, invariants, troubleshooting
 ```
 
 ---
 
 ## Deployment pipeline
 
-All changes flow one-way: dev machine → GitHub → OpenClaw host. The host is a deployment cache — git hooks block commits and branch switches on it. Development always happens on a dev machine via pull requests.
+The host is a Mac mini running as a read-only deployment target. Git hooks block commits and branch switches on it — it always tracks main. Development happens on a dev machine via pull requests.
 
 ```
-Dev Machine ──PR──▶ GitHub (main) ──Actions──▶ OpenClaw Host
-                                                     │
-                                             deploy.sh --pull
-                                             sync-agents.sh
-                                             stow --restow
-                                             apply-cron.sh
+Dev Machine ──PR──▶ GitHub (main) ──Actions──▶ OpenClaw Host (Mac mini)
+                                                      │
+                                              deploy.sh --pull
+                                              openclaw config validate
+                                              validate-invariants.sh   ← hard-fail gate
+                                              sync-agents.sh
+                                              stow --restow
+                                              apply-cron.sh
 ```
+
+`apply-cron.sh` diffs `.openclaw/cron/jobs-config.json` against the gateway's runtime cron state and applies changes (add / edit / remove) declaratively. Cron changes go through PRs like any other change.
+
+The gateway runs as a launchd service with automatic restart on crash. `caffeinate` prevents system sleep during operations. Runtime state (conversations, memory, credentials) never touches GitHub — credentials stay on-host, conversation privacy is preserved, and the repo remains the single source of truth for configuration.
+
+---
+
+## Provisioning a new agent
+
+```bash
+scripts/create-agent.sh --name dev1 --slack-id <slack-user-id>
+```
+
+This generates the directory structure, substitutes templates with agent identity and user info, registers Slack bindings, updates allowlists, creates cron schedules, and deploys. The agent then bootstraps itself: it introduces itself to the developer, establishes its operating style through natural conversation, collects working hours and timezone, and activates its schedule — all without manual configuration.
 
 ---
 
 ## Stack
 
-- **[OpenClaw](https://openclaws.io)** — local-first AI agent platform
-- **[Lossless Claw (LCM)](https://openclaws.io/plugins/lcm)** — DAG-based context management, replaces sliding-window compaction
-- **[QMD](https://github.com/tobilu/qmd)** — vector memory backend with BM25 + semantic search
-- **GNU Stow** — symlink-based config deployment from repo to host
-- **GitHub Actions** — CI/CD trigger for host deploys
-- **Slack** — primary agent communication surface
+| Component | Role |
+|-----------|------|
+| [OpenClaw](https://openclaws.io) | Local-first AI agent platform — gateway, sessions, cron, Slack integration |
+| [Lossless Claw (LCM)](https://openclaws.io/plugins/lcm) | DAG-based context management, replaces sliding-window compaction |
+| [QMD](https://github.com/tobilu/qmd) | Vector memory backend — BM25 + semantic search over dated markdown files |
+| GNU Stow | Symlink-based config deployment from repo into the host's home directory |
+| GitHub Actions | CI/CD trigger: self-hosted runner on the Mac mini host |
+| Slack | Primary agent communication surface |
+| GPT-5.4 (Codex) | Default model — used for both scheduled and interactive modes to prevent personality drift |
+| GLM-5 via Fireworks | Fallback model (202K context window) |
